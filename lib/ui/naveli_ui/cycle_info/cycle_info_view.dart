@@ -631,38 +631,42 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                       ),
 
                       kCommonSpaceV50,
-                      kCommonSpaceV50,
+                      // kCommonSpaceV50,
                       // kCommonSpaceV30,
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Having Period Still at ${calculateAge(
-                                  widget.welcomeData['birthdate'])} age?',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: CommonColors.blackColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
+                      Visibility(
+                        visible: calculateAge(widget.welcomeData['birthdate']) >=
+                            55,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Having Period Still at ${calculateAge(
+                                    widget.welcomeData['birthdate'])} age?',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: CommonColors.blackColor,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                          Switch(
-                            value: isPeriodsOnAfter55,
-                            onChanged: (value) {
-                              setState(() {
-                                isPeriodsOnAfter55 = value;
-                              });
-                            },
-                            activeColor: CommonColors.primaryColor,
-                          ),
-                        ],
+                            Switch(
+                              value: isPeriodsOnAfter55,
+                              onChanged: (value) {
+                                setState(() {
+                                  isPeriodsOnAfter55 = value;
+                                });
+                              },
+                              activeColor: CommonColors.primaryColor,
+                            ),
+                          ],
+                        ),
                       ),
 
 
                       Visibility(
                         visible: calculateAge(widget.welcomeData['birthdate']) <
-                            55 && !isPeriodsOnAfter55,
+                            55,
                         child: LabelTextField(
                           onTap: () async {
                             DateTime? picked = await showDatePicker(
@@ -950,7 +954,9 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                           mViewModel.userUpdateDetailsApi(
                             isFromCycle: true,
                             name: widget.welcomeData['name'],
-                            roleId: !isPeriodsOnAfter55 ? "4" : null,
+                            roleId: calculateAge(widget
+                                .welcomeData['birthdate']) >=
+                                55 && isPeriodsOnAfter55? "4" : null,
                             birthdate: widget.welcomeData['birthdate'],
                             gender: widget.welcomeData['gender'],
                             genderType: widget.welcomeData['otherGender'],

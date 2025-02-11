@@ -1220,6 +1220,8 @@ class ApiServices extends BaseServices {
 
   @override
   Future<PeriodInfoListResponse?> savePeriodsInfo({required Map<String, dynamic> params}) async {
+    
+    log("AddPerido: $params",name: ApiUrl.ADD_PERIOD_INFO);
     dynamic response = await appBaseClient.postApiWithTokenCall(
         url: ApiUrl.ADD_PERIOD_INFO, postParams: params);
     if (response != null) {

@@ -586,7 +586,8 @@ class _HomeViewState extends State<HomeView> {
     //   ),
     // );
 
-    var calender2 = SizedBox(
+    var calender2 =
+    SizedBox(
       height: 80.0,
       child: Container(
         padding: const EdgeInsets.only(left: 15, right: 15),
@@ -654,7 +655,8 @@ class _HomeViewState extends State<HomeView> {
                 no = 0;
               }
               return Container(
-                  color: isCycleDate ? no < clen
+                  color:
+                  isCycleDate ? no < clen
                       ? Color(0xFFFFB5AE).withOpacity(opc)
                       : Color(bgColor)
                       : Color(bgColor),
