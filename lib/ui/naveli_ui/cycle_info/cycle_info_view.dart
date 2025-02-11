@@ -907,16 +907,39 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                         label: S.of(context)!.next,
                         borderRadius: BorderRadius.circular(50),
                         onPress: () async {
-                          if (!isPeriodsOnAfter55) {
+                          if ( calculateAge(widget
+                              .welcomeData['birthdate']) >=
+                              55 && isPeriodsOnAfter55) {
+
+                            mViewModel.userUpdateDetailsApi(
+                              isFromCycle: true,
+                              name: widget.welcomeData['name'],
+                              birthdate: widget.welcomeData['birthdate'],
+                              gender: widget.welcomeData['gender'],
+                              genderType: widget.welcomeData['otherGender'],
+                              relationshipStatus: widget.welcomeData['relation'],
+                              averageCycleLength: cycleData['cycleLength'],
+                              previousPeriodsBegin:
+                              cycleData['previousPeriodDate'],
+                              previousPeriodsMonth:
+                              cycleData['previousPeriodMonth'],
+                              averagePeriodLength: cycleData['periodsLength'],
+                            );
+
+                          }  else  {
+                            debugPrint("IN  else ");
+
+
+                            debugPrint("IN IF Condition");
                             singInViewModel.userRoleId = "4";
                             globalUserMaster = AppPreferences.instance
                                 .getUserDetails();
 
                             UserMaster userMaster = UserMaster(
-                              id: globalUserMaster!.id,
+                                id: globalUserMaster!.id,
                                 name: globalUserMaster!.name,
                                 email: globalUserMaster!.email,
-                             roleId : int.parse(singInViewModel.userRoleId),
+                                roleId : int.parse(singInViewModel.userRoleId),
                                 uuId: globalUserMaster!.uuId,
                                 birthdate: globalUserMaster!.birthdate,
                                 age: globalUserMaster!.age,
@@ -949,25 +972,27 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                             gUserType = singInViewModel.userRoleId.toString();
 
                             SplashViewModel().checkGlobalUserData();
+
+                            mViewModel.userUpdateDetailsApi(
+                              isFromCycle: true,
+                              name: widget.welcomeData['name'],
+                              roleId: "4",
+                              birthdate: widget.welcomeData['birthdate'],
+                              gender: widget.welcomeData['gender'],
+                              genderType: widget.welcomeData['otherGender'],
+                              relationshipStatus: widget.welcomeData['relation'],
+                              averageCycleLength: cycleData['cycleLength'],
+                              previousPeriodsBegin:
+                              cycleData['previousPeriodDate'],
+                              previousPeriodsMonth:
+                              cycleData['previousPeriodMonth'],
+                              averagePeriodLength: cycleData['periodsLength'],
+                            );
+
+
                           }
 
-                          mViewModel.userUpdateDetailsApi(
-                            isFromCycle: true,
-                            name: widget.welcomeData['name'],
-                            roleId: calculateAge(widget
-                                .welcomeData['birthdate']) >=
-                                55 && isPeriodsOnAfter55? "4" : null,
-                            birthdate: widget.welcomeData['birthdate'],
-                            gender: widget.welcomeData['gender'],
-                            genderType: widget.welcomeData['otherGender'],
-                            relationshipStatus: widget.welcomeData['relation'],
-                            averageCycleLength: cycleData['cycleLength'],
-                            previousPeriodsBegin:
-                            cycleData['previousPeriodDate'],
-                            previousPeriodsMonth:
-                            cycleData['previousPeriodMonth'],
-                            averagePeriodLength: cycleData['periodsLength'],
-                          );
+
                         },
                       ),
                     ],
