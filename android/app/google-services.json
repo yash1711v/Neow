@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "994842148142",
+    "project_id": "homegrocery-f5bd4",
+    "storage_bucket": "homegrocery-f5bd4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994842148142:android:6b9a7ebf5ac59deb938ebf",
+        "android_client_info": {
+          "package_name": "com.example.homegrocery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATOcC012B6or5fwVs18zAWZkW68cbVU_g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994842148142:android:2f21f72d86c01a63938ebf",
+        "android_client_info": {
+          "package_name": "com.invoidea.homegrocery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATOcC012B6or5fwVs18zAWZkW68cbVU_g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994842148142:android:667c17290141b316938ebf",
+        "android_client_info": {
+          "package_name": "com.naveli.naveli_2023"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATOcC012B6or5fwVs18zAWZkW68cbVU_g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
