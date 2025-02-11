@@ -163,7 +163,7 @@ class _SignInViewState extends State<SignInView> {
                             width: kDeviceWidth / 1,
                             onPress: () async {
                               print(
-                                  ".......................${AppPreferences.instance.getLanguageCode()}");
+                                  "Language.......................${AppPreferences.instance.getLanguageCode()}");
                               if (isValid()) {
                                 print(".......................IN 171");
                                 await mViewModel.checkDeviceTokenApi(

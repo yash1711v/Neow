@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac/zodiac.dart';
 
@@ -11,6 +12,7 @@ import '../../../ui/common_ui/welcome/welcome_view_model.dart';
 import '../../../utils/common_colors.dart';
 import '../../../utils/common_utils.dart';
 import '../../../utils/constant.dart';
+import '../../../utils/global_function.dart';
 import '../../../utils/global_variables.dart';
 import '../../../utils/local_images.dart';
 import '../../../widgets/common_gender_select_box.dart';
@@ -20,6 +22,7 @@ import '../../../widgets/primary_button.dart';
 import '../../../widgets/scaffold_bg.dart';
 import '../../naveli_ui/cycle_info/cycle_info_view.dart';
 import '../../naveli_ui/cycle_info/cycle_info_view_model.dart';
+import '../singin/signin_view_model.dart';
 
 class WelcomeView extends StatefulWidget {
   const WelcomeView({super.key});
@@ -36,6 +39,9 @@ class _WelcomeViewState extends State<WelcomeView> {
   final mDateController = TextEditingController();
   final mAapkeKonController = TextEditingController();
   final mUniqueIdController = TextEditingController();
+
+  late SignInViewModel singInViewModel =  SignInViewModel();
+
   final PageController pageController = PageController(
     initialPage: 0,
   );
@@ -46,9 +52,28 @@ class _WelcomeViewState extends State<WelcomeView> {
   String? zodiac;
   Map<String, dynamic> allData = {};
 
+  //
+  // int calculateAge(String birthDateString) {
+  //   // Parse the string date
+  //   DateTime birthDate = DateFormat("yyyy-MM-dd").parse(birthDateString);
+  //   DateTime currentDate = DateTime.now();
+  //
+  //   int age = currentDate.year - birthDate.year;
+  //
+  //   // Adjust if the birthday hasn't occurred yet this year
+  //   if (currentDate.month < birthDate.month ||
+  //       (currentDate.month == birthDate.month && currentDate.day < birthDate.day)) {
+  //     age--;
+  //   }
+  //
+  //   return age;
+  // }
+
+
   @override
   void initState() {
     Future.delayed(Duration.zero, () {
+      // singInViewModel.userRoleId = "";
       mViewModel.attachedContext(context);
 
       mNameController.text = globalUserMaster?.name ?? '';
@@ -308,6 +333,16 @@ class _WelcomeViewState extends State<WelcomeView> {
                       kCommonSpaceV30,
                       if (gUserType == AppConstants.BUDDY ||
                           gUserType == AppConstants.CYCLE_EXPLORER) ...[
+
+                        Image.asset(
+                          height: kDeviceHeight / 4,
+                          LocalImages.img_gender_screen,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(LocalImages.img_image_error);
+                          },
+                        ),
+                        kCommonSpaceV30,
+
                         CommonGenderSelectBox(
                             onTap: () {
                               setState(() {
@@ -319,14 +354,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                             imagePath: LocalImages.img_male,
                             isSelected: selectedGender == 1),
                       ],
-                      Image.asset(
-                        height: kDeviceHeight / 4,
-                        LocalImages.img_gender_screen,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(LocalImages.img_image_error);
-                        },
-                      ),
-                      kCommonSpaceV30,
+
                       CommonGenderSelectBox(
                           onTap: () {
                             setState(() {
@@ -668,7 +696,7 @@ class _WelcomeViewState extends State<WelcomeView> {
 
                                 DateTime? picked = await showDatePicker(
                                   context: mainNavKey.currentContext!,
-                                  initialDate: minimumAllowedDate, // Default to 14 years ago
+                                  initialDate: mDateController.text.isNotEmpty?DateFormat("yyyy-MM-dd").parse(mDateController.text):minimumAllowedDate, // Default to 14 years ago
                                   firstDate: DateTime(1900),       // Earliest selectable date for DOB
                                   lastDate: minimumAllowedDate,   // Maximum selectable date is 14 years ago
                                 );
@@ -676,6 +704,18 @@ class _WelcomeViewState extends State<WelcomeView> {
                                 if (picked != null) {
                                   setState(() {
                                     mDateController.text = CommonUtils.dateFormatyyyyMMDD(picked.toString());
+
+                                   int age =  calculateAge(mDateController.text);
+
+                                   debugPrint("Age===>: $age");
+                                   //
+                                   // if(age >= 55){
+                                   //   singInViewModel.userRoleId = "4";
+                                   // } else {
+                                   //   singInViewModel.userRoleId = "4";
+                                   // }
+                            debugPrint("Role ID===>: ${singInViewModel.userRoleId}");
+
                                     zodiac = Zodiac().getZodiac(mDateController.text.toString());
                                   });
                                 } else {
@@ -1140,6 +1180,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                             print("cycle...");
                             CycleInfoViewModel().userUpdateDetailsApi(
                               isFromCycle: true,
+                              // roleId: calculateAge(mDateController.text)>=55?"4":null,
                               name: allData['name'],
                               birthdate: allData['birthdate'],
                               gender: allData['gender'],
@@ -1170,14 +1211,14 @@ class _WelcomeViewState extends State<WelcomeView> {
                             CycleInfoViewModel()
                                 .userUpdateDetailsApi(
                               isFromCycle: true,
+                              // roleId: calculateAge(mDateController.text)>=55?"4":null,
                               name: allData['name'],
                               birthdate: allData['birthdate'],
                               gender: allData['gender'],
                               genderType: allData['otherGender'],
                               relationshipStatus: allData['relation'],
                               humAapkeHeKon: allData['humAapkeKon'],
-                            )
-                                .whenComplete(() {
+                            ).whenComplete(() {
                               mViewModel.verifyUniqueIdApi(
                                   uniqueId: mUniqueIdController.text.trim(),
                                   isFromCycle: true);

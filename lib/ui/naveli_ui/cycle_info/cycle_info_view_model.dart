@@ -11,6 +11,7 @@ import '../../../utils/common_colors.dart';
 import '../../../utils/common_utils.dart';
 import '../../../utils/constant.dart';
 import '../../../utils/global_variables.dart';
+import '../../common_ui/singin/signin_view_model.dart';
 
 class CycleInfoViewModel with ChangeNotifier {
   late BuildContext context;
@@ -32,6 +33,7 @@ class CycleInfoViewModel with ChangeNotifier {
 
   Future<void> userUpdateDetailsApi({
     required bool isFromCycle,
+    String? roleId,
     String? name,
     String? birthdate,
     String? gender,
@@ -43,8 +45,10 @@ class CycleInfoViewModel with ChangeNotifier {
     String? averagePeriodLength,
     String? humAapkeHeKon,
   }) async {
+
     CommonUtils.showProgressDialog();
     Map<String, dynamic> params = <String, dynamic>{
+      ApiParams.role_id: roleId,
       ApiParams.name: name,
       ApiParams.birthdate: birthdate,
       ApiParams.gender: gender,
@@ -83,9 +87,10 @@ class CycleInfoViewModel with ChangeNotifier {
       if (isFromCycle) {
         if (gUserType == AppConstants.NEOWME ||
             gUserType == AppConstants.CYCLE_EXPLORER) {
+          (roleId ?? "").isNotEmpty? gUserType = roleId ?? "":null;
           SplashViewModel().getUserDetails().whenComplete(
                 () => pushAndRemoveUntil(
-                  const WelComeGifView(
+                  WelComeGifView(
                     isFromSplash: false,
                   ),
                 ),

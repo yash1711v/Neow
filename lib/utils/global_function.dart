@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 import '../models/login_master.dart';
 import '../models/cycle_dates_master.dart';
@@ -54,4 +55,20 @@ int getDaysInMonth(int year, int month) {
   }
 
   return dates;
+}
+
+int calculateAge(String birthDateString) {
+  // Parse the string date
+  DateTime birthDate = DateFormat("yyyy-MM-dd").parse(birthDateString);
+  DateTime currentDate = DateTime.now();
+
+  int age = currentDate.year - birthDate.year;
+
+  // Adjust if the birthday hasn't occurred yet this year
+  if (currentDate.month < birthDate.month ||
+      (currentDate.month == birthDate.month && currentDate.day < birthDate.day)) {
+    age--;
+  }
+
+  return age;
 }

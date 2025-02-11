@@ -1,17 +1,27 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:animated_weight_picker/animated_weight_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:naveli_2023/utils/global_function.dart';
 import 'package:naveli_2023/widgets/primary_button.dart';
 import 'package:naveli_2023/widgets/scaffold_bg.dart';
 import 'package:provider/provider.dart';
 
+import '../../../database/app_preferences.dart';
+import '../../../models/login_master.dart';
+import '../../../utils/global_variables.dart';
 import '../../../widgets/common_text_field.dart';
 import '../../../generated/i18n.dart';
 import '../../../utils/common_colors.dart';
 import '../../../utils/common_utils.dart';
 import '../../../utils/constant.dart';
 import '../../../utils/local_images.dart';
+import '../../common_ui/singin/signin_view_model.dart';
+import '../../common_ui/splash/splash_view_model.dart';
 import 'cycle_info_view_model.dart';
 
 class CycleInfoView extends StatefulWidget {
@@ -31,12 +41,14 @@ class _CycleInfoViewState extends State<CycleInfoView> {
   late CycleInfoViewModel mViewModel;
   int? selectedCycleLength = 0;
   String? selectedPreviousPeriodDate;
+  late SignInViewModel singInViewModel = SignInViewModel();
 
   // String? selectedPreviousPeriodMonth;
   int? selectedPeriodsLength = 5;
   late FixedExtentScrollController scrollController;
   late FixedExtentScrollController scrollPeriodLengthController;
   Map<String, dynamic> cycleData = {};
+  bool isPeriodsOnAfter55 = false;
 
   @override
   void initState() {
@@ -79,6 +91,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
 
   @override
   Widget build(BuildContext context) {
+    log("CycleInfoView:${singInViewModel.userRoleId}");
     mViewModel = Provider.of<CycleInfoViewModel>(context);
     return ScaffoldBG(
       child: SafeArea(
@@ -185,24 +198,25 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                           },
                           children: List.generate(
                             45,
-                            (index) => Container(
-                              height: 80,
-                              width: 120,
-                              decoration: const BoxDecoration(
-                                color: CommonColors.mWhite,
-                                // shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                index == 0
-                                    ? "${index + 1} Day"
-                                    : "${index + 1} Days",
-                                style: getAppStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w400,
-                                    color: CommonColors.blackColor),
-                              ),
-                            ),
+                                (index) =>
+                                Container(
+                                  height: 80,
+                                  width: 120,
+                                  decoration: const BoxDecoration(
+                                    color: CommonColors.mWhite,
+                                    // shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    index == 0
+                                        ? "${index + 1} Day"
+                                        : "${index + 1} Days",
+                                    style: getAppStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w400,
+                                        color: CommonColors.blackColor),
+                                  ),
+                                ),
                           ),
                         ),
                       ),
@@ -250,7 +264,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                       ),
                                       child: Column(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.start,
+                                          MainAxisAlignment.start,
                                           children: [
                                             Align(
                                                 alignment: Alignment.topRight,
@@ -258,19 +272,19 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                                   width: 40,
                                                   isRounded: false,
                                                   padding:
-                                                      const EdgeInsets.only(
-                                                          left: 8, right: 20),
+                                                  const EdgeInsets.only(
+                                                      left: 8, right: 20),
                                                   onPress: () {
                                                     Navigator.pop(context);
                                                   },
                                                   label: 'X',
                                                   labelColor:
-                                                      CommonColors.primaryColor,
+                                                  CommonColors.primaryColor,
                                                 )),
                                             Container(
-                                                // width: 70,
+                                              // width: 70,
                                                 padding:
-                                                    const EdgeInsets.all(10),
+                                                const EdgeInsets.all(10),
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     border: Border.all(
@@ -294,7 +308,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     color:
-                                                        CommonColors.blackColor,
+                                                    CommonColors.blackColor,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 20),
                                               ),
@@ -311,7 +325,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     color:
-                                                        CommonColors.blackColor,
+                                                    CommonColors.blackColor,
                                                     fontSize: 14),
                                               ),
                                             )
@@ -413,24 +427,25 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                         },
                         children: List.generate(
                           15,
-                          (index) => Container(
-                            height: 80,
-                            width: 120,
-                            decoration: const BoxDecoration(
-                              color: CommonColors.mWhite,
-                              // shape: BoxShape.circle,
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              index == 0
-                                  ? "${index + 1} Day"
-                                  : "${index + 1} Days",
-                              style: getAppStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: CommonColors.blackColor),
-                            ),
-                          ),
+                              (index) =>
+                              Container(
+                                height: 80,
+                                width: 120,
+                                decoration: const BoxDecoration(
+                                  color: CommonColors.mWhite,
+                                  // shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  index == 0
+                                      ? "${index + 1} Day"
+                                      : "${index + 1} Days",
+                                  style: getAppStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: CommonColors.blackColor),
+                                ),
+                              ),
                         ),
                       ),
                     ),
@@ -481,7 +496,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                     ),
                                     child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                        MainAxisAlignment.start,
                                         children: [
                                           Align(
                                               alignment: Alignment.topRight,
@@ -495,17 +510,17 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                                 },
                                                 label: 'X',
                                                 labelColor:
-                                                    CommonColors.primaryColor,
+                                                CommonColors.primaryColor,
                                               )),
                                           Container(
-                                              // width: 70,
+                                            // width: 70,
                                               padding: const EdgeInsets.all(10),
                                               decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
                                                       width: 1,
                                                       color:
-                                                          CommonColors.mGrey)),
+                                                      CommonColors.mGrey)),
                                               child: Image.asset(
                                                 LocalImages.img_alert,
                                                 // width:kDeviceWidth/1.4,
@@ -523,7 +538,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                   color:
-                                                      CommonColors.blackColor,
+                                                  CommonColors.blackColor,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 20),
                                             ),
@@ -540,7 +555,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                   color:
-                                                      CommonColors.blackColor,
+                                                  CommonColors.blackColor,
                                                   fontSize: 14),
                                             ),
                                           )
@@ -618,32 +633,95 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                       kCommonSpaceV50,
                       kCommonSpaceV50,
                       // kCommonSpaceV30,
-                      LabelTextField(
-                        onTap: () async {
-                          DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now()
-                                  .subtract(const Duration(days: 365 * 60)),
-                              lastDate: DateTime.now());
-                          if (picked != null) {
-                            setState(() {
-                              mDateController.text =
-                                  CommonUtils.dateFormatyyyyMMDD(
-                                      picked.toString());
-                              print(mDateController.text.toString());
-                              selectedPreviousPeriodDate =
-                                  mDateController.text.toString();
-                              /* zodiac = Zodiac().getZodiac(
-                                        mDateController.text.toString()); */
-                            });
-                          } else {
-                            print(picked);
-                          }
-                        },
-                        hintText: S.of(context)!.selectDate,
-                        controller: mDateController,
-                        readOnly: true,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Having Period Still at ${calculateAge(
+                                  widget.welcomeData['birthdate'])} age?',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                color: CommonColors.blackColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Switch(
+                            value: isPeriodsOnAfter55,
+                            onChanged: (value) {
+                              setState(() {
+                                isPeriodsOnAfter55 = value;
+                              });
+                            },
+                            activeColor: CommonColors.primaryColor,
+                          ),
+                        ],
+                      ),
+
+
+                      Visibility(
+                        visible: calculateAge(widget.welcomeData['birthdate']) <
+                            55 && !isPeriodsOnAfter55,
+                        child: LabelTextField(
+                          onTap: () async {
+                            DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now()
+                                    .subtract(const Duration(days: 365 * 60)),
+                                lastDate: DateTime.now());
+                            if (picked != null) {
+                              setState(() {
+                                mDateController.text =
+                                    CommonUtils.dateFormatyyyyMMDD(
+                                        picked.toString());
+                                print(mDateController.text.toString());
+                                selectedPreviousPeriodDate =
+                                    mDateController.text.toString();
+                                /* zodiac = Zodiac().getZodiac(
+                                          mDateController.text.toString()); */
+                              });
+                            } else {
+                              print(picked);
+                            }
+                          },
+                          hintText: S.of(context)!.selectDate,
+                          controller: mDateController,
+                          readOnly: true,
+                        ),
+                      ),
+                      Visibility(
+                        visible: calculateAge(widget
+                            .welcomeData['birthdate']) >=
+                            55 && isPeriodsOnAfter55,
+                        child: LabelTextField(
+                          onTap: () async {
+                            DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now()
+                                    .subtract(const Duration(days: 365 * 60)),
+                                lastDate: DateTime.now());
+                            if (picked != null) {
+                              setState(() {
+                                mDateController.text =
+                                    CommonUtils.dateFormatyyyyMMDD(
+                                        picked.toString());
+                                print(mDateController.text.toString());
+                                selectedPreviousPeriodDate =
+                                    mDateController.text.toString();
+                                /* zodiac = Zodiac().getZodiac(
+                                          mDateController.text.toString()); */
+                              });
+                            } else {
+                              print(picked);
+                            }
+                          },
+                          hintText: S.of(context)!.selectDate,
+                          controller: mDateController,
+                          readOnly: true,
+                        ),
                       ),
                       kCommonSpaceV50,
                       // kCommonSpaceV50,
@@ -825,18 +903,63 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                         label: S.of(context)!.next,
                         borderRadius: BorderRadius.circular(50),
                         onPress: () async {
+                          if (!isPeriodsOnAfter55) {
+                            singInViewModel.userRoleId = "4";
+                            globalUserMaster = AppPreferences.instance
+                                .getUserDetails();
+
+                            UserMaster userMaster = UserMaster(
+                              id: globalUserMaster!.id,
+                                name: globalUserMaster!.name,
+                                email: globalUserMaster!.email,
+                             roleId : int.parse(singInViewModel.userRoleId),
+                                uuId: globalUserMaster!.uuId,
+                                birthdate: globalUserMaster!.birthdate,
+                                age: globalUserMaster!.age,
+                                height: globalUserMaster!.height,
+                                weight: globalUserMaster!.weight,
+                                bmiScore: globalUserMaster!.bmiScore,
+                                bmiType: globalUserMaster!.bmiType,
+                                badTime: globalUserMaster!.badTime,
+                                wakeUpTime: globalUserMaster!.wakeUpTime,
+                                totalSleepTime: globalUserMaster!.totalSleepTime,
+                                waterMl: globalUserMaster!.waterMl,
+                                gender: globalUserMaster!.gender,
+                                genderType: globalUserMaster!.genderType,
+                                mobile: globalUserMaster!.mobile,
+                                deviceToken: globalUserMaster!.deviceToken,
+                                image: globalUserMaster!.image,
+                                relationshipStatus: globalUserMaster!.relationshipStatus,
+                                averageCycleLength: cycleData['cycleLength'],
+                                previousPeriodsBegin: cycleData['previousPeriodDate'],
+                                previousPeriodsMonth: cycleData['previousPeriodMonth'],
+                                averagePeriodLength: cycleData['periodsLength'],
+                                humApkeHeKon: globalUserMaster!.humApkeHeKon,
+                                status: globalUserMaster!.status,
+                                state: globalUserMaster!.state,
+                                city: globalUserMaster!.city
+                            );
+
+                            AppPreferences.instance.setUserDetails(
+                                jsonEncode(userMaster));
+                            gUserType = singInViewModel.userRoleId.toString();
+
+                            SplashViewModel().checkGlobalUserData();
+                          }
+
                           mViewModel.userUpdateDetailsApi(
                             isFromCycle: true,
                             name: widget.welcomeData['name'],
+                            roleId: !isPeriodsOnAfter55 ? "4" : null,
                             birthdate: widget.welcomeData['birthdate'],
                             gender: widget.welcomeData['gender'],
                             genderType: widget.welcomeData['otherGender'],
                             relationshipStatus: widget.welcomeData['relation'],
                             averageCycleLength: cycleData['cycleLength'],
                             previousPeriodsBegin:
-                                cycleData['previousPeriodDate'],
+                            cycleData['previousPeriodDate'],
                             previousPeriodsMonth:
-                                cycleData['previousPeriodMonth'],
+                            cycleData['previousPeriodMonth'],
                             averagePeriodLength: cycleData['periodsLength'],
                           );
                         },
@@ -853,7 +976,8 @@ class _CycleInfoViewState extends State<CycleInfoView> {
   }
 
   bool isValid() {
-    if (pageController.page == 2 && selectedPreviousPeriodDate == null) {
+    if (pageController.page == 2 && selectedPreviousPeriodDate == null &&
+        isPeriodsOnAfter55) {
       CommonUtils.showSnackBar(
         S.of(context)!.plSelectPreviousPeriodDate,
         color: CommonColors.mRed,
