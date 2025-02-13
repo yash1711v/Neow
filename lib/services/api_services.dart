@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:naveli_2023/models/about_us_master.dart';
 import 'package:naveli_2023/models/buddy_request_master.dart';
 import 'package:naveli_2023/models/login_master.dart';
@@ -1226,6 +1227,7 @@ class ApiServices extends BaseServices {
         url: ApiUrl.ADD_PERIOD_INFO, postParams: params);
     if (response != null) {
       try {
+        debugPrint("AddPerido: $response");
         return PeriodInfoListResponse.fromJson(response);
       } on Exception catch (e) {
         log("Exception :: $e");

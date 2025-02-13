@@ -40,7 +40,7 @@ class PagedVerticalCalendar extends StatefulWidget {
     this.startWeekWithSunday = false,
     this.weekdaysToHide = const [],
     this.isChecked,
-    required List<DateTime> dateList,
+    required this.dateList,
   }) : initialDate = initialDate ?? DateTime.now().removeTime();
   final DateTime? minDate;
 
@@ -74,7 +74,8 @@ class PagedVerticalCalendar extends StatefulWidget {
 
   var isChecked;
 
-  get dateList => [];
+  final List<DateTime> dateList;
+
 
   @override
   _PagedVerticalCalendarState createState() => _PagedVerticalCalendarState();
@@ -447,16 +448,40 @@ class _MonthViewState extends State<_MonthView> {
               months.add(now.month);
             }
             bool currentDateCheck = false;
+
+            // debugPrint('dateList: ${widget.dateList}');
+            // debugPrint('dateList Date: $date');
+
             if (widget.dateList?.contains(date)) {
               currentDateCheck = true;
             }
+
+            // for (var dateRange in peroidCustomeList) {
+            //   DateTime start = DateTime.parse(dateRange.period_start_date);
+            //
+            //   DateTime end = DateTime.parse(dateRange.period_end_date);
+            //
+            //   if (date.isAfter(start) && date.isBefore(end) ||
+            //       date.isAtSameMomentAs(start) ||
+            //       date.isAtSameMomentAs(end)) {
+            //     currentDateCheck = true;
+            //     if (widget.dateList.contains(date)) {
+            //       widget.dateList.remove(date);
+            //     } else {
+            //       widget.dateList.add(date);
+            //     }
+            //   }
+            //
+            // }
+
             // print(widget.dateList);
             return AspectRatio(
               aspectRatio: 1.0,
               child: InkWell(
                 child: widget.dayBuilder?.call(context, date) ??
                     Center(
-                      child: widget.isChecked && months.contains(date.month)
+                      child: widget.isChecked && months.contains(date.month) &&
+                            (date.isBefore(now) || date.isAtSameMomentAs(now))
                           ? GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -500,7 +525,8 @@ class _MonthViewState extends State<_MonthView> {
                                                 widget.dateList.add(
                                                     date); // Add date when checked
                                               }
-                                            } else {
+                                            }
+                                            else {
                                               widget.dateList.remove(
                                                   date); // Remove date when unchecked
                                             }

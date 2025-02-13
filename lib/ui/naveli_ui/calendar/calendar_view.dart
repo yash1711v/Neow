@@ -72,6 +72,13 @@ class _CalendarViewState extends State<CalendarView> {
   List<DateTime> dateList = [];
   List<DateTime> forParentUseDateList = [];
 
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   void _updateButtonText() {
     setState(() {
       if (_isChecked) {
@@ -94,9 +101,15 @@ class _CalendarViewState extends State<CalendarView> {
     // setState(() {
     if (forParentUseDateList.contains(NewItem)) {
       forParentUseDateList.remove(NewItem);
+      dateList.remove(NewItem);
     } else {
       forParentUseDateList.add(NewItem);
+      dateList.add(NewItem);
     }
+
+
+    debugPrint("forParentUseDateList: $forParentUseDateList");
+    debugPrint("dateList: $dateList");
     // });
   }
 
@@ -463,7 +476,8 @@ class _CalendarViewState extends State<CalendarView> {
               dates[0].year.toString() + dates[0].month.toString()
         };
       }
-    } else {
+    }
+    else {
       for (int i = 1; i < dates.length; i++) {
         // Check if the current date is the next day of the previous date
         if (dates[i].difference(dates[i - 1]).inDays == 1) {
@@ -550,7 +564,7 @@ class _CalendarViewState extends State<CalendarView> {
         };
       }
     }
-
+         debugPrint("params: $params");
     PeriodInfoListResponse? master =
         await _services.api!.savePeriodsInfo(params: params);
     CommonUtils.hideProgressDialog();
@@ -728,8 +742,7 @@ class _CalendarViewState extends State<CalendarView> {
                     ? PagedVerticalCalendar(
                         minDate: DateTime(DateTime.now().year, 1, 1),
                         maxDate: DateTime(DateTime.now().year + 1, 12, 31),
-                        initialDate:
-                            DateTime.now().add(const Duration(days: 0)),
+                        initialDate: DateTime.now().add(const Duration(days: 0)),
                         invisibleMonthsThreshold: 1,
                         isChecked: _isChecked,
                         dateList: dateList,
@@ -768,7 +781,44 @@ class _CalendarViewState extends State<CalendarView> {
                 if (isLogEdit && selectedIndex == 1)
                   ElevatedButton(
                     onPressed: () {
-                      _updateButtonText();
+                      if(_isChecked) {
+                        _updateButtonText();
+                      } else {
+
+                        for (var dateRange in peroidCustomeList) {
+                          DateTime start = DateTime.parse(dateRange.period_start_date);
+                          DateTime end = DateTime.parse(dateRange.period_end_date);
+
+                          DateTime now = DateTime.now(); // Get current date
+                          debugPrint("start: $start");
+                          debugPrint("end: $end");
+                          for(DateTime i = start; i.isBefore(end) || i.isAtSameMomentAs(end); i = i.add(Duration(days: 1))) {
+                            if(forParentUseDateList.contains(i)) {
+                              // forParentUseDateList.remove(i);
+                              // dateList.remove(i);
+                            } else {
+                              forParentUseDateList.add(i);
+                              dateList.add(i);
+                            }
+                            // forParentUseDateList.add(i);
+                            // dateList.add(i);
+                          }
+                        }
+
+
+                        //
+                        // setState(() {
+                        //   dateList = forParentUseDateList;
+                        //
+                        //   debugPrint("dateList: $dateList");
+                        // });
+                        // List<DateTime> dates = formattedDates
+                        //     .map((dateString) => DateTime.parse(dateString))
+                        //     .toList()
+                        //   ..sort();
+
+                        _updateButtonText();
+                      }
 
                       // Add your onPressed code here!
                     },

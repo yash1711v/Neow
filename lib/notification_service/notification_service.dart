@@ -181,8 +181,11 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
 class NotificationService {
   final _firebaseMessaging = FirebaseMessaging.instance;
   Future<void> initService() async {
+    debugPrint("initService called");
     _firebaseMessaging.requestPermission();
+    debugPrint("initService called 2");
     final fCMToken = await _firebaseMessaging.getToken();
+    debugPrint("initService called 3");
     log('FCM Token :: $fCMToken');
     if (fCMToken != null) {
       AppPreferences.instance.setFCMToken(fCMToken);

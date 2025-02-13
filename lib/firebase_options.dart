@@ -125,7 +125,7 @@ class DefaultFirebaseOptions {
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyATOcC012B6or5fwVs18zAWZkW68cbVU_g',
     appId: '1:994842148142:android:667c17290141b316938ebf',
-    messagingSenderId: '208696305866',
+    messagingSenderId: '994842148142',
     projectId: 'homegrocery-f5bd4',
     storageBucket: 'naveli-india-a7a83.appspot.com',
   );
