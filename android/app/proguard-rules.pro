@@ -1,2 +1,0 @@
--keep class com.google.common.reflect.TypeToken
--keep class * extends com.google.common.reflect.TypeToken

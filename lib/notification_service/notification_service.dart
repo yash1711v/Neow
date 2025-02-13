@@ -185,12 +185,12 @@ class NotificationService {
     _firebaseMessaging.requestPermission();
     debugPrint("initService called 2");
     final fCMToken = await _firebaseMessaging.getToken();
-    debugPrint("initService called 3");
+    debugPrint("initService called 3 ${fCMToken}");
     log('FCM Token :: $fCMToken');
     if (fCMToken != null) {
-      AppPreferences.instance.setFCMToken(fCMToken);
+     await AppPreferences.instance.setFCMToken(fCMToken);
     }
-    initializeNotification();
+    // initializeNotification();
   }
 
   static Future<void> initializeNotification() async {

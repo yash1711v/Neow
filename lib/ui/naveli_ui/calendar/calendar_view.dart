@@ -790,12 +790,15 @@ class _CalendarViewState extends State<CalendarView> {
                           DateTime end = DateTime.parse(dateRange.period_end_date);
 
                           DateTime now = DateTime.now(); // Get current date
-                          debugPrint("start: $start");
-                          debugPrint("end: $end");
+
                           for(DateTime i = start; i.isBefore(end) || i.isAtSameMomentAs(end); i = i.add(Duration(days: 1))) {
+                            if(dateList.isEmpty) {
+                              forParentUseDateList.add(i);
+                              dateList.add(i);
+                            }
                             if(forParentUseDateList.contains(i)) {
-                              // forParentUseDateList.remove(i);
-                              // dateList.remove(i);
+                              forParentUseDateList.remove(i);
+                              dateList.remove(i);
                             } else {
                               forParentUseDateList.add(i);
                               dateList.add(i);
@@ -816,7 +819,8 @@ class _CalendarViewState extends State<CalendarView> {
                         //     .map((dateString) => DateTime.parse(dateString))
                         //     .toList()
                         //   ..sort();
-
+                        debugPrint("start: $forParentUseDateList");
+                        debugPrint("end: $dateList");
                         _updateButtonText();
                       }
 

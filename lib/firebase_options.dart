@@ -123,10 +123,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyATOcC012B6or5fwVs18zAWZkW68cbVU_g',
-    appId: '1:994842148142:android:667c17290141b316938ebf',
-    messagingSenderId: '994842148142',
-    projectId: 'homegrocery-f5bd4',
+    apiKey: 'AIzaSyAJp1mHMYoNRFvjSkeNWucmcKfxj1GflSI',
+    appId: '1:208696305866:android:b8ac75ef6a6422005bac33',
+    messagingSenderId: '208696305866',
+    projectId: 'naveli-india-a7a83',
     storageBucket: 'naveli-india-a7a83.appspot.com',
   );
 

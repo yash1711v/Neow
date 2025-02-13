@@ -41,12 +41,13 @@ Future<void> main() async {
   );
   final firebaseApp = Firebase.app();
   final options = firebaseApp.options;
-  print('Firebase Project ID: ${options.projectId}');
+  // print('Firebase Project ID: ${options.projectId}');
   await FirebaseAppCheck.instance.activate(
       androidProvider:
-          kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity);
+          kDebugMode ? AndroidProvider.playIntegrity : AndroidProvider.playIntegrity);
+  print('Firebase Project ID: ${options.projectId}');
   await NotificationService().initService();
-  await NotificationService.initializeNotification();
+  // await NotificationService.initializeNotification();
   //tz.initializeTimeZones();
   runApp(const App());
 }
