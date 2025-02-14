@@ -654,7 +654,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                               value: isPeriodsOnAfter55,
                               onChanged: (value) {
                                 setState(() {
-                                  isPeriodsOnAfter55 = value;
+                                  isPeriodsOnAfter55 = !isPeriodsOnAfter55;
                                 });
                               },
                               activeColor: CommonColors.primaryColor,
@@ -907,10 +907,14 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                         label: S.of(context)!.next,
                         borderRadius: BorderRadius.circular(50),
                         onPress: () async {
+
+
                           if ( calculateAge(widget
                               .welcomeData['birthdate']) >=
-                              55 && isPeriodsOnAfter55) {
+                              55 ) {
 
+                            debugPrint("IN  if ");
+                             if(isPeriodsOnAfter55){
                             mViewModel.userUpdateDetailsApi(
                               isFromCycle: true,
                               name: widget.welcomeData['name'],
@@ -924,59 +928,74 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                               previousPeriodsMonth:
                               cycleData['previousPeriodMonth'],
                               averagePeriodLength: cycleData['periodsLength'],
-                            );
+                            );} else {
+                               // debugPrint("IN  else ");
+                               // debugPrint("IN IF Condition");
+                               singInViewModel.userRoleId = "4";
+                               globalUserMaster = AppPreferences.instance
+                                   .getUserDetails();
 
-                          }  else  {
-                            debugPrint("IN  else ");
+                               UserMaster userMaster = UserMaster(
+                                   id: globalUserMaster!.id,
+                                   name: globalUserMaster!.name,
+                                   email: globalUserMaster!.email,
+                                   roleId : int.parse(singInViewModel.userRoleId),
+                                   uuId: globalUserMaster!.uuId,
+                                   birthdate: globalUserMaster!.birthdate,
+                                   age: globalUserMaster!.age,
+                                   height: globalUserMaster!.height,
+                                   weight: globalUserMaster!.weight,
+                                   bmiScore: globalUserMaster!.bmiScore,
+                                   bmiType: globalUserMaster!.bmiType,
+                                   badTime: globalUserMaster!.badTime,
+                                   wakeUpTime: globalUserMaster!.wakeUpTime,
+                                   totalSleepTime: globalUserMaster!.totalSleepTime,
+                                   waterMl: globalUserMaster!.waterMl,
+                                   gender: globalUserMaster!.gender,
+                                   genderType: globalUserMaster!.genderType,
+                                   mobile: globalUserMaster!.mobile,
+                                   deviceToken: globalUserMaster!.deviceToken,
+                                   image: globalUserMaster!.image,
+                                   relationshipStatus: globalUserMaster!.relationshipStatus,
+                                   averageCycleLength: cycleData['cycleLength'],
+                                   previousPeriodsBegin: cycleData['previousPeriodDate'],
+                                   previousPeriodsMonth: cycleData['previousPeriodMonth'],
+                                   averagePeriodLength: cycleData['periodsLength'],
+                                   humApkeHeKon: globalUserMaster!.humApkeHeKon,
+                                   status: globalUserMaster!.status,
+                                   state: globalUserMaster!.state,
+                                   city: globalUserMaster!.city
+                               );
 
+                               AppPreferences.instance.setUserDetails(
+                                   jsonEncode(userMaster));
+                               gUserType = singInViewModel.userRoleId.toString();
 
-                            debugPrint("IN IF Condition");
-                            singInViewModel.userRoleId = "4";
-                            globalUserMaster = AppPreferences.instance
-                                .getUserDetails();
+                               SplashViewModel().checkGlobalUserData();
 
-                            UserMaster userMaster = UserMaster(
-                                id: globalUserMaster!.id,
-                                name: globalUserMaster!.name,
-                                email: globalUserMaster!.email,
-                                roleId : int.parse(singInViewModel.userRoleId),
-                                uuId: globalUserMaster!.uuId,
-                                birthdate: globalUserMaster!.birthdate,
-                                age: globalUserMaster!.age,
-                                height: globalUserMaster!.height,
-                                weight: globalUserMaster!.weight,
-                                bmiScore: globalUserMaster!.bmiScore,
-                                bmiType: globalUserMaster!.bmiType,
-                                badTime: globalUserMaster!.badTime,
-                                wakeUpTime: globalUserMaster!.wakeUpTime,
-                                totalSleepTime: globalUserMaster!.totalSleepTime,
-                                waterMl: globalUserMaster!.waterMl,
-                                gender: globalUserMaster!.gender,
-                                genderType: globalUserMaster!.genderType,
-                                mobile: globalUserMaster!.mobile,
-                                deviceToken: globalUserMaster!.deviceToken,
-                                image: globalUserMaster!.image,
-                                relationshipStatus: globalUserMaster!.relationshipStatus,
-                                averageCycleLength: cycleData['cycleLength'],
-                                previousPeriodsBegin: cycleData['previousPeriodDate'],
-                                previousPeriodsMonth: cycleData['previousPeriodMonth'],
-                                averagePeriodLength: cycleData['periodsLength'],
-                                humApkeHeKon: globalUserMaster!.humApkeHeKon,
-                                status: globalUserMaster!.status,
-                                state: globalUserMaster!.state,
-                                city: globalUserMaster!.city
-                            );
+                               mViewModel.userUpdateDetailsApi(
+                                 isFromCycle: true,
+                                 name: widget.welcomeData['name'],
+                                 roleId: "4",
+                                 birthdate: widget.welcomeData['birthdate'],
+                                 gender: widget.welcomeData['gender'],
+                                 genderType: widget.welcomeData['otherGender'],
+                                 relationshipStatus: widget.welcomeData['relation'],
+                                 averageCycleLength: cycleData['cycleLength'],
+                                 previousPeriodsBegin:
+                                 cycleData['previousPeriodDate'],
+                                 previousPeriodsMonth:
+                                 cycleData['previousPeriodMonth'],
+                                 averagePeriodLength: cycleData['periodsLength'],
+                               );
+                             }
 
-                            AppPreferences.instance.setUserDetails(
-                                jsonEncode(userMaster));
-                            gUserType = singInViewModel.userRoleId.toString();
-
-                            SplashViewModel().checkGlobalUserData();
+                          }
+                          else  {
 
                             mViewModel.userUpdateDetailsApi(
                               isFromCycle: true,
                               name: widget.welcomeData['name'],
-                              roleId: "4",
                               birthdate: widget.welcomeData['birthdate'],
                               gender: widget.welcomeData['gender'],
                               genderType: widget.welcomeData['otherGender'],

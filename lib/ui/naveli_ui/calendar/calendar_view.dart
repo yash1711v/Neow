@@ -70,6 +70,7 @@ class _CalendarViewState extends State<CalendarView> {
   late HomeViewModel mViewModel;
   bool _isChecked = false; // State variable to hold checkbox status
   List<DateTime> dateList = [];
+  List<DateTime> dateListLatest = [];
   List<DateTime> forParentUseDateList = [];
 
 
@@ -77,6 +78,41 @@ class _CalendarViewState extends State<CalendarView> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    for (var dateRange in peroidCustomeList) {
+      DateTime start = DateTime.parse(dateRange.period_start_date);
+      DateTime end = DateTime.parse(dateRange.period_end_date);
+
+
+      debugPrint("start: $start");
+      debugPrint("end: $end");
+      DateTime now = DateTime.now(); // Get current date
+
+      for(DateTime i = start; i.isBefore(end) || i.isAtSameMomentAs(end); i = i.add(Duration(days: 1))) {
+
+        setState(() {
+          // if(dateList.isEmpty) {
+          //   debugPrint("i: $i");
+          //   forParentUseDateList.add(i);
+          //   dateList.add(i);
+          // }
+          if(forParentUseDateList.contains(i)) {
+            forParentUseDateList.remove(i);
+            dateList.remove(i);
+          } else {
+            forParentUseDateList.add(i);
+            dateList.add(i);
+          }
+        });
+
+        // forParentUseDateList.add(i);
+        // dateList.add(i);
+      }
+
+      debugPrint("dateList: $dateList");
+      debugPrint("forParentUseDateList: $forParentUseDateList");
+    }
+
   }
 
   void _updateButtonText() {
@@ -102,9 +138,11 @@ class _CalendarViewState extends State<CalendarView> {
     if (forParentUseDateList.contains(NewItem)) {
       forParentUseDateList.remove(NewItem);
       dateList.remove(NewItem);
+      dateListLatest.remove(NewItem);
     } else {
       forParentUseDateList.add(NewItem);
       dateList.add(NewItem);
+      dateListLatest.add(NewItem);
     }
 
 
@@ -357,233 +395,57 @@ class _CalendarViewState extends State<CalendarView> {
     CommonUtils.showProgressDialog();
 
     DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-
     String accessToken = AppPreferences.instance.getAccessToken();
     final globalUserMaster = AppPreferences.instance.getUserDetails();
-    print("ddatt: $forParentUseDateList");
-    forParentUseDateList.sort();
-    print(forParentUseDateList);
 
+    forParentUseDateList.sort();
     List<String> formattedDates = forParentUseDateList.map((dateTime) {
       return '${dateTime.toLocal().year}-${dateTime.toLocal().month.toString().padLeft(2, '0')}-${dateTime.toLocal().day.toString().padLeft(2, '0')}';
     }).toList();
-    print(formattedDates);
-    List<DateTime> dates = formattedDates
-        .map((dateString) => DateTime.parse(dateString))
-        .toList()
-      ..sort();
 
-    // Find lengths of nearby dates
-    List<int> nearbyLengths = [];
+    List<DateTime> dates = formattedDates.map((dateString) => DateTime.parse(dateString)).toList()..sort();
 
-    List<Object> finalArray = [];
+    // **Group Dates by Month**
+    Map<String, List<DateTime>> groupedByMonth = {};
+    for (var date in dates) {
+      String key = "${date.year}-${date.month.toString().padLeft(2, '0')}";
+      groupedByMonth.putIfAbsent(key, () => []).add(date);
+    }
 
-    int currentLength = 1;
-    String currentMonth = '';
-    int lenghtForPost = 0;
-    Map<String, dynamic> params = <String, dynamic>{};
+    // **Process Each Month Separately**
+    for (var entry in groupedByMonth.entries) {
+      List<DateTime> monthDates = entry.value;
+      monthDates.sort();
 
-    if (dates.length == 1) {
-      int updateDatePos = 0;
-      DateTime selectedDate = dates[0];
-      DateTime startDate =
-          DateTime.parse(peroidCustomeList[0].period_start_date);
-      DateTime endDate = DateTime.parse(peroidCustomeList[0].period_end_date);
-      if (isWithinFourteenDays) {
-        if (selectedDate.isBefore(startDate)) {
-          //It means first period start date changed
-          updateDatePos = 0;
-        } else if (selectedDate.isAfter(endDate) &&
-            (selectedDate.difference(endDate).inDays.abs() <= 2)) {
-          //It means first period end pass and selected date is within 2 days of existing end then first period end date changed
-          updateDatePos = 0;
-        } else {
-          //otherwise we considered second period changes
-          updateDatePos = 1;
-        }
+      DateTime periodStart = monthDates.first;
+      DateTime periodEnd = monthDates.last;
+      int periodLength = periodEnd.difference(periodStart).inDays + 1;
 
-        startDate =
-            DateTime.parse(peroidCustomeList[updateDatePos].period_start_date);
-        endDate =
-            DateTime.parse(peroidCustomeList[updateDatePos].period_end_date);
+      Map<String, dynamic> params = {
+        ApiParams.period_start_date: dateFormat.format(periodStart),
+        ApiParams.period_end_date: dateFormat.format(periodEnd),
+        ApiParams.period_length: periodLength,
+        ApiParams.period_cycle_length: "${globalUserMaster?.averageCycleLength}",
+        ApiParams.period_month_update: "${periodStart.year}${periodStart.month.toString().padLeft(2, '0')}"
+      };
 
-        if (selectedDate.isBefore(startDate)) {
-          if (selectedDate.difference(startDate).inDays.abs() > 7) {
-            //this is when selected date first period start date gap is more than 7
-            params = <String, dynamic>{
-              ApiParams.period_start_date: dateFormat.format(dates[0]),
-              ApiParams.period_end_date: dateFormat.format(dates[0]),
-              ApiParams.period_length: 1,
-              ApiParams.period_cycle_length:
-                  "${globalUserMaster?.averageCycleLength}",
-              ApiParams.period_month_update:
-                  dates[0].year.toString() + dates[0].month.toString()
-            };
-          } else {
-            int periodLength = selectedDate.difference(endDate).inDays.abs();
-            print("selected date before start date ${periodLength + 1}");
-            params = <String, dynamic>{
-              ApiParams.period_start_date: dateFormat.format(dates[0]),
-              ApiParams.period_end_date:
-                  peroidCustomeList[updateDatePos].period_end_date,
-              ApiParams.period_length: (periodLength + 1),
-              ApiParams.period_cycle_length:
-                  "${globalUserMaster?.averageCycleLength}",
-              ApiParams.period_month_update:
-                  dates[0].year.toString() + dates[0].month.toString()
-            };
-          }
-        }
+      debugPrint("params for ${entry.key}: $params");
 
-        if (selectedDate.isAfter(endDate)) {
-          if (endDate.difference(selectedDate).inDays.abs() > 7) {
-            //this is when selected date first period end date gap is more than 7
-            params = <String, dynamic>{
-              ApiParams.period_start_date: dateFormat.format(dates[0]),
-              ApiParams.period_end_date: dateFormat.format(dates[0]),
-              ApiParams.period_length: 1,
-              ApiParams.period_cycle_length:
-              "${globalUserMaster?.averageCycleLength}",
-              ApiParams.period_month_update:
-              dates[0].year.toString() + dates[0].month.toString()
-            };
-          }else {
-            int periodLength = startDate
-                .difference(selectedDate)
-                .inDays
-                .abs();
-            print("selected date after end date ${periodLength}");
-            params = <String, dynamic>{
-              ApiParams.period_start_date:
-              peroidCustomeList[updateDatePos].period_start_date,
-              ApiParams.period_end_date: dateFormat.format(dates[0]),
-              ApiParams.period_length: (periodLength + 1),
-              ApiParams.period_cycle_length:
-              "${globalUserMaster?.averageCycleLength}",
-              ApiParams.period_month_update:
-              dates[0].year.toString() + dates[0].month.toString()
-            };
-          }
-        }
-      } else {
-        params = <String, dynamic>{
-          ApiParams.period_start_date: dateFormat.format(selectedDate),
-          ApiParams.period_end_date: dateFormat.format(selectedDate),
-          ApiParams.period_length: "1",
-          ApiParams.period_cycle_length:
-              "${globalUserMaster?.averageCycleLength}",
-          ApiParams.period_month_update:
-              dates[0].year.toString() + dates[0].month.toString()
-        };
+      // **Make API Call**
+      PeriodInfoListResponse? master = await _services.api!.savePeriodsInfo(params: params);
+
+      if (master == null) {
+        CommonUtils.oopsMSG();
+      } else if (master.success == false) {
+        CommonUtils.showSnackBar(master.message ?? "--", color: CommonColors.mRed);
+      } else if (master.success == true) {
+        CommonUtils.showSnackBar(master.message ?? "--", color: CommonColors.mRed);
       }
     }
-    else {
-      for (int i = 1; i < dates.length; i++) {
-        // Check if the current date is the next day of the previous date
-        if (dates[i].difference(dates[i - 1]).inDays == 1) {
-          currentLength++;
-        } else {
-          // Store the length of the current sequence if it's more than 1
-          if (currentLength > 1) {
-            DateTime startMonth =
-                DateTime.parse(dateFormat.format(dates[i - (currentLength)]));
-            if (startMonth.month == DateTime.now().month) {
-              currentMonth = dateFormat.format(dates[i - (currentLength)]);
-              lenghtForPost = currentLength;
-            }
-            finalArray.add({
-              "user_id": globalUserMaster?.id,
-              "period_start_date":
-                  dateFormat.format(dates[i - (currentLength)]),
-              // "${dates[i - (currentLength)].year}-${dates[i - (currentLength)].month}-${dates[i - (currentLength)].day}",
-              "period_end_date": dateFormat.format(dates[i - 1]),
-              // "${dates[i - 1].year}-${dates[i - 1].month}-${dates[i - 1].day}",
-              "period_length": currentLength,
-              "period_cycle_length": "${globalUserMaster?.averageCycleLength}",
-              "period_month_update":
-                  dates[i - (currentLength - 1)].year.toString() +
-                      dates[i - (currentLength - 1)].month.toString()
-            });
-            nearbyLengths.add(currentLength);
-          }
 
-          currentLength = 1; // Reset for the next sequence
-
-          params = <String, dynamic>{
-            /* ApiParams.user_id: globalUserMaster?.id,*/
-            ApiParams.period_start_date:
-                dateFormat.format(dates[dates.length - (currentLength)]),
-            ApiParams.period_end_date:
-                dateFormat.format(dates[dates.length - 1]),
-            ApiParams.period_length: currentLength,
-            ApiParams.period_cycle_length:
-                "${globalUserMaster?.averageCycleLength}",
-            ApiParams.period_month_update:
-                dates[dates.length - (currentLength - 1)].year.toString() +
-                    dates[dates.length - (currentLength - 1)].month.toString()
-          };
-        }
-      }
-      // Check for the last sequence
-      if (currentLength > 1) {
-        if (currentMonth == '' || lenghtForPost == 0) {
-          DateTime startMonth = DateTime.parse(
-              dateFormat.format(dates[dates.length - (currentLength)]));
-          if (startMonth.month == DateTime.now().month) {
-            currentMonth =
-                dateFormat.format(dates[dates.length - (currentLength)]);
-            lenghtForPost = currentLength;
-          }
-        }
-        finalArray.add({
-          "user_id": globalUserMaster?.id,
-          "period_start_date":
-              dateFormat.format(dates[dates.length - (currentLength)]),
-          // "${dates[dates.length - (currentLength)].year}-${dates[dates.length - (currentLength)].month}-${dates[dates.length - (currentLength)].day}",
-          "period_end_date": dateFormat.format(dates[dates.length - 1]),
-          // "${dates[dates.length - 1].year}-${dates[dates.length - 1].month}-${dates[dates.length - 1].day}",
-          "period_length": currentLength,
-          "period_cycle_length": "${globalUserMaster?.averageCycleLength}",
-          "period_month_update":
-              dates[dates.length - (currentLength - 1)].year.toString() +
-                  dates[dates.length - (currentLength - 1)].month.toString()
-        });
-        nearbyLengths.add(currentLength);
-
-        params = <String, dynamic>{
-          /*ApiParams.user_id: globalUserMaster?.id,*/
-          ApiParams.period_start_date:
-              dateFormat.format(dates[dates.length - (currentLength)]),
-          ApiParams.period_end_date: dateFormat.format(dates[dates.length - 1]),
-          ApiParams.period_length: currentLength,
-          ApiParams.period_cycle_length:
-              "${globalUserMaster?.averageCycleLength}",
-          ApiParams.period_month_update:
-              dates[dates.length - (currentLength - 1)].year.toString() +
-                  dates[dates.length - (currentLength - 1)].month.toString()
-        };
-      }
-    }
-         debugPrint("params: $params");
-    PeriodInfoListResponse? master =
-        await _services.api!.savePeriodsInfo(params: params);
     CommonUtils.hideProgressDialog();
-    if (master == null) {
-      CommonUtils.oopsMSG();
-      print(
-          "................................save period info.............................");
-    } else if (master.success == false) {
-      CommonUtils.showSnackBar(
-        master.message ?? "--",
-        color: CommonColors.mRed,
-      );
-    } else if (master.success == true) {
-      CommonUtils.showSnackBar(
-        master.message ?? "--",
-        color: CommonColors.mRed,
-      );
-    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -785,28 +647,28 @@ class _CalendarViewState extends State<CalendarView> {
                         _updateButtonText();
                       } else {
 
-                        for (var dateRange in peroidCustomeList) {
-                          DateTime start = DateTime.parse(dateRange.period_start_date);
-                          DateTime end = DateTime.parse(dateRange.period_end_date);
-
-                          DateTime now = DateTime.now(); // Get current date
-
-                          for(DateTime i = start; i.isBefore(end) || i.isAtSameMomentAs(end); i = i.add(Duration(days: 1))) {
-                            if(dateList.isEmpty) {
-                              forParentUseDateList.add(i);
-                              dateList.add(i);
-                            }
-                            if(forParentUseDateList.contains(i)) {
-                              forParentUseDateList.remove(i);
-                              dateList.remove(i);
-                            } else {
-                              forParentUseDateList.add(i);
-                              dateList.add(i);
-                            }
-                            // forParentUseDateList.add(i);
-                            // dateList.add(i);
-                          }
-                        }
+                        // for (var dateRange in peroidCustomeList) {
+                        //   DateTime start = DateTime.parse(dateRange.period_start_date);
+                        //   DateTime end = DateTime.parse(dateRange.period_end_date);
+                        //
+                        //   DateTime now = DateTime.now(); // Get current date
+                        //
+                        //   for(DateTime i = start; i.isBefore(end) || i.isAtSameMomentAs(end); i = i.add(Duration(days: 1))) {
+                        //     if(dateList.isEmpty) {
+                        //       forParentUseDateList.add(i);
+                        //       dateList.add(i);
+                        //     }
+                        //     if(forParentUseDateList.contains(i)) {
+                        //       forParentUseDateList.remove(i);
+                        //       dateList.remove(i);
+                        //     } else {
+                        //       forParentUseDateList.add(i);
+                        //       dateList.add(i);
+                        //     }
+                        //     // forParentUseDateList.add(i);
+                        //     // dateList.add(i);
+                        //   }
+                        // }
 
 
                         //

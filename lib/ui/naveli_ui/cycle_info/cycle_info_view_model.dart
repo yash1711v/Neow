@@ -89,7 +89,7 @@ class CycleInfoViewModel with ChangeNotifier {
             gUserType == AppConstants.CYCLE_EXPLORER) {
           (roleId ?? "").isNotEmpty? gUserType = roleId ?? "":null;
           SplashViewModel().getUserDetails().whenComplete(
-                () => pushAndRemoveUntil(
+                () => pushReplacement(
                   WelComeGifView(
                     isFromSplash: false,
                   ),

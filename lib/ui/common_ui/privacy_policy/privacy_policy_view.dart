@@ -204,7 +204,7 @@ class _PrivacyPolicyViewState extends State<PrivacyPolicyView> {
                     width: kDeviceWidth / 1.3,
                     onPress: () {
                       if (isValid()) {
-                        push(const StateSelectionView());
+                        pushReplacement(const StateSelectionView());
                       }
                     },
                     label: S.of(context)!.accept,
