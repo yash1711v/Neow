@@ -93,8 +93,8 @@ class CycleTableData {
 
   CycleTableData.fromJson(Map<String, dynamic> json) {
     _periodDate = json['period_date'];
-    _periodCycleLength = json['period_cycle_length'];
-    _periodLength = json['period_length'];
+    _periodCycleLength = json['period_cycle_length'].toString();
+    _periodLength = json['period_length'].toString();
     _deviation = json['deviation'];
   }
 

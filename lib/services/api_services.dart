@@ -149,6 +149,8 @@ class ApiServices extends BaseServices {
       url: ApiUrl.USER_UPDATE_DETAILS,
       postParams: params,
     );
+
+    debugPrint("response $response");
     if (response != null) {
       try {
         return CommonMaster.fromJson(response);

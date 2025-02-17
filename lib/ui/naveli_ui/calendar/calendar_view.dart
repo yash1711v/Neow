@@ -426,7 +426,7 @@ class _CalendarViewState extends State<CalendarView> {
         ApiParams.period_end_date: dateFormat.format(periodEnd),
         ApiParams.period_length: periodLength,
         ApiParams.period_cycle_length: "${globalUserMaster?.averageCycleLength}",
-        ApiParams.period_month_update: "${periodStart.year}${periodStart.month.toString().padLeft(2, '0')}"
+        ApiParams.period_month_update: "${periodStart.year}${periodStart.month}"
       };
 
       debugPrint("params for ${entry.key}: $params");

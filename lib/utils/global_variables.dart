@@ -89,14 +89,14 @@ class PeriodObj {
         : []; // Default to empty list if null
     return PeriodObj(
         user_id: json['user_id'] ?? 1,
-        period_start_date: json['period_start_date'] ?? "",
-        period_end_date: json['period_end_date'] ?? "",
-        period_length: json['period_length'] ?? "",
-        period_cycle_length: json['period_cycle_length'] ?? "",
-        period_month_update: json['period_month_update'] ?? "",
+        period_start_date: json['period_start_date'].toString() ?? "",
+        period_end_date: json['period_end_date'].toString() ?? "",
+        period_length: json['period_length'].toString() ?? "",
+        period_cycle_length: json['period_cycle_length'].toString() ?? "",
+        period_month_update: json['period_month_update'].toString() ?? "",
         predicated_period_start_date:
-            json['predicated_period_start_date'] ?? "",
-        predicated_period_end_date: json['predicated_period_end_date'] ?? "",
+            json['predicated_period_start_date'].toString() ?? "",
+        predicated_period_end_date: json['predicated_period_end_date'].toString() ?? "",
         periodData: periodDataList);
   }
 

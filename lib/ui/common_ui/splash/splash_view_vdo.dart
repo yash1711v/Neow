@@ -173,12 +173,17 @@ class _SplashViewState extends State<SplashViewVdo> {
   loadSecondVideoPlayer(String vpath) {
     vdo_Controller = VideoPlayerController.asset(vpath);
     vdo_Controller.addListener(() {
-      setState(() {});
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {});
+      });
+
     });
     vdo_Controller.initialize().then((value) {
       vdo_Controller.play();
       // vdo_Controller.setLooping(true);
-      setState(() {});
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {});
+      });
     });
   }
 
