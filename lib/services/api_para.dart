@@ -126,4 +126,5 @@ class ApiParams {
   static const String period_length = "period_length";
   static const String period_cycle_length = "period_cycle_length";
   static const String period_month_update = "period_month_update";
+  static const String period_deleted_month = "period_deleted_month";
 }

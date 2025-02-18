@@ -408,9 +408,28 @@ class _CalendarViewState extends State<CalendarView> {
     // **Group Dates by Month**
     Map<String, List<DateTime>> groupedByMonth = {};
     for (var date in dates) {
-      String key = "${date.year}-${date.month.toString().padLeft(2, '0')}";
+      String key = "${date.year}${date.month.toString()}";
       groupedByMonth.putIfAbsent(key, () => []).add(date);
     }
+
+    // **Find Missing Months**
+    List<String> allMonths = [];
+
+    // if (dates.isNotEmpty) {
+      DateTime minDate = DateTime(dates.first.year, 1, 1); // First date of the year
+      DateTime maxDate = DateTime(dates.last.year, 12, 31); // Last date of the year
+
+      for (DateTime current = minDate;
+      current.isBefore(maxDate) || current.isAtSameMomentAs(maxDate);
+      current = DateTime(current.year, current.month + 1, 1)) {
+        allMonths.add("${current.year}${current.month.toString()}");
+      }
+    // }
+
+    debugPrint("All Months months: $allMonths");
+    List<String> missingMonths = allMonths.where((month) => !groupedByMonth.containsKey(month)).toList();
+
+    debugPrint("Missing months: $missingMonths");
 
     // **Process Each Month Separately**
     for (var entry in groupedByMonth.entries) {
@@ -425,8 +444,9 @@ class _CalendarViewState extends State<CalendarView> {
         ApiParams.period_start_date: dateFormat.format(periodStart),
         ApiParams.period_end_date: dateFormat.format(periodEnd),
         ApiParams.period_length: periodLength,
-        ApiParams.period_cycle_length: "${globalUserMaster?.averageCycleLength}",
-        ApiParams.period_month_update: "${periodStart.year}${periodStart.month}"
+        ApiParams.period_month_update: "${periodStart.year}${periodStart.month.toString()}",
+        if(missingMonths.isNotEmpty)
+        ApiParams.period_deleted_month: missingMonths,
       };
 
       debugPrint("params for ${entry.key}: $params");
@@ -445,6 +465,7 @@ class _CalendarViewState extends State<CalendarView> {
 
     CommonUtils.hideProgressDialog();
   }
+
 
 
   @override

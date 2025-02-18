@@ -80,10 +80,10 @@ class CycleInfoViewModel with ChangeNotifier {
         color: CommonColors.mRed,
       );
     } else if (master.success == true) {
-      // CommonUtils.showSnackBar(
-      //   master.message,
-      //   color: CommonColors.greenColor,
-      // );
+      CommonUtils.showSnackBar(
+        master.message,
+        color: CommonColors.greenColor,
+      );
       if (isFromCycle) {
         if (gUserType == AppConstants.NEOWME ||
             gUserType == AppConstants.CYCLE_EXPLORER) {

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
@@ -99,9 +100,12 @@ class HomeViewModel with ChangeNotifier {
   }
 
   List<DateTime> calculateCycleDatesInYear(
-      DateTime previousDate, int cycleLength) {
+      DateTime previousDate, int cycleLength)
+  {
     List<DateTime> nextCycleDates = [];
+
     print('PrevousDate : $previousDate CycleLength: $cycleLength');
+
     DateTime nextDate = previousDate;
 
     DateTime now = DateTime.now();
@@ -234,7 +238,7 @@ class HomeViewModel with ChangeNotifier {
 
   String calculateDaysToGo(DateTime currentDate) {
     nextCycleDates.sort();
-
+    nextCycleDates = nextCycleDates.toSet().toList();
     DateTime nextCycleStartDate = nextCycleDates.firstWhere(
         (date) => date.isAfter(currentDate),
         orElse: () => nextCycleDates.last);
@@ -262,24 +266,28 @@ class HomeViewModel with ChangeNotifier {
   }
 
   String getCycleDayOrDaysToGo(DateTime currentDate) {
+
+
     if (nextCycleDates.isEmpty) {
       return "No cycle dates available";
     }
+
+
+    nextCycleDates = nextCycleDates.toSet().toList();
     nextCycleDates.sort();
 
    // print("nextCycleDates  ${nextCycleDates}");
     // Find the most recent period start date before or on the current date
-    DateTime previousCycleStartDate = nextCycleDates.lastWhere(
-      (date) =>
-          date.isBefore(currentDate) || date.isAtSameMomentAs(currentDate),
-      orElse: () => nextCycleDates.first,
-    );
+    DateTime? previousCycleStartDate = nextCycleDates
+        .where((date) => date.year == currentDate.year && date.month == currentDate.month) // Filter same year and month
+        .where((date) => date.isBefore(currentDate) || date.isAtSameMomentAs(currentDate)) // Filter dates before or equal to currentDate
+        .fold<DateTime?>(null, (prev, date) => prev == null || date.isBefore(prev) ? date : prev); // Find the minimum date
 
     // Find the next cycle start date after the current date
-    DateTime nextCycleStartDate = nextCycleDates.firstWhere(
-      (date) => date.isAfter(currentDate),
-      orElse: () => nextCycleDates.last,
-    );
+    DateTime? nextCycleStartDate = nextCycleDates
+        .where((date) => date.isAfter(currentDate)) // Keep only dates after currentDate
+        .fold<DateTime?>(null, (prev, date) => prev == null || date.isBefore(prev) ? date : prev); // Find the smallest date
+
 
     //print("periodLenght =====>${peroidCustomeList.length}");
     int prL=0;
@@ -289,7 +297,7 @@ class HomeViewModel with ChangeNotifier {
       prL=int.parse(peroidCustomeList[peroidCustomeList.length-1].period_length);
     }
     // Calculate the cycle day including the current date
-    int cycleDay = currentDate.difference(previousCycleStartDate).inDays + prL/*int.parse(globalUserMaster?.averagePeriodLength ?? "5")*/;
+    int cycleDay = currentDate.difference(previousCycleStartDate ?? DateTime.now()).inDays + prL/*int.parse(globalUserMaster?.averagePeriodLength ?? "5")*/;
 
     /* int pday = currentDate.difference(previousCycleStartDate).inDays;
     print('pday $pday'); */
@@ -328,7 +336,12 @@ class HomeViewModel with ChangeNotifier {
         ovdays = ovdays - cycleDay;
       } else {
         // ovdays = cycleDay-ovdays;
-        int daysToNextCycle = nextCycleStartDate.difference(currentDate).inDays + 1;
+        int daysToNextCycle = (nextCycleStartDate ?? DateTime.now()).difference(currentDate).inDays;
+        //  log("NextCycle Days: ${nextCycleDates}",name: "NextCycle");
+        // debugPrint("daysToNextCycle $daysToNextCycle");
+        // debugPrint("daysToNextCycle $daysToNextCycle");
+        // debugPrint("dNextCycle $nextCycleStartDate");
+
         if(daysToNextCycle==1) {
           return "Period may\nstart today";
         }else {
@@ -342,7 +355,7 @@ class HomeViewModel with ChangeNotifier {
     } else {
       // Calculate days to go until the next period starts
       int daysToNextCycle =
-          nextCycleStartDate.difference(currentDate).inDays + 1;
+          (nextCycleStartDate ?? DateTime.now()).difference(currentDate).inDays + 1;
       if(daysToNextCycle==1) {
         return "Period may\nstart today";
       }else {
@@ -451,7 +464,7 @@ class HomeViewModel with ChangeNotifier {
     if (response.statusCode == 200 || response.statusCode == 201) {
       // If the server returns a successful response, parse the JSON.
       var data = jsonDecode(response.body);
-
+          // debugPrint("data ====>$data");
       List<dynamic> jsonList = jsonDecode(response.body);
       // peroidCustomeList =
       //     jsonList.map((json) => PeriodObj.fromJson(json)).toList();
@@ -484,8 +497,11 @@ class HomeViewModel with ChangeNotifier {
     //CommonUtils.showProgressDialog();
     PeriodInfoListResponse? master = await _services.api!.getPeriodInfoList();
     //CommonUtils.hideProgressDialog();
-    print("master ${master}");
+    print("master $master");
     print("master ${master!.success!}");
+    // var data = jsonDecode(master.data.toString());
+    // debugPrint("data ====>$data");
+
     if (master == null) {
       CommonUtils.oopsMSG();
       print(
@@ -562,7 +578,7 @@ class HomeViewModel with ChangeNotifier {
       firtileDates = calculateFirtileDatesInYear(ovulationDates);
       print("CycleDates date is :::::::::: ${gCycleDates[0].periodDay}");
       generateDaysList();
-      print("Next date is :::::::::: ${nextCycleDates}");
+      print("Next date is :::::::::: $nextCycleDates");
 
       DateTime today = DateTime.now();
       DateTime? nextCycleDate = nextCycleDates.firstWhere(

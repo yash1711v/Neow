@@ -95,8 +95,8 @@ class PeriodObj {
         period_cycle_length: json['period_cycle_length'].toString() ?? "",
         period_month_update: json['period_month_update'].toString() ?? "",
         predicated_period_start_date:
-            json['predicated_period_start_date'].toString() ?? "",
-        predicated_period_end_date: json['predicated_period_end_date'].toString() ?? "",
+            json['predicted_period_start_date'].toString() ?? "",
+        predicated_period_end_date: json['predicted_period_end_date'].toString() ?? "",
         periodData: periodDataList);
   }
 

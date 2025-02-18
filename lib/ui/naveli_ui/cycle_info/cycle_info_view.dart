@@ -116,7 +116,8 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                     });
                   }
                 });
-              } else if (page == 1) {
+              }
+              else if (page == 1) {
                 print("Page 2 is fully loaded!");
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (scrollPeriodLengthController.hasClients) {
@@ -928,7 +929,8 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                               previousPeriodsMonth:
                               cycleData['previousPeriodMonth'],
                               averagePeriodLength: cycleData['periodsLength'],
-                            );} else {
+                            );
+                             } else {
                                // debugPrint("IN  else ");
                                // debugPrint("IN IF Condition");
                                singInViewModel.userRoleId = "4";
@@ -971,7 +973,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                    jsonEncode(userMaster));
                                gUserType = singInViewModel.userRoleId.toString();
 
-                               SplashViewModel().checkGlobalUserData();
+
 
                                mViewModel.userUpdateDetailsApi(
                                  isFromCycle: true,
@@ -987,7 +989,9 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                                  previousPeriodsMonth:
                                  cycleData['previousPeriodMonth'],
                                  averagePeriodLength: cycleData['periodsLength'],
-                               );
+                               ).whenComplete(() {
+                                 // SplashViewModel().checkGlobalUserData();
+                               });
                              }
 
                           }

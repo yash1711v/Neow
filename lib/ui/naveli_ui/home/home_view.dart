@@ -184,7 +184,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   bool isCycleStartFromTommorw() {
-    if (peroidCustomeList.length > 0) {
+    if (peroidCustomeList.isNotEmpty) {
       DateTime startPredicatedPeriods = DateTime.parse(
           peroidCustomeList[0].predicated_period_start_date);
       // Get the current date and add one day to it
@@ -633,8 +633,22 @@ class _HomeViewState extends State<HomeView> {
                 no = 0;
               }
 
+
+              //
+              // WidgetsBinding.instance.addPostFrameCallback((_) async {
+              //   mViewModel.getPeriodInfoList();
+              //   await handleFirstBloc();
+              //   // await mViewModel.handleSecondBloc(dateString);
+              //   await handleThirdBloc();
+              //   print("diipppka1");
+              //   //mViewModel.fetchData();
+              //   _setTimeout();
+              // });
+
+
               return Container(
-                color: isCycleDate ? (no < clen ? Color(0xFFFFB5AE).withOpacity(opc) : Color(bgColor)) : Color(bgColor),
+                color: isCycleDate ? (no < clen ? Color(0xFFFFB5AE).withOpacity(
+                    opc) : Color(bgColor)) : Color(bgColor),
                 width: 35,
                 child: Column(
                   children: [
@@ -643,7 +657,8 @@ class _HomeViewState extends State<HomeView> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: Color(bgColor),
-                          borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(20.0, 8.0)),
+                          borderRadius: BorderRadius.vertical(
+                              bottom: Radius.elliptical(20.0, 8.0)),
                         ),
                       ),
                     ),
@@ -653,7 +668,8 @@ class _HomeViewState extends State<HomeView> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: Color(bgColor),
-                          borderRadius: BorderRadius.vertical(top: Radius.elliptical(15.0, 8.0)),
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.elliptical(15.0, 8.0)),
                         ),
                       ),
                     ),
@@ -670,7 +686,8 @@ class _HomeViewState extends State<HomeView> {
 
               for (var dateRange in peroidCustomeList) {
                 DateTime start = DateTime.parse(dateRange.period_start_date);
-                DateTime end = DateTime.parse(dateRange.period_end_date).add(Duration(days: 1));
+                DateTime end = DateTime.parse(dateRange.period_end_date).add(
+                    Duration(days: 1));
                 cycleLength = int.parse(dateRange.period_cycle_length);
 
                 if ((currentDate.isAfter(start) && currentDate.isBefore(end)) ||
@@ -680,10 +697,14 @@ class _HomeViewState extends State<HomeView> {
                   break;
                 }
 
-                DateTime startPredicated = DateTime.parse(dateRange.predicated_period_start_date);
-                DateTime endPredicated = DateTime.parse(dateRange.predicated_period_end_date).add(Duration(days: 1));
+                DateTime startPredicated = DateTime.parse(
+                    dateRange.predicated_period_start_date);
+                DateTime endPredicated = DateTime.parse(
+                    dateRange.predicated_period_end_date).add(
+                    Duration(days: 1));
 
-                if ((currentDate.isAfter(startPredicated) && currentDate.isBefore(endPredicated)) ||
+                if ((currentDate.isAfter(startPredicated) &&
+                    currentDate.isBefore(endPredicated)) ||
                     currentDate.isAtSameMomentAs(startPredicated) ||
                     currentDate.isAtSameMomentAs(endPredicated)) {
                   isPredictedDate = true;
@@ -693,9 +714,12 @@ class _HomeViewState extends State<HomeView> {
 
               DateTime today = DateTime.now();
               bool isToday = currentDate.isAtSameMomentAs(today);
-              bool isSelectedDate = currentDate.isAtSameMomentAs(mViewModel.selectedDate);
+              bool isSelectedDate = currentDate.isAtSameMomentAs(
+                  mViewModel.selectedDate);
               int clen = int.parse(peroidCustomeList.last.period_length ?? "5");
-              double opc = isCycleDate ? (1 - ((1 / clen) * no)).clamp(0.0, 1.0) : 0.0;
+              double opc = isCycleDate
+                  ? (1 - ((1 / clen) * no)).clamp(0.0, 1.0)
+                  : 0.0;
 
               return Container(
                 decoration: BoxDecoration(color: Color(bgColor)),
@@ -703,7 +727,9 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     Text(
                       isToday ? "Today" : weekDay,
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0, color: Colors.black),
+                      style: TextStyle(fontWeight: FontWeight.w500,
+                          fontSize: 16.0,
+                          color: Colors.black),
                     ),
                     GestureDetector(
                       onTap: () => mViewModel.updateSelectedDate(currentDate),
@@ -713,27 +739,41 @@ class _HomeViewState extends State<HomeView> {
                         decoration: BoxDecoration(
                           gradient: isSelectedDate
                               ? isCycleDate
-                              ? LinearGradient(colors: [Colors.white, Colors.white])
-                              : LinearGradient(colors: [Color(0xFFDBDBDB), Color(0xFFDBDBDB)])
+                              ? LinearGradient(
+                              colors: [Colors.white, Colors.white])
+                              : LinearGradient(
+                              colors: [Color(0xFFDBDBDB), Color(0xFFDBDBDB)])
                               : isCycleDate
-                              ? LinearGradient(colors: [Color(0xFFFF9D93), Color(0xFFFFB5AE).withOpacity(opc)])
+                              ? LinearGradient(colors: [
+                            Color(0xFFFF9D93),
+                            Color(0xFFFFB5AE).withOpacity(opc)
+                          ])
                               : isPredictedDate
-                              ? LinearGradient(colors: [Colors.white, Colors.white])
+                              ? LinearGradient(
+                              colors: [Colors.white, Colors.white])
                               : null,
                           shape: BoxShape.circle,
                         ),
                         child: DottedBorder(
                           color: isSelectedDate
-                              ? (isCycleDate ? CommonColors.mRed : CommonColors.mTransparent)
-                              : (isPredictedDate ? CommonColors.mRed : CommonColors.mTransparent),
+                              ? (isCycleDate ? CommonColors.mRed : CommonColors
+                              .mTransparent)
+                              : (isPredictedDate
+                              ? CommonColors.mRed
+                              : CommonColors.mTransparent),
                           dashPattern: [4, 3],
-                          strokeWidth: isSelectedDate || isPredictedDate ? 2 : 0,
+                          strokeWidth: isSelectedDate || isPredictedDate
+                              ? 2
+                              : 0,
                           borderType: BorderType.Circle,
                           child: Center(
                             child: Text(
                               formattedDate,
                               style: TextStyle(
-                                color: isSelectedDate ? Colors.black : (isCycleDate ? CommonColors.mRed : Colors.black),
+                                color: isSelectedDate
+                                    ? Colors.black
+                                    : (isCycleDate ? CommonColors.mRed : Colors
+                                    .black),
                                 fontWeight: FontWeight.w500,
                                 fontSize: 15.0,
                               ),

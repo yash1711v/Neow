@@ -1210,6 +1210,8 @@ class ApiServices extends BaseServices {
   Future<PeriodInfoListResponse?> getPeriodInfoList() async {
     dynamic response = await appBaseClient. getApiWithTokenCall(url: ApiUrl.GET_PERIOD_INFO);
     if (response != null) {
+
+      debugPrint("PeriodInfoListResponse: $response");
       try {
         return PeriodInfoListResponse.fromJson(response);
       } on Exception catch (e) {
