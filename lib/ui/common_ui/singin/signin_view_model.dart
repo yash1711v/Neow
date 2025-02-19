@@ -144,7 +144,8 @@ class SignInViewModel with ChangeNotifier {
   Future<void> verifyPhone(
       {required String phoneNumber,
       required Function onCodeSent,
-      required BuildContext context}) async {
+      required BuildContext context})
+  async {
     CommonUtils.showProgressDialog();
     final PhoneCodeSent smsOTPSent = (String verId, [int? forceCodeResend]) {
       CommonUtils.hideProgressDialog();
@@ -160,17 +161,22 @@ class SignInViewModel with ChangeNotifier {
       await _auth.verifyPhoneNumber(
           phoneNumber: "+91$phoneNumber",
           // PHONE NUMBER TO SEND OTP
-          codeAutoRetrievalTimeout: (String verId) {
-            //Starts the phone number verification process for the given phone number.
-            //Either sends an SMS with a 6 digit code to the phone number specified, or sign's the user in and [verificationCompleted] is called.
-            // this.verificationId = verId;
-          },
+          // codeAutoRetrievalTimeout: (String verId) {
+          //   //Starts the phone number verification process for the given phone number.
+          //   //Either sends an SMS with a 6 digit code to the phone number specified, or sign's the user in and [verificationCompleted] is called.
+          //   // this.verificationId = verId;
+          // },
           codeSent: smsOTPSent,
           // WHEN CODE SENT THEN WE OPEN DIALOG TO ENTER OTP.
-          timeout: const Duration(seconds: 40),
+          timeout: const Duration(seconds: 120),
           verificationCompleted: (AuthCredential phoneAuthCredential) {
             CommonUtils.hideProgressDialog();
           },
+          codeAutoRetrievalTimeout: (String verId) {
+            log("Auto retrieval timeout. Retrying...");
+            verifyPhone(phoneNumber: phoneNumber, onCodeSent: onCodeSent, context: context);
+          },
+
           verificationFailed: (FirebaseAuthException exceptio) {
             CommonUtils.hideProgressDialog();
             // final snackBar = SnackBar(content: Text(exceptio.message));

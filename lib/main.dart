@@ -42,9 +42,9 @@ Future<void> main() async {
   final firebaseApp = Firebase.app();
   final options = firebaseApp.options;
   // print('Firebase Project ID: ${options.projectId}');
-  await FirebaseAppCheck.instance.activate(
-      androidProvider:
-          kDebugMode ? AndroidProvider.playIntegrity : AndroidProvider.playIntegrity);
+  // await FirebaseAppCheck.instance.activate(
+  //     androidProvider:
+  //         kDebugMode ? AndroidProvider.playIntegrity : AndroidProvider.playIntegrity);
   print('Firebase Project ID: ${options.projectId}');
   await NotificationService().initService();
   // await NotificationService.initializeNotification();
