@@ -1643,18 +1643,26 @@ class _HomeViewState extends State<HomeView> {
                                     // Text(timeoutValue),
                                   ],
                                 )
-                                    : null,
+                                    :       Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 20),
+                                    child: Text(/*cycleLength <= 14*/
+                                        isWithinFourteenDays
+                                            ? 'That doesn\’t seem right! Irregular periods are usually harmless, but it\'s best to consult your doctor.'
+                                            : 'Unusual Period',
+                                        style: TextStyle(fontSize: 12)),
+                                    alignment: Alignment.center
+                                ),
                               ),
-                              kCommonSpaceV5,
-                              Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 20),
-                                  child: Text(/*cycleLength <= 14*/
-                                      isWithinFourteenDays
-                                          ? 'That doesn\’t seem right! Irregular periods are usually harmless, but it\'s best to consult your doctor.'
-                                          : 'Unusual Period',
-                                      style: TextStyle(fontSize: 12)),
-                                  alignment: Alignment.center
-                              ),
+                              // kCommonSpaceV5,
+                              // Container(
+                              //     padding: EdgeInsets.symmetric(horizontal: 20),
+                              //     child: Text(/*cycleLength <= 14*/
+                              //         isWithinFourteenDays
+                              //             ? 'That doesn\’t seem right! Irregular periods are usually harmless, but it\'s best to consult your doctor.'
+                              //             : 'Unusual Period',
+                              //         style: TextStyle(fontSize: 12)),
+                              //     alignment: Alignment.center
+                              // ),
                               kCommonSpaceV5,
                               ElevatedButton(
                                 onPressed: () {

@@ -282,13 +282,14 @@ class HomeViewModel with ChangeNotifier {
         .where((date) => date.year == currentDate.year && date.month == currentDate.month) // Filter same year and month
         .where((date) => date.isBefore(currentDate) || date.isAtSameMomentAs(currentDate)) // Filter dates before or equal to currentDate
         .fold<DateTime?>(null, (prev, date) => prev == null || date.isBefore(prev) ? date : prev); // Find the minimum date
-
+    // debugPrint("previousCycleStartDate $previousCycleStartDate");
     // Find the next cycle start date after the current date
     DateTime? nextCycleStartDate = nextCycleDates
+        .where((date) => date.year == currentDate.year && date.month == currentDate.month+1)
         .where((date) => date.isAfter(currentDate)) // Keep only dates after currentDate
         .fold<DateTime?>(null, (prev, date) => prev == null || date.isBefore(prev) ? date : prev); // Find the smallest date
 
-
+    // log("nextCycleStartDate $nextCycleDates");
     //print("periodLenght =====>${peroidCustomeList.length}");
     int prL=0;
     if(peroidCustomeList.length<=0){
@@ -528,6 +529,7 @@ class HomeViewModel with ChangeNotifier {
               predicated_period_start_date: master.data!.predicated_period_start_date,
               predicated_period_end_date: master.data!.predicated_period_end_date);
           peroidCustomeList.add(data);
+          notifyListeners();
         }
       }
 
@@ -538,7 +540,9 @@ class HomeViewModel with ChangeNotifier {
         isWithinFourteenDays = firstPeriodLastDate.difference(secondPeriodStartDate).inDays.abs()<=14;
       }
 
-      handleSecondBloc(peroidCustomeList[(master.data!.periodData?.length??0)-1].period_start_date);
+      debugPrint("peroidCustomeList ====>${peroidCustomeList[(master.data!.periodData?.length??0)-1].period_cycle_length}");
+
+      handleSecondBloc(master.data!.periodData![0].period_start_date);
       /*peroidCustomeList.add( PeriodObj(
           user_id: master.data!.user_id,
           period_cycle_length: master.data!.period_cycle_length,
@@ -556,40 +560,86 @@ class HomeViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> handleSecondBloc(String dt) async {
+
+
+  Future<void> handleSecondBloc(String dt,) async {
+
+
     if (gUserType == AppConstants.NEOWME || gUserType == AppConstants.BUDDY) {
-      int cycleLength = int.parse(globalUserMaster?.averageCycleLength ?? "28");
       print("Cycle length :: ${globalUserMaster?.averageCycleLength}");
       print(
-          "Period length :: ${globalUserMaster?.averagePeriodLength} previouspreriodbegin : ${globalUserMaster?.previousPeriodsBegin ?? ''}");
-      //mViewModel.dateParts = dateString.split(RegExp(r'[\s-]+'));
-      dateParts = dt.split(RegExp(r'[\s-]+'));
-      year = int.parse(dateParts[0]);
-      month = int.parse(dateParts[1]);
-      day = int.parse(dateParts[2]);
-      DateTime previousDate = DateTime(year, month, day);
-      print("previousDate :::::::::: $previousDate");
-      DateTime newDate = previousDate.add(Duration(days: -cycleLength));
+          "Period length :: ${globalUserMaster?.averagePeriodLength}");
+     dateParts = dt.split(RegExp(r'[\s-]+'));
+     year = int.parse(dateParts[0]);
+month = int.parse(dateParts[1]);
+   day = int.parse(dateParts[2]);
+      DateTime previousDate =
+      DateTime(year, month, day);
+      DateTime newDate = previousDate.add(Duration(days: -int.parse(globalUserMaster?.averageCycleLength ?? "28")));
+      print("previousDate is :::::::::: $previousDate");
       print("newDate date is :::::::::: $newDate");
-      print(" cycleLength date is :::::::::: $cycleLength");
+      print(" cycleLength date is :::::::::: $globalUserMaster?.averageCycleLength");
 
-      nextCycleDates = calculateCycleDatesInYear(newDate, cycleLength);
-      ovulationDates = calculateOvolutionDatesInYear(newDate, cycleLength);
-      firtileDates = calculateFirtileDatesInYear(ovulationDates);
+   nextCycleDates =
+    calculateCycleDatesInYear(newDate, int.parse(globalUserMaster?.averageCycleLength ?? "28"));
+ ovulationDates =
+  calculateOvolutionDatesInYear(newDate, int.parse(globalUserMaster?.averageCycleLength ?? "28"));
+  firtileDates =
+    calculateFirtileDatesInYear(ovulationDates);
       print("CycleDates date is :::::::::: ${gCycleDates[0].periodDay}");
-      generateDaysList();
-      print("Next date is :::::::::: $nextCycleDates");
+ generateDaysList();
+      print("Next date is :::::::::: ${nextCycleDates}");
 
       DateTime today = DateTime.now();
       DateTime? nextCycleDate = nextCycleDates.firstWhere(
-        (date) => date.isAfter(today),
+            (date) => date.isAfter(today),
         orElse: () => nextCycleDates.last,
       );
 
       // Pass the next cycle date to the calculateDaysToGo method
-      // daysToGo = mViewModel.calculateDaysToGo(nextCycleDate);
+     String daysToGo = calculateDaysToGo(nextCycleDate);
+      print(
+          'FInal date for done :::::::::::::::::::::::::::==============> $daysToGo');
 
       // daysToGo = mViewModel.calculateDaysToGo(mViewModel.nextCycleDates);
     }
+
+
+    // if (gUserType == AppConstants.NEOWME || gUserType == AppConstants.BUDDY) {
+    //   int cycleLength = int.parse(globalUserMaster?.averageCycleLength ?? "28");
+    //   print("Cycle length :: ${globalUserMaster?.averageCycleLength}");
+    //   print("dt :: ${dt}");
+    //   print(
+    //       "Period length :: ${globalUserMaster?.averagePeriodLength} previouspreriodbegin : ${globalUserMaster?.previousPeriodsBegin ?? ''}");
+    //   //mViewModel.dateParts = dateString.split(RegExp(r'[\s-]+'));
+    //   dateParts = dt.split(RegExp(r'[\s-]+'));
+    //   year = int.parse(dateParts[0]);
+    //   month = int.parse(dateParts[1]);
+    //   day = int.parse(dateParts[2]);
+    //   DateTime previousDate = DateTime(year, month, day);
+    //   DateTime endDate = DateTime(year, month, day).add(Duration(days: int.parse(globalUserMaster?.averagePeriodLength ?? "5") - 1));
+    //   print("previousDate :::::::::: $previousDate");
+    //   DateTime newDate = previousDate.add(Duration(days: cycleLength));
+    //   print("newDate date is :::::::::: $newDate");
+    //   print(" cycleLength date is :::::::::: $cycleLength");
+    //
+    //   nextCycleDates = calculateCycleDatesInYear(newDate.subtract(Duration(days: 1)), cycleLength);
+    //   ovulationDates = calculateOvolutionDatesInYear(previousDate, cycleLength);
+    //   firtileDates = calculateFirtileDatesInYear(ovulationDates);
+    //   print("CycleDates date is :::::::::: ${gCycleDates[0].periodDay}");
+    //   generateDaysList();
+    //   print("Next date is :::::::::: $nextCycleDates");
+    //
+    //   DateTime today = DateTime.now();
+    //   DateTime? nextCycleDate = nextCycleDates.firstWhere(
+    //     (date) => date.isAfter(today),
+    //     orElse: () => nextCycleDates.last,
+    //   );
+    //
+    //   // Pass the next cycle date to the calculateDaysToGo method
+    //   // daysToGo = mViewModel.calculateDaysToGo(nextCycleDate);
+    //
+    //   // daysToGo = mViewModel.calculateDaysToGo(mViewModel.nextCycleDates);
+    // }
   }
 }
