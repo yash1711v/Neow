@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
@@ -7,7 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:zodiac/zodiac.dart';
 
+import '../../../database/app_preferences.dart';
 import '../../../generated/i18n.dart';
+import '../../../models/login_master.dart';
 import '../../../ui/common_ui/welcome/welcome_view_model.dart';
 import '../../../utils/common_colors.dart';
 import '../../../utils/common_utils.dart';
@@ -112,6 +115,121 @@ class _WelcomeViewState extends State<WelcomeView> {
       }); */
     }
   }
+
+
+  Future<void> selectDate() async {
+    DateTime today = DateTime.now();
+    DateTime minimumAllowedDate = today.subtract(const Duration(days: 365 * 15)); // 15 years ago
+
+    DateTime? picked = await showDatePicker(
+      context: mainNavKey.currentContext!,
+      initialDate: mDateController.text.isNotEmpty
+          ? DateFormat("yyyy-MM-dd").parse(mDateController.text)
+          : minimumAllowedDate,
+      firstDate: DateTime(1900),
+      lastDate: minimumAllowedDate,
+    );
+
+    if (picked != null) {
+      setState(() {
+        mDateController.text = CommonUtils.dateFormatyyyyMMDD(picked.toString());
+        int age = calculateAge(mDateController.text);
+        debugPrint("Age===>: $age");
+
+        if(singInViewModel.userRoleId == "2"){
+          if (age >= 55) {
+            // Automatically pop the date picker and show the dialog
+            Future.delayed(Duration.zero, () {
+              askMenstrualStatus();
+            });
+          } else {
+            // Set default user role for younger users
+            singInViewModel.userRoleId = "2";
+            gUserType = AppConstants.NEOWME;
+          }
+        }
+      });
+    } else {
+      print("Date selection canceled");
+    }
+  }
+
+  void askMenstrualStatus() {
+    showDialog(
+      context: mainNavKey.currentContext!,
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Menstrual Status"),
+          content: const Text("Are you still having periods?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+
+
+                  singInViewModel.userRoleId = "4"; // Assign role for menopause
+                  gUserType = AppConstants.CYCLE_EXPLORER;
+                  globalUserMaster = AppPreferences.instance
+                      .getUserDetails();
+
+                  UserMaster userMaster = UserMaster(
+                      id: globalUserMaster!.id,
+                      name: globalUserMaster!.name,
+                      email: globalUserMaster!.email,
+                      roleId : 4,
+                      uuId: globalUserMaster!.uuId,
+                      birthdate: globalUserMaster!.birthdate,
+                      age: globalUserMaster!.age,
+                      height: globalUserMaster!.height,
+                      weight: globalUserMaster!.weight,
+                      bmiScore: globalUserMaster!.bmiScore,
+                      bmiType: globalUserMaster!.bmiType,
+                      badTime: globalUserMaster!.badTime,
+                      wakeUpTime: globalUserMaster!.wakeUpTime,
+                      totalSleepTime: globalUserMaster!.totalSleepTime,
+                      waterMl: globalUserMaster!.waterMl,
+                      gender: globalUserMaster!.gender,
+                      genderType: globalUserMaster!.genderType,
+                      mobile: globalUserMaster!.mobile,
+                      deviceToken: globalUserMaster!.deviceToken,
+                      image: globalUserMaster!.image,
+                      relationshipStatus: globalUserMaster!.relationshipStatus,
+                      humApkeHeKon: globalUserMaster!.humApkeHeKon,
+                      status: globalUserMaster!.status,
+                      state: globalUserMaster!.state,
+                      city: globalUserMaster!.city
+                  );
+
+                  AppPreferences.instance.setUserDetails(
+                      jsonEncode(userMaster));
+                  gUserType = singInViewModel.userRoleId.toString();
+
+
+                  debugPrint("Role ID: ${singInViewModel.userRoleId}");
+                });
+              },
+              child: const Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  singInViewModel.userRoleId = "2"; // Default role
+                  gUserType = AppConstants.NEOWME;
+                  debugPrint("Role ID: ${singInViewModel.userRoleId}");
+                });
+              },
+              child: const Text("Yes"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -435,98 +553,100 @@ class _WelcomeViewState extends State<WelcomeView> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: InkWell(
-                        onTap: () {
-                          pageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        child: const Icon(Icons.arrow_back,
-                            color: CommonColors.primaryColor),
+              SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: InkWell(
+                          onTap: () {
+                            pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          child: const Icon(Icons.arrow_back,
+                              color: CommonColors.primaryColor),
+                        ),
                       ),
-                    ),
-                    kCommonSpaceV10,
-                    Text(
-                      S.of(context)!.relationshipStatus,
-                      style: TextStyle(
-                        color: CommonColors.blackColor,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
+                      kCommonSpaceV10,
+                      Text(
+                        S.of(context)!.relationshipStatus,
+                        style: TextStyle(
+                          color: CommonColors.blackColor,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    kCommonSpaceV30,
-                    Row(mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                      kCommonSpaceV30,
+                      Row(mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                        CommonRelationSelectBox(
+                          onTap: () {
+                            setState(() {
+                              selectedRelation = 1;
+                            });
+                          },
+                          text: S.of(context)!.solo,
+                          imagePath: LocalImages.img_solo,
+                          // isBoxFit: true,
+                          isShowDefaultBorder: true,
+                          isSelected: selectedRelation == 1,
+                        ),
+                        kCommonSpaceH10,
+                        kCommonSpaceH10,
+                        CommonRelationSelectBox(
+                          onTap: () {
+                            setState(() {
+                              selectedRelation = 2;
+                            });
+                          },
+                          text: S.of(context)!.tied,
+                          imagePath: LocalImages.img_naveli_heart,
+                          // isBoxFit: true,
+                          isShowDefaultBorder: true,
+                
+                          isSelected: selectedRelation == 2,
+                        ),
+                      ]),
                       CommonRelationSelectBox(
                         onTap: () {
                           setState(() {
-                            selectedRelation = 1;
+                            selectedRelation = 3;
                           });
                         },
-                        text: S.of(context)!.solo,
-                        imagePath: LocalImages.img_solo,
-                        // isBoxFit: true,
+                        text: 'Open for surprises',
+                        imagePath: LocalImages.img_open_for_surprises,
                         isShowDefaultBorder: true,
-                        isSelected: selectedRelation == 1,
-                      ),
-                      kCommonSpaceH10,
-                      kCommonSpaceH10,
-                      CommonRelationSelectBox(
-                        onTap: () {
-                          setState(() {
-                            selectedRelation = 2;
-                          });
-                        },
-                        text: S.of(context)!.tied,
-                        imagePath: LocalImages.img_naveli_heart,
+                
                         // isBoxFit: true,
-                        isShowDefaultBorder: true,
-
-                        isSelected: selectedRelation == 2,
+                        isSelected: selectedRelation == 3,
                       ),
-                    ]),
-                    CommonRelationSelectBox(
-                      onTap: () {
-                        setState(() {
-                          selectedRelation = 3;
-                        });
-                      },
-                      text: 'Open for surprises',
-                      imagePath: LocalImages.img_open_for_surprises,
-                      isShowDefaultBorder: true,
-
-                      // isBoxFit: true,
-                      isSelected: selectedRelation == 3,
-                    ),
-                    // ListView.builder(
-                    //   scrollDirection: Axis.vertical,
-                    //   shrinkWrap: true,
-                    //   physics: ClampingScrollPhysics(),
-                    //   itemCount: dataList1.length,
-                    //   itemBuilder: (BuildContext context, int index) {
-                    //     return InkWell(
-                    //       onTap: () {
-                    //         mViewModel.changeRelationStatusIndex(index);
-                    //         print(mViewModel.selectedRelationStatusIndex);
-                    //       },
-                    //       child: CommonGenderSelectBox(
-                    //         text: dataList1[index]['text'],
-                    //         imagePath: dataList1[index]['image'],
-                    //         isSelected:
-                    //             index == mViewModel.selectedRelationStatusIndex,
-                    //       ),
-                    //     );
-                    //   },
-                    // ),
-                  ],
+                      // ListView.builder(
+                      //   scrollDirection: Axis.vertical,
+                      //   shrinkWrap: true,
+                      //   physics: ClampingScrollPhysics(),
+                      //   itemCount: dataList1.length,
+                      //   itemBuilder: (BuildContext context, int index) {
+                      //     return InkWell(
+                      //       onTap: () {
+                      //         mViewModel.changeRelationStatusIndex(index);
+                      //         print(mViewModel.selectedRelationStatusIndex);
+                      //       },
+                      //       child: CommonGenderSelectBox(
+                      //         text: dataList1[index]['text'],
+                      //         imagePath: dataList1[index]['image'],
+                      //         isSelected:
+                      //             index == mViewModel.selectedRelationStatusIndex,
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
+                    ],
+                  ),
                 ),
               ),
               // Center(
@@ -673,54 +793,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                             kCommonSpaceV10,
                             LabelTextField(
                               onTap: () async {
-                                /*DateTime? picked = await showDatePicker(
-                                    context: mainNavKey.currentContext!,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime.now().subtract(
-                                        const Duration(days: 365 * 60)),
-                                    lastDate: DateTime.now());
-                                if (picked != null) {
-                                  setState(() {
-                                    mDateController.text =
-                                        CommonUtils.dateFormatyyyyMMDD(
-                                            picked.toString());
-                                    zodiac = Zodiac().getZodiac(
-                                        mDateController.text.toString());
-                                  });
-                                } else {
-                                  print(picked);
-                                }*/
-
-                                DateTime today = DateTime.now();
-                                DateTime minimumAllowedDate = today.subtract(const Duration(days: 365 * 15)); // 14 years ago
-
-                                DateTime? picked = await showDatePicker(
-                                  context: mainNavKey.currentContext!,
-                                  initialDate: mDateController.text.isNotEmpty?DateFormat("yyyy-MM-dd").parse(mDateController.text):minimumAllowedDate, // Default to 14 years ago
-                                  firstDate: DateTime(1900),       // Earliest selectable date for DOB
-                                  lastDate: minimumAllowedDate,   // Maximum selectable date is 14 years ago
-                                );
-
-                                if (picked != null) {
-                                  setState(() {
-                                    mDateController.text = CommonUtils.dateFormatyyyyMMDD(picked.toString());
-
-                                   int age =  calculateAge(mDateController.text);
-
-                                   debugPrint("Age===>: $age");
-                                   //
-                                   // if(age >= 55){
-                                   //   singInViewModel.userRoleId = "4";
-                                   // } else {
-                                   //   singInViewModel.userRoleId = "4";
-                                   // }
-                            debugPrint("Role ID===>: ${singInViewModel.userRoleId}");
-
-                                    zodiac = Zodiac().getZodiac(mDateController.text.toString());
-                                  });
-                                } else {
-                                  print("Date selection canceled: $picked");
-                                }
+                                selectDate();
                               },
                               hintText: S.of(context)!.selectDate,
                               controller: mDateController,
@@ -1046,7 +1119,8 @@ class _WelcomeViewState extends State<WelcomeView> {
                           Future.delayed(const Duration(seconds: 3), () {
                             Navigator.of(context).pop();
                           });
-                        } else if (currentIndex == 3 && selectedRelation == 2) {
+                        }
+                        else if (currentIndex == 3 && selectedRelation == 2) {
                           showDialog(
                             barrierDismissible: false,
                             context: context,
@@ -1103,7 +1177,8 @@ class _WelcomeViewState extends State<WelcomeView> {
                           Future.delayed(const Duration(seconds: 3), () {
                             Navigator.of(context).pop();
                           });
-                        } else if (currentIndex == 3 && selectedRelation == 3) {
+                        }
+                        else if (currentIndex == 3 && selectedRelation == 3) {
                           showDialog(
                             barrierDismissible: false,
                             context: context,
@@ -1173,14 +1248,14 @@ class _WelcomeViewState extends State<WelcomeView> {
                           allData['relation'] = selectedRelation.toString();
                           allData['birthdate'] = mDateController.text.trim();
                           if (currentIndex == 5 &&
-                              gUserType == AppConstants.NEOWME) {
+                              gUserType == AppConstants.NEOWME ) {
                             push(CycleInfoView(welcomeData: allData));
                           } else if (currentIndex == 4 &&
                               gUserType == AppConstants.CYCLE_EXPLORER) {
                             print("cycle...");
                             CycleInfoViewModel().userUpdateDetailsApi(
                               isFromCycle: true,
-                              // roleId: calculateAge(mDateController.text)>=55?"4":null,
+                              roleId: "4",
                               name: allData['name'],
                               birthdate: allData['birthdate'],
                               gender: allData['gender'],
@@ -1211,7 +1286,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                             CycleInfoViewModel()
                                 .userUpdateDetailsApi(
                               isFromCycle: true,
-                              // roleId: calculateAge(mDateController.text)>=55?"4":null,
+                              roleId: "3",
                               name: allData['name'],
                               birthdate: allData['birthdate'],
                               gender: allData['gender'],
@@ -1275,3 +1350,5 @@ class _WelcomeViewState extends State<WelcomeView> {
     }
   }
 }
+
+
