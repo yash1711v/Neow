@@ -587,7 +587,7 @@ month = int.parse(dateParts[1]);
    day = int.parse(dateParts[2]);
       DateTime previousDate =
       DateTime(year, month, day);
-      DateTime newDate = previousDate.add(Duration(days: int.parse(globalUserMaster?.averageCycleLength ?? "28")));
+      DateTime newDate = previousDate.add(Duration(days: -int.parse(globalUserMaster?.averageCycleLength ?? "28")));
       print("previousDate is :::::::::: $previousDate");
       print("newDate date is :::::::::: $newDate");
       print(" cycleLength date is :::::::::: $globalUserMaster?.averageCycleLength");

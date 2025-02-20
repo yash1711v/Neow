@@ -1646,9 +1646,7 @@ class _HomeViewState extends State<HomeView> {
                                     :       Container(
                                     padding: EdgeInsets.symmetric(horizontal: 20),
                                     child: Text(/*cycleLength <= 14*/
-                                        isWithinFourteenDays
-                                            ? 'That doesn\’t seem right! Irregular periods are usually harmless, but it\'s best to consult your doctor.'
-                                            : 'Unusual Period',
+                                        "updating..",
                                         style: TextStyle(fontSize: 12)),
                                     alignment: Alignment.center
                                 ),

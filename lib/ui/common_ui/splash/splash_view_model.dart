@@ -60,6 +60,8 @@ class SplashViewModel with ChangeNotifier {
 
   void onFinishGIF() {
     pushAndRemoveUntil(const SelectOptionView());
+    AppPreferences.instance
+        .setIsFirstTime(false);
     // pushAndRemoveUntil(const StateSelectionView());
   }
 
