@@ -136,17 +136,15 @@ class _WelcomeViewState extends State<WelcomeView> {
         int age = calculateAge(mDateController.text);
         debugPrint("Age===>: $age");
 
-        if(singInViewModel.userRoleId == "2"){
-          if (age >= 55) {
-            // Automatically pop the date picker and show the dialog
-            Future.delayed(Duration.zero, () {
-              askMenstrualStatus();
-            });
-          } else {
-            // Set default user role for younger users
-            singInViewModel.userRoleId = "2";
-            gUserType = AppConstants.NEOWME;
-          }
+        if (age >= 55) {
+          // Automatically pop the date picker and show the dialog
+          Future.delayed(Duration.zero, () {
+            askMenstrualStatus();
+          });
+        } else {
+          // Set default user role for younger users
+          singInViewModel.userRoleId = "2";
+          gUserType = AppConstants.NEOWME;
         }
       });
     } else {

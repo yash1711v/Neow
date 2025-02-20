@@ -279,7 +279,7 @@ class HomeViewModel with ChangeNotifier {
    // print("nextCycleDates  ${nextCycleDates}");
     // Find the most recent period start date before or on the current date
     DateTime? previousCycleStartDate = nextCycleDates
-        .where((date) => date.year == currentDate.year && date.month == currentDate.month) // Filter same year and month
+        .where((date) => date.year == currentDate.year && date.month == currentDate.month-1) // Filter same year and month
         .where((date) => date.isBefore(currentDate) || date.isAtSameMomentAs(currentDate)) // Filter dates before or equal to currentDate
         .fold<DateTime?>(null, (prev, date) => prev == null || date.isBefore(prev) ? date : prev); // Find the minimum date
     // debugPrint("previousCycleStartDate $previousCycleStartDate");
@@ -288,6 +288,11 @@ class HomeViewModel with ChangeNotifier {
         .where((date) => date.year == currentDate.year && date.month == currentDate.month+1)
         .where((date) => date.isAfter(currentDate)) // Keep only dates after currentDate
         .fold<DateTime?>(null, (prev, date) => prev == null || date.isBefore(prev) ? date : prev); // Find the smallest date
+
+
+
+    debugPrint("previousCycleStartDate $previousCycleStartDate");
+    debugPrint("nextCycleStartDate $nextCycleStartDate");
 
     // log("nextCycleStartDate $nextCycleDates");
     //print("periodLenght =====>${peroidCustomeList.length}");
@@ -329,15 +334,17 @@ class HomeViewModel with ChangeNotifier {
 
       int num = currentDateIndex.abs() + 1;
       return "Period day $num";
-    } else if (cycleDay <= clen) {
+    }
+    else if (cycleDay <= clen) {
       // If the current cycle day is less than or equal to 15, display the day of the current cycle
 
       int ovdays = 7 + (clen - 21);
       if (ovdays >= cycleDay) {
         ovdays = ovdays - cycleDay;
       } else {
+       // debugPrint("previousCycleStartDate $previousCycleStartDate");
         // ovdays = cycleDay-ovdays;
-        int daysToNextCycle = (nextCycleStartDate ?? DateTime.now()).difference(currentDate).inDays;
+        int daysToNextCycle = (nextCycleStartDate?.subtract(Duration(days: 1)) ?? DateTime.now()).difference(currentDate).inDays;
         //  log("NextCycle Days: ${nextCycleDates}",name: "NextCycle");
         // debugPrint("daysToNextCycle $daysToNextCycle");
         // debugPrint("daysToNextCycle $daysToNextCycle");
@@ -356,7 +363,10 @@ class HomeViewModel with ChangeNotifier {
     } else {
       // Calculate days to go until the next period starts
       int daysToNextCycle =
-          (nextCycleStartDate ?? DateTime.now()).difference(currentDate).inDays + 1;
+          (nextCycleStartDate ?? DateTime.now()).difference(currentDate).inDays;
+
+      debugPrint("daysToNextCycle $daysToNextCycle");
+      debugPrint("daysToNextCycle $currentDate");
       if(daysToNextCycle==1) {
         return "Period may\nstart today";
       }else {
@@ -570,12 +580,14 @@ class HomeViewModel with ChangeNotifier {
       print(
           "Period length :: ${globalUserMaster?.averagePeriodLength}");
      dateParts = dt.split(RegExp(r'[\s-]+'));
+      debugPrint(
+          "dt :: ${dt.toString()}");
      year = int.parse(dateParts[0]);
 month = int.parse(dateParts[1]);
    day = int.parse(dateParts[2]);
       DateTime previousDate =
       DateTime(year, month, day);
-      DateTime newDate = previousDate.add(Duration(days: -int.parse(globalUserMaster?.averageCycleLength ?? "28")));
+      DateTime newDate = previousDate.add(Duration(days: int.parse(globalUserMaster?.averageCycleLength ?? "28")));
       print("previousDate is :::::::::: $previousDate");
       print("newDate date is :::::::::: $newDate");
       print(" cycleLength date is :::::::::: $globalUserMaster?.averageCycleLength");
