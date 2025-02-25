@@ -413,6 +413,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                   child: Column(
                     // mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+
                       Align(
                         alignment: Alignment.topLeft,
                         child: InkWell(
@@ -446,17 +447,17 @@ class _WelcomeViewState extends State<WelcomeView> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      Image.asset(
+                        height: kDeviceHeight / 4,
+                        LocalImages.img_gender_screen,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(LocalImages.img_image_error);
+                        },
+                      ),
                       kCommonSpaceV30,
                       if (gUserType == AppConstants.BUDDY ||
                           gUserType == AppConstants.CYCLE_EXPLORER) ...[
 
-                        Image.asset(
-                          height: kDeviceHeight / 4,
-                          LocalImages.img_gender_screen,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Image.asset(LocalImages.img_image_error);
-                          },
-                        ),
                         kCommonSpaceV30,
 
                         CommonGenderSelectBox(

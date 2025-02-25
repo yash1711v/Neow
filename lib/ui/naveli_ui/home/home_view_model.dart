@@ -286,7 +286,7 @@ class HomeViewModel with ChangeNotifier {
 
     nextCycleDates = nextCycleDates.toSet().toList();
     nextCycleDates.sort();
-
+    DateTime? previousDateExists = getValidCycleStartDate(nextCycleDates,currentDate);
     // print("nextCycleDates  ${nextCycleDates}");
     // Find the most recent period start date before or on the current date
     DateTime? previousCycleStartDate = nextCycleDates
@@ -314,7 +314,7 @@ class HomeViewModel with ChangeNotifier {
                 ? date
                 : prev); // Find the smallest date
 
-    // debugPrint("previousCycleStartDate $previousCycleStartDate");
+    // debugPrint("previousCycleStartDate $nextCycleDates");
     // debugPrint("nextCycleStartDate $nextCycleStartDate");
 
     // log("nextCycleStartDate $nextCycleDates");
@@ -360,14 +360,17 @@ class HomeViewModel with ChangeNotifier {
     int clen = int.parse(globalUserMaster?.averageCycleLength ?? '28');
     globalPday = "$cycleDay";
     if (isPeriodDay && previousDateLocal.month == currentDate.month) {
+      // debugPrint("Current Month ${currentDate.month}");
+      // debugPrint("Current Month ${nextCycleDates}");
       // This is a period day
       int currentMonth = currentDate.month;
       int currentYear = currentDate.year;
       // Filter dates for the current month and year
       List<DateTime> filteredDates = nextCycleDates
           .where(
-              (date) => date.month == currentMonth && date.year == currentYear)
+              (date) => date.month == currentMonth  && date.year == currentYear)
           .toList();
+      // debugPrint("filteredDates $filteredDates");
       int currentDateIndex = filteredDates[0].difference(currentDate).inDays;
       globalIsPeriodDay = true;
 
@@ -424,7 +427,7 @@ class HomeViewModel with ChangeNotifier {
           // debugPrint("NextCycle Date==> ${nextCycleStartDate}");
           daysToNextCycle = (
               currentDate)
-              .difference((nextCycleStartDate ?? DateTime.now()).subtract(Duration(days: 1)))
+              .difference(( nextCycleStartDate ?? DateTime.now()).subtract(Duration(days: 1)))
               .inDays;
           if(daysToNextCycle<=5 && daysToNextCycle<=0){
             return "Period may\nstart today";
@@ -497,10 +500,10 @@ class HomeViewModel with ChangeNotifier {
               nextCycleStartDate!.isSameDayOrBefore(currentDate) ??
           false) {
         // debugPrint("previousDate:- $previousCycleStartDate");
-        // debugPrint("nextDate:- $nextCycleStartDate");
-        daysToNextCycle = (currentDate)
-            .difference((nextCycleStartDate ?? DateTime.now())
-                .subtract(Duration(days: 1)))
+        debugPrint("nextDate:- $previousDateExists");
+        daysToNextCycle = (
+            currentDate)
+            .difference((nextCycleStartDate ?? DateTime.now()).subtract(Duration(days: 1)))
             .inDays;
         if (daysToNextCycle <= 5 && daysToNextCycle <= 0) {
           return "Period may\nstart today";
@@ -752,8 +755,8 @@ class HomeViewModel with ChangeNotifier {
           " cycleLength date is :::::::::: $globalUserMaster?.averageCycleLength");
 
       nextCycleDates = calculateCycleDatesInYear(
-          newDate.month == DateTime.now().month &&
-                  previousDate.month != DateTime.now().month
+          newDate.month == DateTime.now().month ||
+                  previousDate.month == DateTime.now().month
               ? previousDate
               : newDate,
           int.parse(globalUserMaster?.averageCycleLength ?? "28"));
@@ -842,4 +845,24 @@ bool isCurrentDateAfterOvulationRange(
   } else {
     return false; // The current date is before or within the ovulation window
   }
+}
+
+
+DateTime? getValidCycleStartDate(List<DateTime> nextCycleDates, DateTime currentDate) {
+  // Filter dates that belong to the previous month(s) or the start of the current month
+  List<DateTime> validDates = nextCycleDates
+      .where((date) => date.month < currentDate.month || date.day <= 2) // End of prev month & start of current
+      .toList();
+
+  if (validDates.isNotEmpty) {
+    // Find the smallest date in the valid range
+    return validDates.reduce((smallest, date) {
+      // Prefer 28 over 29 if both exist
+      if (smallest.day == 29 && date.day == 28) return date;
+      if (smallest.day == 28 && date.day == 29) return smallest;
+      return date.isBefore(smallest) ? date : smallest;
+    });
+  }
+
+  return null; // No valid dates found
 }

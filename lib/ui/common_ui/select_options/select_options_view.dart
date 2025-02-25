@@ -53,7 +53,7 @@ class _SelectOptionViewState extends State<SelectOptionView>
     super.initState();
     player = AudioPlayer();
     player.setAsset(LocalImages.au_who_are_you);
-    playAudio();
+    // playAudio();
     if (AppPreferences.instance.getLanguageCode() ==
         AppConstants.LANGUAGE_ENGLISH) {
       selectedIndex = 1;

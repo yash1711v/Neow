@@ -171,55 +171,56 @@ class _SplashViewState extends State<SplashViewVdo> {
             });
           }
         },
-        child: FittedBox(
-          fit: BoxFit.none,
-          child: SizedBox(
-            width: vdo_Controller.value.size.width,
-            height: vdo_Controller.value.size.height,
-            child: Stack(
-              children: [
-                VideoPlayer(vdo_Controller),
-                Positioned(
-                  top: 100,
-                  right: 50,
-                  child: TextButton(
-                    onPressed: skipVideo,
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.black.withOpacity(0.5),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                    ),
-                    child: const Text(
-                      "Skip",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          // vdo_Controller.value.size.width,
+          height: MediaQuery.of(context).size.height,
+          child: VideoPlayer(vdo_Controller),
         ),
       ),
-      floatingActionButton: SizedBox(
-        height: 30.0,
-        width: 30.0,
-        child: FittedBox(
-          child: FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                if (isMute) {
-                  vdo_Controller.setVolume(0.0);
-                } else {
-                  vdo_Controller.setVolume(1.0);
-                }
-                toggleMute();
-              });
-            },
-            child: Icon(
-              isMute ? Icons.volume_up : Icons.volume_off,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Visibility(
+            visible: isPlayingStart,
+            child: SizedBox(
+              height: 30.0,
+              width: 30.0,
+              child: FittedBox(
+                child: FloatingActionButton(
+                  onPressed: skipVideo,
+                  child: Icon(
+                    Icons.skip_next,
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
+          Visibility(
+              visible: isPlayingStart,
+              child: SizedBox(width: 10,)),
+          SizedBox(
+            height: 30.0,
+            width: 30.0,
+            child: FittedBox(
+              child: FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    if (isMute) {
+                      vdo_Controller.setVolume(0.0);
+                    } else {
+                      vdo_Controller.setVolume(1.0);
+                    }
+                    toggleMute();
+                  });
+                },
+                child: Icon(
+                  isMute ? Icons.volume_up : Icons.volume_off,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     )
         : const WelComeGifView();
