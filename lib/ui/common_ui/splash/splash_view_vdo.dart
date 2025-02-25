@@ -27,32 +27,35 @@ class _SplashViewState extends State<SplashViewVdo> {
   bool isPlayingFirstGif = true;
   bool isMute = true;
   bool isPlayingStart = false;
+
   loadVideoPlayer(String vpath) {
     vdo_Controller = VideoPlayerController.asset(vpath);
     vdo_Controller.addListener(() {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
     vdo_Controller.initialize().then((value) {
-      vdo_Controller.play();
-      vdo_Controller.setLooping(true);
-      setState(() {});
+      if (mounted) {
+        vdo_Controller.play();
+        vdo_Controller.setLooping(true);
+        setState(() {});
+      }
     });
   }
 
   loadSecondVideoPlayer(String vpath) {
     vdo_Controller = VideoPlayerController.asset(vpath);
     vdo_Controller.addListener(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
         setState(() {});
-      });
-
+      }
     });
     vdo_Controller.initialize().then((value) {
-      vdo_Controller.play();
-      // vdo_Controller.setLooping(true);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        vdo_Controller.play();
         setState(() {});
-      });
+      }
     });
   }
 
@@ -63,18 +66,6 @@ class _SplashViewState extends State<SplashViewVdo> {
     Future.delayed(Duration.zero, () {
       mViewModel.checkIsFirstTime();
     });
-    /* firstController = GifController(
-      autoPlay: true,
-      loop: false,
-    );
-    secondController = GifController(
-      autoPlay: false,
-      loop: false,
-      onFinish: onFinished, // Set onFinish callback for the second GIF
-    );
-
-
-     */
     player1 = AudioPlayer();
     player2 = AudioPlayer();
     player1.setAsset(LocalImages.au_knock_door);
@@ -108,15 +99,17 @@ class _SplashViewState extends State<SplashViewVdo> {
 
   void toggleGif() {
     setState(() {
-      playAudio1();
-      playAudio2();
-      isPlayingFirstGif = !isPlayingFirstGif;
-      if (isPlayingFirstGif) {
-        firstController.play();
-        secondController.pause();
-      } else {
-        firstController.pause();
-        secondController.play();
+      if (mounted) {
+        playAudio1();
+        playAudio2();
+        isPlayingFirstGif = !isPlayingFirstGif;
+        if (isPlayingFirstGif) {
+          firstController.play();
+          secondController.pause();
+        } else {
+          firstController.pause();
+          secondController.play();
+        }
       }
     });
   }
@@ -127,11 +120,21 @@ class _SplashViewState extends State<SplashViewVdo> {
     });
   }
 
-
   skipVideo() {
     vdo_Controller.pause();
+    vdo_Controller.removeListener(() {
+      if (mounted) {
+        setState(() {});
+      }
+    });
     vdo_Controller.dispose();
-    mViewModel.onFinishGIF(); // Move to next screen or animation
+    player1.stop();
+    player2.stop();
+    player1.dispose();
+    player2.dispose();
+    if (mounted) {
+      mViewModel.onFinishGIF(); // Move to next screen or animation
+    }
   }
 
   @override
@@ -141,29 +144,28 @@ class _SplashViewState extends State<SplashViewVdo> {
         ? Scaffold(
       body: GestureDetector(
         onTap: () async {
-          // toggleGif();
           if (isPlayingStart) {
             print("False ==");
           } else {
             playAudio1();
-            // playAudio2();
 
             Future.delayed(const Duration(seconds: 1), () {
               loadSecondVideoPlayer('assets/video/new_Door_Open.mp4');
 
-              // condition TRUE --> set first time false after 1 second
               Future.delayed(const Duration(seconds: 28), () {
-                // updating after 1 second because in Splash view we fetch with singleton instance
-                loadSecondVideoPlayer('assets/video/logoanimation.mp4');
-                if (AppPreferences.instance.getIsFirstTime()) {
-                  Future.delayed(const Duration(seconds: 7), () {
-                    vdo_Controller.setLooping(false);
-                    vdo_Controller.pause();
-                    setState(() {});
-                    mViewModel.onFinishGIF();
-                    AppPreferences.instance
-                        .setIsFirstTime(false); //need to change
-                  });
+                if (mounted) {
+                  loadSecondVideoPlayer('assets/video/logoanimation.mp4');
+                  if (AppPreferences.instance.getIsFirstTime()) {
+                    Future.delayed(const Duration(seconds: 7), () {
+                      if (mounted) {
+                        vdo_Controller.setLooping(false);
+                        vdo_Controller.pause();
+                        setState(() {});
+                        mViewModel.onFinishGIF();
+                        AppPreferences.instance.setIsFirstTime(false);
+                      }
+                    });
+                  }
                 }
               });
             });
@@ -184,7 +186,8 @@ class _SplashViewState extends State<SplashViewVdo> {
                     onPressed: skipVideo,
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.black.withOpacity(0.5),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                     ),
                     child: const Text(
                       "Skip",
@@ -195,15 +198,7 @@ class _SplashViewState extends State<SplashViewVdo> {
               ],
             ),
           ),
-        ), /* Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: 7.8/16,
-
-                     child: VideoPlayer(vdo_Controller),
-                  ),
-                ],
-              ), */
+        ),
       ),
       floatingActionButton: SizedBox(
         height: 30.0,
@@ -212,18 +207,14 @@ class _SplashViewState extends State<SplashViewVdo> {
           child: FloatingActionButton(
             onPressed: () {
               setState(() {
-                // pause
-
                 if (isMute) {
                   vdo_Controller.setVolume(0.0);
                 } else {
-                  // play
                   vdo_Controller.setVolume(1.0);
                 }
                 toggleMute();
               });
             },
-            // icon
             child: Icon(
               isMute ? Icons.volume_up : Icons.volume_off,
             ),

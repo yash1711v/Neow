@@ -396,9 +396,10 @@ class LocalImages {
   static const String workout_yoga = 'assets/emojis/workout_yoga.png';
   static const String loader_home = 'assets/gif/loader.gif';
 
-  static const String red_loader = 'assets/gif/3.gif';
-  static const String green_loader = 'assets/gif/2.gif';
-  static const String white_loader = 'assets/gif/4.gif';
+  static const String red_loader = 'assets/gif/3.png';
+  static const String green_loader = 'assets/gif/2.png';
+  static const String white_loader = 'assets/gif/4.png';
+  static const String not_fertile_loader = 'assets/gif/not_fertile_loader.png';
   static const String loadDots = 'assets/gif/Load2.gif';
   static const String heartHands = 'assets/gif/heart_hands.gif';
 
@@ -407,6 +408,7 @@ class LocalImages {
   static const String red_Static = 'assets/images/red_p.png';
   static const String green_Static = 'assets/images/green1.png';
   static const String white_Static = 'assets/images/gry1.png';
+  static const String not_fertile = 'assets/images/not_fertile.png';
 
 //chat images
   static const String chat1 = 'assets/images/chat1.png';

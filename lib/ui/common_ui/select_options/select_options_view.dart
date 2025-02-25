@@ -52,6 +52,8 @@ class _SelectOptionViewState extends State<SelectOptionView>
     // TODO: implement initState
     super.initState();
     player = AudioPlayer();
+    player.setAsset(LocalImages.au_who_are_you);
+    playAudio();
     if (AppPreferences.instance.getLanguageCode() ==
         AppConstants.LANGUAGE_ENGLISH) {
       selectedIndex = 1;
@@ -61,20 +63,20 @@ class _SelectOptionViewState extends State<SelectOptionView>
     }
   }
 
-  //
-  // Future<void> playAudio() async {
-  //   try {
-  //     await player.play();
-  //   } catch (e) {
-  //     print("Error playing audio: $e");
-  //   }
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   player.dispose();
-  //   super.dispose();
-  // }
+
+  Future<void> playAudio() async {
+    try {
+      await player.play();
+    } catch (e) {
+      print("Error playing audio: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

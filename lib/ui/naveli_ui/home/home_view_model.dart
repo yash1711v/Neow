@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+
+// import 'dart:developer';
+// import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:naveli_2023/utils/date_utils.dart';
 
 import '../../../database/app_preferences.dart';
+import '../../../models/cycle_dates_master.dart';
 import '../../../models/slider_video_master.dart';
 import '../../../services/api_para.dart';
 import '../../../services/index.dart';
@@ -12,8 +17,6 @@ import '../../../utils/common_colors.dart';
 import '../../../utils/common_utils.dart';
 import '../../../utils/constant.dart';
 import '../../../utils/global_variables.dart';
-import '../../../models/cycle_dates_master.dart';
-import 'package:http/http.dart' as http;
 
 class HomeViewModel with ChangeNotifier {
   late BuildContext context;
@@ -100,8 +103,7 @@ class HomeViewModel with ChangeNotifier {
   }
 
   List<DateTime> calculateCycleDatesInYear(
-      DateTime previousDate, int cycleLength)
-  {
+      DateTime previousDate, int cycleLength) {
     List<DateTime> nextCycleDates = [];
 
     print('PrevousDate : $previousDate CycleLength: $cycleLength');
@@ -113,19 +115,27 @@ class HomeViewModel with ChangeNotifier {
     List<DateTime> ovulationDates = [];
 
     print("ppppppp ${globalUserMaster!.averagePeriodLength ?? '5'}");
-    DateTime startDate = DateTime.parse(peroidCustomeList[peroidCustomeList.length-1].period_start_date);
-    DateTime endDate = DateTime.parse(peroidCustomeList[peroidCustomeList.length-1].period_end_date);
+    DateTime startDate = DateTime.parse(
+        peroidCustomeList[peroidCustomeList.length - 1].period_start_date);
+    DateTime endDate = DateTime.parse(
+        peroidCustomeList[peroidCustomeList.length - 1].period_end_date);
     int periodLength = startDate.difference(endDate).inDays.abs();
-    print("ppppppp ${peroidCustomeList[peroidCustomeList.length-1].period_length}");
+    print(
+        "ppppppp ${peroidCustomeList[peroidCustomeList.length - 1].period_length}");
 
     while (nextDate.isBefore(twelveMonthsLater)) {
       // Add all days of the period to the list
-      for (int i = 0; i < int.parse(peroidCustomeList[peroidCustomeList.length-1].period_length) /*globalUserMaster!.averagePeriodLength ?? '5')*/; i++) {
+      for (int i = 0;
+          i <
+              int.parse(peroidCustomeList[peroidCustomeList.length - 1]
+                  .period_length) /*globalUserMaster!.averagePeriodLength ?? '5')*/;
+          i++) {
         if (i == 0) {
           ovulationDates.add(nextDate.add(Duration(days: 14)));
         }
         nextCycleDates.add(nextDate.add(Duration(days: i)));
-        gCycleDates.add(CycleDates(nextDate.add(Duration(days: i)), true, false, false, (i + 1)));
+        gCycleDates.add(CycleDates(
+            nextDate.add(Duration(days: i)), true, false, false, (i + 1)));
       }
       // Move to the next cycle start date
       nextDate = nextDate.add(Duration(days: cycleLength));
@@ -146,7 +156,9 @@ class HomeViewModel with ChangeNotifier {
     while (nextDate.isBefore(twelveMonthsLater)) {
       // Add all days of the period to the list
       for (int i = 0;
-          i < int.parse(peroidCustomeList[peroidCustomeList.length-1].period_length)/*int.parse(globalUserMaster!.averagePeriodLength ?? '5')*/;
+          i <
+              int.parse(peroidCustomeList[peroidCustomeList.length - 1]
+                  .period_length) /*int.parse(globalUserMaster!.averagePeriodLength ?? '5')*/;
           i++) {
         if (i == 0) {
           int ovdays = 6 + (cycleLength - 21);
@@ -248,15 +260,15 @@ class HomeViewModel with ChangeNotifier {
     return "$daysRemaining days";
   }
 
-  bool getPredictedDaySelected(DateTime currentDate){
-    for(int i=0;i<peroidCustomeList.length;i++){
-      DateTime startPredicatedPeriods = DateTime.parse(
-          peroidCustomeList[i].predicated_period_start_date);
-      DateTime endPredicatedPeriods = DateTime.parse(
-          peroidCustomeList[i].predicated_period_end_date);
+  bool getPredictedDaySelected(DateTime currentDate) {
+    for (int i = 0; i < peroidCustomeList.length; i++) {
+      DateTime startPredicatedPeriods =
+          DateTime.parse(peroidCustomeList[i].predicated_period_start_date);
+      DateTime endPredicatedPeriods =
+          DateTime.parse(peroidCustomeList[i].predicated_period_end_date);
 
       if ((currentDate.isAfter(startPredicatedPeriods) &&
-          currentDate.isBefore(endPredicatedPeriods)) ||
+              currentDate.isBefore(endPredicatedPeriods)) ||
           currentDate.isAtSameMomentAs(startPredicatedPeriods) ||
           currentDate.isAtSameMomentAs(endPredicatedPeriods)) {
         return true;
@@ -266,61 +278,88 @@ class HomeViewModel with ChangeNotifier {
   }
 
   String getCycleDayOrDaysToGo(DateTime currentDate) {
-
+    // debugPrint("Previous Date=====>${previousDateLocal}");
 
     if (nextCycleDates.isEmpty) {
       return "No cycle dates available";
     }
 
-
     nextCycleDates = nextCycleDates.toSet().toList();
     nextCycleDates.sort();
 
-   // print("nextCycleDates  ${nextCycleDates}");
+    // print("nextCycleDates  ${nextCycleDates}");
     // Find the most recent period start date before or on the current date
     DateTime? previousCycleStartDate = nextCycleDates
-        .where((date) => date.year == currentDate.year && date.month == currentDate.month-1) // Filter same year and month
-        .where((date) => date.isBefore(currentDate) || date.isAtSameMomentAs(currentDate)) // Filter dates before or equal to currentDate
-        .fold<DateTime?>(null, (prev, date) => prev == null || date.isBefore(prev) ? date : prev); // Find the minimum date
+        // .where((date) => date.year == currentDate.year && date.month == currentDate.month-1) // Filter same year and month
+        .where((date) =>
+            date.isBefore(currentDate) ||
+            date.isAtSameMomentAs(
+                currentDate)) // Filter dates before or equal to currentDate
+        .fold<DateTime?>(
+            null,
+            (prev, date) => prev == null || date.isBefore(prev)
+                ? date
+                : prev); // Find the minimum date
     // debugPrint("previousCycleStartDate $previousCycleStartDate");
     // Find the next cycle start date after the current date
     DateTime? nextCycleStartDate = nextCycleDates
-        .where((date) => date.year == currentDate.year && date.month == currentDate.month+1)
-        .where((date) => date.isAfter(currentDate)) // Keep only dates after currentDate
-        .fold<DateTime?>(null, (prev, date) => prev == null || date.isBefore(prev) ? date : prev); // Find the smallest date
+        // .where((date) => date.year == currentDate.year && date.month == currentDate.month+1)
+        .where((date) =>
+            date.isAfter(currentDate) ||
+            date.month ==
+                currentDate.month) // Keep only dates after currentDate
+        .fold<DateTime?>(
+            null,
+            (prev, date) => prev == null || date.isBefore(prev)
+                ? date
+                : prev); // Find the smallest date
 
-
-
-    debugPrint("previousCycleStartDate $previousCycleStartDate");
-    debugPrint("nextCycleStartDate $nextCycleStartDate");
+    // debugPrint("previousCycleStartDate $previousCycleStartDate");
+    // debugPrint("nextCycleStartDate $nextCycleStartDate");
 
     // log("nextCycleStartDate $nextCycleDates");
     //print("periodLenght =====>${peroidCustomeList.length}");
-    int prL=0;
-    if(peroidCustomeList.length<=0){
-      prL=0;
-    }else{
-      prL=int.parse(peroidCustomeList[peroidCustomeList.length-1].period_length);
+    int prL =
+        int.parse((globalUserMaster?.averagePeriodLength ?? 0).toString());
+    if (peroidCustomeList.length <= 0) {
+      prL = 0;
+    } else {
+      prL = int.parse((globalUserMaster?.averagePeriodLength ?? 0).toString());
     }
     // Calculate the cycle day including the current date
-    int cycleDay = currentDate.difference(previousCycleStartDate ?? DateTime.now()).inDays + prL/*int.parse(globalUserMaster?.averagePeriodLength ?? "5")*/;
+    int cycleDay = currentDate
+            .difference(previousCycleStartDate ?? DateTime.now())
+            .inDays +
+        prL /*int.parse(globalUserMaster?.averagePeriodLength ?? "5")*/;
 
     /* int pday = currentDate.difference(previousCycleStartDate).inDays;
     print('pday $pday'); */
     // Check if the current date is within the period days
+
+    int periodLength = int.parse(globalUserMaster?.averagePeriodLength ?? "5");
+
     bool isPeriodDay = nextCycleDates.any((date) =>
-        date.year == currentDate.year &&
-        date.month == currentDate.month &&
-        date.day == currentDate.day);
+            date.year == currentDate.year &&
+            date.month == currentDate.month &&
+            date.day == currentDate.day) ||
+        nextCycleDates.any((date) {
+          final periodLengthInDays =
+              int.tryParse(globalUserMaster?.averagePeriodLength ?? "5") ?? 5;
+          final previousDateWithPeriod =
+              previousDateLocal.add(Duration(days: periodLengthInDays));
+
+          return currentDate.isSameDayOrBefore(previousDateLocal) ||
+              currentDate.isSameDayOrBefore(previousDateWithPeriod);
+        });
 
     // print("===================================$cycleDay");
     // print("===================================$previousCycleStartDate");
     // print("===================================$nextCycleStartDate");
-    // print("===================================$currentDate");
+    // // print("===================================$currentDate");
 
     int clen = int.parse(globalUserMaster?.averageCycleLength ?? '28');
     globalPday = "$cycleDay";
-    if (isPeriodDay) {
+    if (isPeriodDay && previousDateLocal.month == currentDate.month) {
       // This is a period day
       int currentMonth = currentDate.month;
       int currentYear = currentDate.year;
@@ -334,43 +373,152 @@ class HomeViewModel with ChangeNotifier {
 
       int num = currentDateIndex.abs() + 1;
       return "Period day $num";
-    }
-    else if (cycleDay <= clen) {
+    } else if (cycleDay <= clen) {
       // If the current cycle day is less than or equal to 15, display the day of the current cycle
 
-      int ovdays = 7 + (clen - 21);
-      if (ovdays >= cycleDay) {
-        ovdays = ovdays - cycleDay;
-      } else {
-       // debugPrint("previousCycleStartDate $previousCycleStartDate");
-        // ovdays = cycleDay-ovdays;
-        int daysToNextCycle = (nextCycleStartDate?.subtract(Duration(days: 1)) ?? DateTime.now()).difference(currentDate).inDays;
-        //  log("NextCycle Days: ${nextCycleDates}",name: "NextCycle");
-        // debugPrint("daysToNextCycle $daysToNextCycle");
-        // debugPrint("daysToNextCycle $daysToNextCycle");
-        // debugPrint("dNextCycle $nextCycleStartDate");
+      int ovdays = clen - 14;
 
-        if(daysToNextCycle==1) {
-          return "Period may\nstart today";
-        }else {
-          return "Period in $daysToNextCycle days";
+      // debugPrint(
+      //     "Previous Date:- ${isCurrentDateAfterOvulationRange(currentDate: currentDate, nextCycleStartDate: nextCycleStartDate ?? DateTime.now(), periodLength: int.parse((globalUserMaster?.averagePeriodLength ?? 5).toString()))}");
+
+      // debugPrint("nextCycleStart Date:- $nextCycleStartDate");
+
+      int daysToNextCycle = 0;
+      if (isCurrentDateAfterOvulationRange(
+          currentDate: currentDate,
+          nextCycleStartDate: nextCycleStartDate ?? DateTime.now(),
+          periodLength: int.parse(
+              (globalUserMaster?.averagePeriodLength ?? 5).toString()))) {
+
+        if(nextCycleStartDate?.month==currentDate.month && nextCycleStartDate!.isSameDayOrBefore(currentDate)??false)
+        {
+          // debugPrint("NextCycle Date==> ${nextCycleStartDate}");
+          daysToNextCycle = (
+              currentDate)
+              .difference((nextCycleStartDate ?? DateTime.now()).subtract(Duration(days: 1)))
+              .inDays;
+          if(daysToNextCycle<=5 && daysToNextCycle<=0){
+            return "Period may\nstart today";
+          } else {
+            return "Periods late ${daysToNextCycle.toString().replaceAll("-", "")} ${daysToNextCycle.toString().replaceAll("-", "")=="1"?"day":"days"}";
+          }
+
         }
+        else {
+          daysToNextCycle = (nextCycleStartDate?.subtract(
+              Duration(days: 1)) ?? DateTime.now())
+              .difference(currentDate)
+              .inDays;
+          // debugPrint("Value");
+          if(daysToNextCycle==1) {
+            return "Period may\nstart today";
+          } else {
+            return "Period in ${daysToNextCycle + 1 } days after";
+          }
+
+        }
+
+      } else {
+        if(nextCycleStartDate?.month==currentDate.month && nextCycleStartDate!.isSameDayOrBefore(currentDate)??false)
+        {
+          // debugPrint("NextCycle Date==> ${nextCycleStartDate}");
+          daysToNextCycle = (
+              currentDate)
+              .difference((nextCycleStartDate ?? DateTime.now()).subtract(Duration(days: 1)))
+              .inDays;
+          if(daysToNextCycle<=5 && daysToNextCycle<=0){
+            return "Period may\nstart today";
+          } else {
+            return "Periods late ${daysToNextCycle.toString().replaceAll("-", "")} ${daysToNextCycle.toString().replaceAll("-", "")=="1"?"day":"days"}";
+          }
+
+        }
+        else {
+
+          // debugPrint("Next Cycle Start Date==> $nextCycleStartDate");
+          daysToNextCycle = (nextCycleStartDate ?? DateTime.now())
+              .difference(currentDate)
+              .inDays;
+          // debugPrint("Value");
+          if(daysToNextCycle==1) {
+            return "Period may\nstart today";
+          } else {
+            return "Period in ${daysToNextCycle} days";
+          }
+
+        }
+
       }
+      // if (ovdays >= cycleDay) {
+      //   ovdays = ovdays - cycleDay;
+      // }
+      // else {
+      //  // debugPrint("previousCycleStartDate $previousCycleStartDate");
+      //   // ovdays = cycleDay-ovdays;
+      //   int daysToNextCycle = 0;
+      //   if(nextCycleStartDate?.month==currentDate.month && nextCycleStartDate!.isSameDayOrBefore(currentDate)??false)
+      //   {
+      //     daysToNextCycle = (
+      //         currentDate)
+      //         .difference((nextCycleStartDate ?? DateTime.now()).subtract(Duration(days: 1)))
+      //         .inDays;
+      //     if(daysToNextCycle<=5 && daysToNextCycle<=0){
+      //       return "Period may\nstart today";
+      //     } else {
+      //       return "Periods late ${daysToNextCycle.toString().replaceAll("-", "")} ${daysToNextCycle.toString().replaceAll("-", "")=="1"?"day":"days"}";
+      //     }
+      //
+      //   }
+      //   else {
+      //     daysToNextCycle = (nextCycleStartDate?.subtract(
+      //         Duration(days: 1)) ?? DateTime.now())
+      //         .difference(currentDate)
+      //         .inDays;
+      //
+      //     if(daysToNextCycle==1) {
+      //       return "Period may\nstart today";
+      //     } else {
+      //       return "Period in $daysToNextCycle days";
+      //     }
+      //
+      //   }
+      // }
+      //
+      // // debugPrint("Ovulation in $nextCycleStartDate Days\n");
+      //
+      //
+      // int daysToNextCycle = 0;
 
-      // print("Ovulation in $ovdays Days\n");
-
-      return "Ovulation in $ovdays Days\n";
+      return "periods in";
     } else {
       // Calculate days to go until the next period starts
-      int daysToNextCycle =
-          (nextCycleStartDate ?? DateTime.now()).difference(currentDate).inDays;
+      int daysToNextCycle = 0;
+      if (nextCycleStartDate?.month == currentDate.month &&
+              nextCycleStartDate!.isSameDayOrBefore(currentDate) ??
+          false) {
+        // debugPrint("previousDate:- $previousCycleStartDate");
+        // debugPrint("nextDate:- $nextCycleStartDate");
+        daysToNextCycle = (currentDate)
+            .difference((nextCycleStartDate ?? DateTime.now())
+                .subtract(Duration(days: 1)))
+            .inDays;
+        if (daysToNextCycle <= 5 && daysToNextCycle <= 0) {
+          return "Period may\nstart today";
+        } else {
+          return "Periods late ${daysToNextCycle.toString().replaceAll("-", "")} ${daysToNextCycle.toString().replaceAll("-", "") == "1" ? "day" : "days"}";
+        }
+      } else {
+        daysToNextCycle =
+            (nextCycleStartDate?.subtract(Duration(days: 1)) ?? DateTime.now())
+                .difference(currentDate)
+                .inDays;
 
-      debugPrint("daysToNextCycle $daysToNextCycle");
-      debugPrint("daysToNextCycle $currentDate");
-      if(daysToNextCycle==1) {
-        return "Period may\nstart today";
-      }else {
-        return "Period in $daysToNextCycle days";
+        if (daysToNextCycle == 1) {
+          return "Period may\nstart today";
+        } else {
+          // debugPrint("previousDate:- $ovdays");
+          return "Period in $daysToNextCycle days";
+        }
       }
     }
   }
@@ -475,7 +623,7 @@ class HomeViewModel with ChangeNotifier {
     if (response.statusCode == 200 || response.statusCode == 201) {
       // If the server returns a successful response, parse the JSON.
       var data = jsonDecode(response.body);
-          // debugPrint("data ====>$data");
+      // debugPrint("data ====>$data");
       List<dynamic> jsonList = jsonDecode(response.body);
       // peroidCustomeList =
       //     jsonList.map((json) => PeriodObj.fromJson(json)).toList();
@@ -525,8 +673,8 @@ class HomeViewModel with ChangeNotifier {
     } else if (master.success == true) {
       //  CommonUtils.hideProgressDialog();
       peroidCustomeList.clear();
-      if ((master.data!.periodData?.length??0) > 0) {
-        for (int i = 0; i < (master.data!.periodData?.length??0); i++) {
+      if ((master.data!.periodData?.length ?? 0) > 0) {
+        for (int i = 0; i < (master.data!.periodData?.length ?? 0); i++) {
           var data = PeriodObj(
               user_id: master.data!.user_id,
               period_start_date: master.data!.periodData![i].period_start_date,
@@ -536,21 +684,30 @@ class HomeViewModel with ChangeNotifier {
                   master.data!.periodData![i].period_cycle_length,
               period_month_update:
                   master.data!.periodData![i].period_month_update,
-              predicated_period_start_date: master.data!.predicated_period_start_date,
-              predicated_period_end_date: master.data!.predicated_period_end_date);
+              predicated_period_start_date:
+                  master.data!.predicated_period_start_date,
+              predicated_period_end_date:
+                  master.data!.predicated_period_end_date);
           peroidCustomeList.add(data);
           notifyListeners();
         }
       }
 
       //check period whithin 14 days
-      if(peroidCustomeList.length>1){
-        DateTime firstPeriodLastDate = DateTime.parse(peroidCustomeList[0].period_end_date);
-        DateTime secondPeriodStartDate = DateTime.parse(peroidCustomeList[1].period_start_date);
-        isWithinFourteenDays = firstPeriodLastDate.difference(secondPeriodStartDate).inDays.abs()<=14;
+      if (peroidCustomeList.length > 1) {
+        DateTime firstPeriodLastDate =
+            DateTime.parse(peroidCustomeList[0].period_end_date);
+        DateTime secondPeriodStartDate =
+            DateTime.parse(peroidCustomeList[1].period_start_date);
+        isWithinFourteenDays = firstPeriodLastDate
+                .difference(secondPeriodStartDate)
+                .inDays
+                .abs() <=
+            14;
       }
 
-      debugPrint("peroidCustomeList ====>${peroidCustomeList[(master.data!.periodData?.length??0)-1].period_cycle_length}");
+      debugPrint(
+          "peroidCustomeList ====>${peroidCustomeList[(master.data!.periodData?.length ?? 0) - 1].period_cycle_length}");
 
       handleSecondBloc(master.data!.periodData![0].period_start_date);
       /*peroidCustomeList.add( PeriodObj(
@@ -570,52 +727,56 @@ class HomeViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  DateTime previousDateLocal = DateTime.now();
 
-
-  Future<void> handleSecondBloc(String dt,) async {
-
-
+  Future<void> handleSecondBloc(
+    String dt,
+  ) async {
     if (gUserType == AppConstants.NEOWME || gUserType == AppConstants.BUDDY) {
       print("Cycle length :: ${globalUserMaster?.averageCycleLength}");
-      print(
-          "Period length :: ${globalUserMaster?.averagePeriodLength}");
-     dateParts = dt.split(RegExp(r'[\s-]+'));
-      debugPrint(
-          "dt :: ${dt.toString()}");
-     year = int.parse(dateParts[0]);
-month = int.parse(dateParts[1]);
-   day = int.parse(dateParts[2]);
-      DateTime previousDate =
-      DateTime(year, month, day);
-      DateTime newDate = previousDate.add(Duration(days: -int.parse(globalUserMaster?.averageCycleLength ?? "28")));
+      print("Period length :: ${globalUserMaster?.averagePeriodLength}");
+      dateParts = dt.split(RegExp(r'[\s-]+'));
+      debugPrint("dt :: ${dt.toString()}");
+      year = int.parse(dateParts[0]);
+      month = int.parse(dateParts[1]);
+      day = int.parse(dateParts[2]);
+      DateTime previousDate = DateTime(year, month, day);
+      previousDateLocal = previousDate;
+      DateTime newDate = previousDate
+          .add(Duration(
+              days: int.parse(globalUserMaster?.averageCycleLength ?? "28")))
+          .subtract(Duration(days: 1));
       print("previousDate is :::::::::: $previousDate");
       print("newDate date is :::::::::: $newDate");
-      print(" cycleLength date is :::::::::: $globalUserMaster?.averageCycleLength");
+      print(
+          " cycleLength date is :::::::::: $globalUserMaster?.averageCycleLength");
 
-   nextCycleDates =
-    calculateCycleDatesInYear(newDate, int.parse(globalUserMaster?.averageCycleLength ?? "28"));
- ovulationDates =
-  calculateOvolutionDatesInYear(newDate, int.parse(globalUserMaster?.averageCycleLength ?? "28"));
-  firtileDates =
-    calculateFirtileDatesInYear(ovulationDates);
+      nextCycleDates = calculateCycleDatesInYear(
+          newDate.month == DateTime.now().month &&
+                  previousDate.month != DateTime.now().month
+              ? previousDate
+              : newDate,
+          int.parse(globalUserMaster?.averageCycleLength ?? "28"));
+      ovulationDates = calculateOvolutionDatesInYear(
+          newDate, int.parse(globalUserMaster?.averageCycleLength ?? "28"));
+      firtileDates = calculateFirtileDatesInYear(ovulationDates);
       print("CycleDates date is :::::::::: ${gCycleDates[0].periodDay}");
- generateDaysList();
+      generateDaysList();
       print("Next date is :::::::::: ${nextCycleDates}");
 
       DateTime today = DateTime.now();
       DateTime? nextCycleDate = nextCycleDates.firstWhere(
-            (date) => date.isAfter(today),
+        (date) => date.isAfter(today),
         orElse: () => nextCycleDates.last,
       );
 
       // Pass the next cycle date to the calculateDaysToGo method
-     String daysToGo = calculateDaysToGo(nextCycleDate);
+      String daysToGo = calculateDaysToGo(nextCycleDate);
       print(
           'FInal date for done :::::::::::::::::::::::::::==============> $daysToGo');
 
       // daysToGo = mViewModel.calculateDaysToGo(mViewModel.nextCycleDates);
     }
-
 
     // if (gUserType == AppConstants.NEOWME || gUserType == AppConstants.BUDDY) {
     //   int cycleLength = int.parse(globalUserMaster?.averageCycleLength ?? "28");
@@ -653,5 +814,32 @@ month = int.parse(dateParts[1]);
     //
     //   // daysToGo = mViewModel.calculateDaysToGo(mViewModel.nextCycleDates);
     // }
+  }
+}
+
+bool isCurrentDateAfterOvulationRange(
+    {required DateTime currentDate,
+    required DateTime nextCycleStartDate,
+    required int periodLength}) {
+  // Step 1: Calculate Previous End Date
+  DateTime previousEndDate = nextCycleStartDate.subtract(Duration(
+      days: periodLength)); // Assuming periodLength is the length of the period
+
+  // Step 2: Calculate Ovulation Date (typically 14 days before the next cycle start)
+  DateTime ovulationDate = nextCycleStartDate.subtract(Duration(days: 14));
+
+  // Step 3: Check if the current date is after the ovulation range (typically a window of 5 days)
+  DateTime ovulationEndDate = ovulationDate.add(Duration(days: 5));
+
+  // Print out the calculated dates for debugging
+  print("Previous End Date: $previousEndDate");
+  print("Ovulation Date: $ovulationDate");
+  print("Ovulation Range End Date: $ovulationEndDate");
+
+  // Step 4: Check if the current date is after the ovulation date range
+  if (currentDate.isAfter(ovulationEndDate)) {
+    return true; // The current date is after the ovulation window
+  } else {
+    return false; // The current date is before or within the ovulation window
   }
 }

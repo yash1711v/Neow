@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 
+// import 'package:widgets_easier/widgets_easier.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:naveli_2023/ui/naveli_ui/home/quiz/quiz_view.dart';
@@ -9,13 +10,10 @@ import 'package:naveli_2023/ui/naveli_ui/home/track/track_view.dart';
 import 'package:naveli_2023/ui/naveli_ui/home/track_helath_view_all/track_health_view_all_view.dart';
 import 'package:naveli_2023/utils/common_colors.dart';
 import 'package:naveli_2023/utils/common_utils.dart';
-import 'package:naveli_2023/utils/global_function.dart';
 import 'package:naveli_2023/utils/local_images.dart';
 import 'package:provider/provider.dart';
-
-// import 'package:widgets_easier/widgets_easier.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:video_player/video_player.dart';
+
 // import 'package:naveli_2023/ui/navaeli_ui/symptom_bot/symptom_bot_view.dart';
 
 import '../../../database/app_preferences.dart';
@@ -23,30 +21,18 @@ import '../../../generated/i18n.dart';
 import '../../../utils/constant.dart';
 import '../../../utils/global_variables.dart';
 import '../../../widgets/common_daily_insight_container.dart';
-import '../../../widgets/common_rounded_container.dart';
-import '../../../widgets/primary_button.dart';
-import '../../../models/cycle_dates_master.dart';
 import '../calendar/calendar_view.dart';
 import '../health_mix/health_mix_view_model.dart';
+import '../health_mix/post_list.dart';
 import '../health_mix/video_particular.dart';
 import '../profile/your_naveli/your_naveli_view_model.dart';
+import '../symptom_bot/symptom_bot_view.dart';
 import 'all_about_periods/all_about_periods_view.dart';
-import 'ask_your_question/ask_your_question_view.dart';
 import 'de_stress/de_stress_view.dart';
-import 'edit_period_date/edit_cycle_length.dart';
-import 'edit_period_date/edit_period_date_view.dart';
-import 'edit_period_date/edit_period_length.dart';
 import 'home_view_model.dart';
-import 'know_your_body/know_your_body_view.dart';
 import 'log_your_symptoms/compulsory_symptoms/compulsory_symptoms_log_view.dart';
 import 'log_your_symptoms/log_your_symptoms_view.dart';
 import 'log_your_symptoms/log_your_symptoms_view_model.dart';
-import 'myth_vs_facts/myth_vs_facts_view.dart';
-import 'nutrition/nutrition_view.dart';
-import '../symptom_bot/symptom_bot_view.dart';
-import '../health_mix/post_list.dart';
-import 'package:naveli_2023/utils/local_images.dart';
-import 'package:http/http.dart' as http;
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -177,21 +163,22 @@ class _HomeViewState extends State<HomeView> {
 
   void _setTimeout() {
     Future.delayed(Duration(seconds: 5, milliseconds: 500), () {
-      setState(() {
-        timeoutValue = 2;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          timeoutValue = 2;
+        });
       });
     });
   }
 
   bool isCycleStartFromTommorw() {
     if (peroidCustomeList.isNotEmpty) {
-      DateTime startPredicatedPeriods = DateTime.parse(
-          peroidCustomeList[0].predicated_period_start_date);
+      DateTime startPredicatedPeriods =
+      DateTime.parse(peroidCustomeList[0].predicated_period_start_date);
       // Get the current date and add one day to it
       DateTime tomorrow = DateTime.now().add(Duration(days: 1));
 // Check if startDate is tomorrow
-      bool isTomorrow = startPredicatedPeriods.year ==
-          tomorrow.year &&
+      bool isTomorrow = startPredicatedPeriods.year == tomorrow.year &&
           startPredicatedPeriods.month == tomorrow.month &&
           startPredicatedPeriods.day == tomorrow.day;
 
@@ -346,43 +333,18 @@ class _HomeViewState extends State<HomeView> {
         mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
             "Period day 6") {
       return LocalImages.red_Static;
-    } else if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-        "Ovulation in 1 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 2 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 3 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 4 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 5 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 15 Days\n") {
+    } else if (mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("Periods late")) {
+      return LocalImages.white_Static;
+    } else if (mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("after")) {
       //red
-      return LocalImages.white_Static;
-    } else if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-        "Ovulation in 0 Days\n") {
-      return LocalImages.white_Static;
-    } else if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-        "Ovulation in - 1 Days\n" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Ovulation in 0 Days\n" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Ovulation in 15 Days\n" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 1" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 2" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 3" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 4" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 5" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 6") {
+      return LocalImages.not_fertile;
+    } else if(mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("Period in")){
       return LocalImages.green_Static;
     } else {
       return LocalImages.white_Static;
@@ -405,46 +367,21 @@ class _HomeViewState extends State<HomeView> {
         mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
             "Period day 6") {
       return LocalImages.red_loader;
-    } else if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-        "Ovulation in 1 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 2 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 3 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 4 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 5 Days\n" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Ovulation in 15 Days\n") {
+    }  else if (mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("Periods late")) {
+      return LocalImages.white_loader;
+    }  else if (mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("after")) {
       //red
-      return LocalImages.white_loader;
-    } else if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-        "Ovulation in 0 Days\n") {
-      return LocalImages.white_loader;
-    } else if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-        "Ovulation in - 1 Days\n" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Ovulation in 0 Days\n" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Ovulation in 15 Days\n" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 1" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 2" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 3" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 4" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 5" &&
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) !=
-            "Period day 6") {
+      return LocalImages.not_fertile_loader;
+    } else if(mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("Period in")){
       return LocalImages.green_loader;
-    } else {
-      return LocalImages.loader_home;
+    }  else {
+      return LocalImages.white_loader;
     }
   }
 
@@ -586,8 +523,7 @@ class _HomeViewState extends State<HomeView> {
     //   ),
     // );
 
-    var calender2 =
-    SizedBox(
+    var calender2 = SizedBox(
       height: 80.0,
       child: Container(
         padding: const EdgeInsets.only(left: 15, right: 15),
@@ -633,7 +569,6 @@ class _HomeViewState extends State<HomeView> {
                 no = 0;
               }
 
-
               //
               // WidgetsBinding.instance.addPostFrameCallback((_) async {
               //   mViewModel.getPeriodInfoList();
@@ -645,10 +580,12 @@ class _HomeViewState extends State<HomeView> {
               //   _setTimeout();
               // });
 
-
               return Container(
-                color: isCycleDate ? (no < clen ? Color(0xFFFFB5AE).withOpacity(
-                    opc) : Color(bgColor)) : Color(bgColor),
+                color: isCycleDate
+                    ? (no < clen
+                    ? Color(0xFFFFB5AE).withOpacity(opc)
+                    : Color(bgColor))
+                    : Color(bgColor),
                 width: 35,
                 child: Column(
                   children: [
@@ -686,8 +623,8 @@ class _HomeViewState extends State<HomeView> {
 
               for (var dateRange in peroidCustomeList) {
                 DateTime start = DateTime.parse(dateRange.period_start_date);
-                DateTime end = DateTime.parse(dateRange.period_end_date).add(
-                    Duration(days: 1));
+                DateTime end = DateTime.parse(dateRange.period_end_date)
+                    .add(Duration(days: 1));
                 cycleLength = int.parse(dateRange.period_cycle_length);
 
                 if ((currentDate.isAfter(start) && currentDate.isBefore(end)) ||
@@ -697,11 +634,11 @@ class _HomeViewState extends State<HomeView> {
                   break;
                 }
 
-                DateTime startPredicated = DateTime.parse(
-                    dateRange.predicated_period_start_date);
-                DateTime endPredicated = DateTime.parse(
-                    dateRange.predicated_period_end_date).add(
-                    Duration(days: 1));
+                DateTime startPredicated =
+                DateTime.parse(dateRange.predicated_period_start_date);
+                DateTime endPredicated =
+                DateTime.parse(dateRange.predicated_period_end_date)
+                    .add(Duration(days: 1));
 
                 if ((currentDate.isAfter(startPredicated) &&
                     currentDate.isBefore(endPredicated)) ||
@@ -714,12 +651,11 @@ class _HomeViewState extends State<HomeView> {
 
               DateTime today = DateTime.now();
               bool isToday = currentDate.isAtSameMomentAs(today);
-              bool isSelectedDate = currentDate.isAtSameMomentAs(
-                  mViewModel.selectedDate);
+              bool isSelectedDate =
+              currentDate.isAtSameMomentAs(mViewModel.selectedDate);
               int clen = int.parse(peroidCustomeList.last.period_length ?? "5");
-              double opc = isCycleDate
-                  ? (1 - ((1 / clen) * no)).clamp(0.0, 1.0)
-                  : 0.0;
+              double opc =
+              isCycleDate ? (1 - ((1 / clen) * no)).clamp(0.0, 1.0) : 0.0;
 
               return Container(
                 decoration: BoxDecoration(color: Color(bgColor)),
@@ -727,7 +663,8 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     Text(
                       isToday ? "Today" : weekDay,
-                      style: TextStyle(fontWeight: FontWeight.w500,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
                           fontSize: 16.0,
                           color: Colors.black),
                     ),
@@ -741,8 +678,10 @@ class _HomeViewState extends State<HomeView> {
                               ? isCycleDate
                               ? LinearGradient(
                               colors: [Colors.white, Colors.white])
-                              : LinearGradient(
-                              colors: [Color(0xFFDBDBDB), Color(0xFFDBDBDB)])
+                              : LinearGradient(colors: [
+                            Color(0xFFDBDBDB),
+                            Color(0xFFDBDBDB)
+                          ])
                               : isCycleDate
                               ? LinearGradient(colors: [
                             Color(0xFFFF9D93),
@@ -756,15 +695,15 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         child: DottedBorder(
                           color: isSelectedDate
-                              ? (isCycleDate ? CommonColors.mRed : CommonColors
-                              .mTransparent)
+                              ? (isCycleDate
+                              ? CommonColors.mRed
+                              : CommonColors.mTransparent)
                               : (isPredictedDate
                               ? CommonColors.mRed
                               : CommonColors.mTransparent),
                           dashPattern: [4, 3],
-                          strokeWidth: isSelectedDate || isPredictedDate
-                              ? 2
-                              : 0,
+                          strokeWidth:
+                          isSelectedDate || isPredictedDate ? 2 : 0,
                           borderType: BorderType.Circle,
                           child: Center(
                             child: Text(
@@ -772,8 +711,9 @@ class _HomeViewState extends State<HomeView> {
                               style: TextStyle(
                                 color: isSelectedDate
                                     ? Colors.black
-                                    : (isCycleDate ? CommonColors.mRed : Colors
-                                    .black),
+                                    : (isCycleDate
+                                    ? CommonColors.mRed
+                                    : Colors.black),
                                 fontWeight: FontWeight.w500,
                                 fontSize: 15.0,
                               ),
@@ -787,7 +727,6 @@ class _HomeViewState extends State<HomeView> {
               );
             },
           ),
-
 
           // ListView.separated(
           //   // backgroundColor:CommonColors.bglightPinkColor,
@@ -1177,7 +1116,6 @@ class _HomeViewState extends State<HomeView> {
     //   ),
     // );
 
-
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -1449,7 +1387,7 @@ class _HomeViewState extends State<HomeView> {
                                         child: InkWell(
                                           onTap: () {
                                             push(const ReminderView());
-                                            
+
                                           },
                                           child: Image.asset(
                                             LocalImages.img_clock,
@@ -1473,182 +1411,189 @@ class _HomeViewState extends State<HomeView> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              (timeoutValue == 1 &&
-                                  getUrlForGif() == LocalImages.red_loader)
+                              (timeoutValue == 1)
                                   ? Container(
-                                width: 150,
-                                height: 150,
-                                child:
-                                vdo_Controller.value.isInitialized
-                                    ? AspectRatio(
-                                  aspectRatio: vdo_Controller.value.aspectRatio,
-                                  child: VideoPlayer(vdo_Controller),
-                                )
-                                    : Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              ) :
-                              Container(
                                 width: 150,
                                 height: 150,
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
                                     image: AssetImage(
                                       /*timeoutValue == 2
-                                          ?*/
-                                        getUrlOntimeOut()
+                                            ?*/
+                                        getUrlForGif()
                                       //: getUrlForGif(),
                                     ),
                                     fit: /*timeoutValue == 1
-                                        ? BoxFit.none
-                                        :*/ BoxFit.contain,
+                                          ? BoxFit.none
+                                          :*/
+                                    BoxFit.contain,
                                   ),
                                 ),
-                                child: timeoutValue == 2
-                                    ? Column(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    if (mViewModel.getCycleDayOrDaysToGo(
-                                        mViewModel
-                                            .selectedDate) ==
-                                        "Period day" ||
-                                        mViewModel
-                                            .getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) ==
-                                            "Period day 1" ||
-                                        mViewModel
-                                            .getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) ==
-                                            "Period day 2" ||
-                                        mViewModel
-                                            .getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) ==
-                                            "Period day 3" ||
-                                        mViewModel
-                                            .getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) ==
-                                            "Period day 4" ||
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) ==
-                                            "Period day 5" ||
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) ==
-                                            "Period day 6")
-                                      Text(
-                                        mViewModel.getPredictedDaySelected(
-                                            mViewModel
-                                                .selectedDate)
-                                            ? "Period may\nstart today"
-                                            : mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel.selectedDate),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          height: 1,
-                                          fontWeight: FontWeight.bold,
-                                          color: CommonColors.mWhite,
-                                        ),
+                              )
+                                  : Visibility(
+                                visible: timeoutValue == 2,
+                                child: Container(
+                                  width: 150,
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                        /*timeoutValue == 2
+                                            ?*/
+                                          getUrlOntimeOut()
+                                        //: getUrlForGif(),
                                       ),
-                                    if (mViewModel.getCycleDayOrDaysToGo(
-                                        mViewModel
-                                            .selectedDate) ==
-                                        "Ovulation in 1 Days\n" ||
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) ==
-                                            "Ovulation in 15 Days\n")
-                                      const Text(
-                                        "",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          height: 1,
-                                          fontWeight: FontWeight.bold,
-                                          color: CommonColors
-                                              .darkPrimaryColor,
+                                      fit: /*timeoutValue == 1
+                                          ? BoxFit.none
+                                          :*/
+                                      BoxFit.contain,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      if (mViewModel
+                                          .getCycleDayOrDaysToGo(
+                                          mViewModel
+                                              .selectedDate) ==
+                                          "Period day" ||
+                                          mViewModel
+                                              .getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) ==
+                                              "Period day 1" ||
+                                          mViewModel
+                                              .getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) ==
+                                              "Period day 2" ||
+                                          mViewModel
+                                              .getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) ==
+                                              "Period day 3" ||
+                                          mViewModel
+                                              .getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) ==
+                                              "Period day 4" ||
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) ==
+                                              "Period day 5" ||
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) ==
+                                              "Period day 6")
+                                        Text(
+                                          mViewModel
+                                              .getPredictedDaySelected(
+                                              mViewModel
+                                                  .selectedDate)
+                                              ? "Period may\nstart today"
+                                              : mViewModel
+                                              .getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate).replaceAll(
+                                              "after", ""),
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            height: 1,
+                                            fontWeight: FontWeight.bold,
+                                            color: CommonColors.mWhite,
+                                          ),
                                         ),
-                                      ),
-                                    if (mViewModel.getCycleDayOrDaysToGo(
-                                        mViewModel.selectedDate) ==
-                                        "Ovulation in 0 Days\n")
-                                      const Text(
-                                        "Predection:\nDay of Ovulation",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          height: 1,
-                                          fontWeight: FontWeight.bold,
-                                          color: CommonColors
-                                              .darkPrimaryColor,
+                                      if (mViewModel.getCycleDayOrDaysToGo(
+                                          mViewModel
+                                              .selectedDate) ==
+                                          "Ovulation in 1 Days\n" ||
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) ==
+                                              "Ovulation in 15 Days\n")
+                                        const Text(
+                                          "",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            height: 1,
+                                            fontWeight: FontWeight.bold,
+                                            color: CommonColors
+                                                .darkPrimaryColor,
+                                          ),
                                         ),
-                                      ),
-                                    if (mViewModel.getCycleDayOrDaysToGo(
-                                        mViewModel.selectedDate) !=
-                                        "Ovulation in - 1 Days\n" &&
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel.selectedDate) !=
-                                            "Ovulation in 0 Days\n" &&
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel.selectedDate) !=
-                                            "Ovulation in 15 Days\n" &&
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel.selectedDate) !=
-                                            "Period day" &&
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) !=
-                                            "Period day 1" &&
-                                        mViewModel
-                                            .getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) !=
-                                            "Period day 2" &&
-                                        mViewModel
-                                            .getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) !=
-                                            "Period day 3" &&
-                                        mViewModel
-                                            .getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) !=
-                                            "Period day 4" &&
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel
-                                                .selectedDate) !=
-                                            "Period day 5" &&
-                                        mViewModel.getCycleDayOrDaysToGo(
-                                            mViewModel.selectedDate) !=
-                                            "Period day 6")
-                                      Text(
-                                        isCycleStartFromTommorw()
-                                            ? "Period may start today"
-                                            : mViewModel
-                                            .getCycleDayOrDaysToGo(
-                                            mViewModel.selectedDate),
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          height: 1,
-                                          fontWeight: FontWeight.w500,
-                                          color: CommonColors
-                                              .darkPrimaryColor,
+                                      if (mViewModel
+                                          .getCycleDayOrDaysToGo(
+                                          mViewModel
+                                              .selectedDate) ==
+                                          "Ovulation in 0 Days\n")
+                                        const Text(
+                                          "Predection:\nDay of Ovulation",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            height: 1,
+                                            fontWeight: FontWeight.bold,
+                                            color: CommonColors
+                                                .darkPrimaryColor,
+                                          ),
                                         ),
-                                      ),
-                                    // Text(timeoutValue),
-                                  ],
-                                )
-                                    :       Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 20),
-                                    child: Text(/*cycleLength <= 14*/
-                                        "updating..",
-                                        style: TextStyle(fontSize: 12)),
-                                    alignment: Alignment.center
+                                      if (mViewModel.getCycleDayOrDaysToGo(
+                                          mViewModel.selectedDate) !=
+                                          "Ovulation in - 1 Days\n" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel.selectedDate) !=
+                                              "Ovulation in 0 Days\n" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel.selectedDate) !=
+                                              "Ovulation in 15 Days\n" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel.selectedDate) !=
+                                              "Period day" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) !=
+                                              "Period day 1" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) !=
+                                              "Period day 2" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) !=
+                                              "Period day 3" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) !=
+                                              "Period day 4" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) !=
+                                              "Period day 5" &&
+                                          mViewModel.getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate) !=
+                                              "Period day 6")
+                                        Text(
+                                          isCycleStartFromTommorw()
+                                              ? "Period may start today"
+                                              : mViewModel
+                                              .getCycleDayOrDaysToGo(
+                                              mViewModel
+                                                  .selectedDate).replaceAll(
+                                              "after", ""),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            height: 1,
+                                            fontWeight: FontWeight.w500,
+                                            color: CommonColors
+                                                .darkPrimaryColor,
+                                          ),
+                                        ),
+                                      // Text(timeoutValue),
+                                    ],
+                                  ),
                                 ),
                               ),
                               // kCommonSpaceV5,
@@ -1783,7 +1728,7 @@ class _HomeViewState extends State<HomeView> {
                                               },
                                               child: const Text(
                                                 "Log Period",
-                                                
+
                                                 style: TextStyle(
                                                     color:
                                                         CommonColors.darkPink,
@@ -1805,7 +1750,7 @@ class _HomeViewState extends State<HomeView> {
                           itemBuilder: (context, index) {
                             return index == 0
                                 ? Stack(
-                                  
+
                                     children: [
                                       Container(
                                         // width:500,
@@ -1823,14 +1768,14 @@ class _HomeViewState extends State<HomeView> {
                                         /* borderRadius: BorderRadius.only(
                                             bottomRight: Radius.circular(6),
                                           ),*/
-                                        ), 
+                                        ),
                                       ),
                                       /* Align(
                                         alignment: Alignment.topLeft,
                                         child: InkWell(
                                           onTap: () {
                                             push(const ReminderView());
-                                            
+
                                           },
                                           child: Image.asset(
                                             LocalImages.img_clock,
@@ -1868,7 +1813,7 @@ class _HomeViewState extends State<HomeView> {
                                                 style: const TextStyle(
                                                   fontSize: 16,
                                                   height: 1,
-                                                  
+
                                                   fontWeight: FontWeight.bold,
                                                   color: CommonColors.mRed,
                                                 ),
@@ -1902,7 +1847,7 @@ class _HomeViewState extends State<HomeView> {
                                                 style: TextStyle(
                                                   fontSize: 16,
                                                   height: 1,
-                                                  
+
                                                   fontWeight: FontWeight.bold,
                                                   color: CommonColors
                                                       .darkPrimaryColor,
@@ -2047,7 +1992,7 @@ class _HomeViewState extends State<HomeView> {
                                                 ),
                                                 child: Text('Log Period',
                                                 style: TextStyle(
-                                                    
+
                                                     fontSize: 16)
                                                 ),
                                               ),
@@ -2153,7 +2098,7 @@ class _HomeViewState extends State<HomeView> {
                                               },
                                               child: const Text(
                                                 "Log Period",
-                                                
+
                                                 style: TextStyle(
                                                     color:
                                                         CommonColors.darkPink,
@@ -2164,7 +2109,7 @@ class _HomeViewState extends State<HomeView> {
                                         ),
                                       ),
 
-                                      
+
 
                                       /* Align(
                                         alignment: Alignment.topRight,
@@ -2290,8 +2235,9 @@ class _HomeViewState extends State<HomeView> {
                                                   const SymptomsBotView());
                                             },
                                             style: ButtonStyle(
-                                              padding: WidgetStateProperty.all<
-                                                  EdgeInsets>(EdgeInsets.zero),
+                                              padding: WidgetStateProperty
+                                                  .all<EdgeInsets>(
+                                                  EdgeInsets.zero),
                                               fixedSize:
                                               WidgetStateProperty.all<
                                                   Size>(
@@ -2300,8 +2246,9 @@ class _HomeViewState extends State<HomeView> {
                                               ),
                                               backgroundColor:
                                               WidgetStateProperty.all<
-                                                  Color>(Color.fromARGB(
-                                                  255, 242, 94, 180)),
+                                                  Color>(
+                                                  Color.fromARGB(255,
+                                                      242, 94, 180)),
                                               foregroundColor:
                                               WidgetStateProperty.all<
                                                   Color>(
@@ -2309,7 +2256,8 @@ class _HomeViewState extends State<HomeView> {
                                             ),
                                             child: Text('Chat Now',
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
+                                                    fontWeight:
+                                                    FontWeight.bold,
                                                     fontSize: 12)),
                                           ),
                                         ]),
@@ -2319,9 +2267,9 @@ class _HomeViewState extends State<HomeView> {
                                               alignment: Alignment.topLeft,
                                               child: InkWell(
                                                 onTap: () {
-                                                  push(const ReminderView());                  
+                                                  push(const ReminderView());
                                                 },
-                                                child: 
+                                                child:
                                               ),
                                             ), */
 
@@ -2329,7 +2277,7 @@ class _HomeViewState extends State<HomeView> {
                                     alignment: Alignment.bottomRight,
                                     child: InkWell(
                                       /* onTap: () {
-                                                  push(const ReminderView());                  
+                                                  push(const ReminderView());
                                                 }, */
                                       child: Image.asset(
                                         LocalImages.img_welcome_home,
@@ -2426,9 +2374,9 @@ class _HomeViewState extends State<HomeView> {
                                               alignment: Alignment.topLeft,
                                               child: InkWell(
                                                 onTap: () {
-                                                  push(const ReminderView());                  
+                                                  push(const ReminderView());
                                                 },
-                                                child: 
+                                                child:
                                               ),
                                             ), */
 
@@ -2436,7 +2384,7 @@ class _HomeViewState extends State<HomeView> {
                                     alignment: Alignment.bottomRight,
                                     child: InkWell(
                                       /* onTap: () {
-                                                  push(const ReminderView());                  
+                                                  push(const ReminderView());
                                                 }, */
                                       child: Image.asset(
                                         LocalImages.img_naveli_nurse,
@@ -2536,9 +2484,9 @@ class _HomeViewState extends State<HomeView> {
                                               alignment: Alignment.topLeft,
                                               child: InkWell(
                                                 onTap: () {
-                                                  push(const ReminderView());                  
+                                                  push(const ReminderView());
                                                 },
-                                                child: 
+                                                child:
                                               ),
                                             ), */
 
@@ -2547,7 +2495,7 @@ class _HomeViewState extends State<HomeView> {
                                     Alignment.bottomRight,
                                     child: InkWell(
                                       /* onTap: () {
-                                                  push(const ReminderView());                  
+                                                  push(const ReminderView());
                                                 }, */
                                       child: Image.asset(
                                         LocalImages
@@ -3329,7 +3277,7 @@ class _HomeViewState extends State<HomeView> {
                                     icon: const Icon(Icons.share_rounded,
                                         color: CommonColors.primaryColor)),
                               ],
-                            ) 
+                            )
                           ],
                         ),*/
                       ),
@@ -3357,13 +3305,13 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         child:Stack(
                           children:[
-                            
+
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text('Previous cycle length',
-                                
+
                                 style:TextStyle(
-                                  
+
                                   fontSize:16,
                                 )
                               ),
@@ -3378,9 +3326,9 @@ class _HomeViewState extends State<HomeView> {
                                 )
                               ),
                             ),
-                            
-                            
-                            
+
+
+
                           ]
                         )
                   ),
@@ -3407,7 +3355,7 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         child:Stack(
                           children:[
-                            
+
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Column(
@@ -3415,22 +3363,22 @@ class _HomeViewState extends State<HomeView> {
                                         CrossAxisAlignment.start,
                                 children:[
                                   Text('Previous period length',
-                                    
+
                                     style:TextStyle(
-                                      
+
                                       fontSize:16,
                                     )
                                   ),
                                   Text('July 17 - July 22',
-                                    
+
                                     style:TextStyle(
-                                      
+
                                       fontSize:12,
                                     )
                                   ),
                                 ]
                               ),
-                              
+
                             ),
 
                             Align(
@@ -3544,18 +3492,18 @@ class _HomeViewState extends State<HomeView> {
                                     ]
                                     )
                                   )
-                                
+
                                 ]
                               )
                             ),
 
                             /* Align(
                               alignment: Alignment.centerRight,
-                              child: 
+                              child:
                             ), */
-                            
-                            
-                            
+
+
+
                           ]
                         )
                   ),
@@ -3565,10 +3513,8 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
           ),
-        )
-        ,
-      )
-      ,
+        ),
+      ),
     );
   }
 
