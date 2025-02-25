@@ -556,7 +556,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Align(
                         alignment: Alignment.topLeft,
@@ -580,7 +580,7 @@ class _WelcomeViewState extends State<WelcomeView> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      kCommonSpaceV30,
+                      kCommonSpaceV50,
                       Row(mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                         CommonRelationSelectBox(

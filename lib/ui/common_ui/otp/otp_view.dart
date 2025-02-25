@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:naveli_2023/widgets/scaffold_bg.dart';
+import 'package:otp_autofill/otp_autofill.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 
@@ -32,9 +34,29 @@ class _OTPViewState extends State<OTPView> {
   final otpController = TextEditingController();
   String otp = "";
   var phone;
+  late OTPTextEditController controller;
+  late OTPInteractor _otpInteractor;
 
   @override
   void initState() {
+
+    _initInteractor();
+    controller = OTPTextEditController(
+      codeLength: 5,
+      //ignore: avoid_print
+      onCodeReceive: (code) => print('Your Application receive code - $code'),
+      otpInteractor: _otpInteractor,
+    )..startListenUserConsent(
+          (code) {
+        final exp = RegExp(r'(\d{5})');
+        return exp.stringMatch(code ?? '') ?? '';
+      },
+      strategies: [
+
+        // SampleStrategy(),
+      ],
+    );
+
     Future.delayed(Duration.zero, () {
       mViewModel.attachedContext(context);
       mViewModel.userRoleId = widget.roleId;
@@ -49,6 +71,16 @@ class _OTPViewState extends State<OTPView> {
     super.dispose();
   }
 
+  Future<void> _initInteractor() async {
+    _otpInteractor = OTPInteractor();
+
+    // You can receive your app signature by using this method.
+    final appSignature = await _otpInteractor.getAppSignature();
+
+    if (kDebugMode) {
+      print('Your app signature: $appSignature');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     mViewModel = Provider.of<OTPViewModel>(context);
@@ -72,7 +104,7 @@ class _OTPViewState extends State<OTPView> {
               kCommonSpaceV30,
               kCommonSpaceV20,
               Pinput(
-                controller: otpController,
+                controller: controller,
                 length: 6,
                 // androidSmsAutofillMethod:
                 //     AndroidSmsAutofillMethod.smsUserConsentApi,
