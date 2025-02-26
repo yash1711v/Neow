@@ -376,63 +376,79 @@ class _MonthViewState extends State<_MonthView> {
             DateTime now = DateTime.now();
             // DateTime isStartDate = DateTime.now();
             // peroidCustomeList
-            if (peroidCustomeList.length == 0) {
+            if (peroidCustomeList.isEmpty) {
               isSelected = mViewModel.nextCycleDates.contains(date);
               isOvulation = mViewModel.ovulationDates.contains(date);
               isFirtile = mViewModel.firtileDates.contains(date);
-            } else {
+            }
+            else {
+              DateTime now = DateTime.now();
+              int currentMonth = now.month;
+              int currentYear = now.year;
+
+              List<DateTime> fertileDates = [];
+              List<DateTime> ovulationDates = [];
+              List<DateTime> loggedPeriodDates = [];
+              List<DateTime> predictedPeriodDates = [];
+
               for (var dateRange in peroidCustomeList) {
                 DateTime start = DateTime.parse(dateRange.period_start_date);
-
-                DateTime end = DateTime.parse(dateRange.period_end_date);
+                DateTime end = DateTime.parse(dateRange.period_end_date).add(Duration(days: 1));
                 int cycleLength = int.parse(dateRange.period_cycle_length);
 
-                if (date.isAfter(start) && date.isBefore(end) ||
-                    date.isAtSameMomentAs(start) ||
-                    date.isAtSameMomentAs(end)) {
-                  isSelected = true;
-                }
-                if (date.isAtSameMomentAs(start)) {
-                  ovulationDate = calculateOvulationDate(start, cycleLength);
-                }
-                ///This calculation for future predicated dates
-                DateTime startPredicatedPeriods =
-                    DateTime.parse(dateRange.predicated_period_start_date);
-                DateTime endPredicatedPeriods =
-                    DateTime.parse(dateRange.predicated_period_end_date);
+                // Store logged period dates
+                loggedPeriodDates.addAll(List.generate(
+                  end.difference(start).inDays + 1,
+                      (i) => start.add(Duration(days: i)),
+                ));
 
-                if ((date.isAfter(startPredicatedPeriods) &&
-                    date.isBefore(endPredicatedPeriods)) ||
-                    date.isAtSameMomentAs(startPredicatedPeriods) ||
-                    date.isAtSameMomentAs(endPredicatedPeriods)) {
-                  isPredictedDate = true;
-                }
-              }
-              if (date.isSameDay(ovulationDate)) {
-                isOvulation = true;
-              }
-              // Normalize the time part to avoid issues with time
-              //
-              Duration difference = ovulationDate.difference(date);
+                // Predicted period dates
+                DateTime startPredictedPeriods = DateTime.parse(dateRange.predicated_period_start_date);
+                DateTime endPredictedPeriods = DateTime.parse(dateRange.predicated_period_end_date);
+                predictedPeriodDates.addAll(List.generate(
+                  endPredictedPeriods.difference(startPredictedPeriods).inDays + 1,
+                      (i) => startPredictedPeriods.add(Duration(days: i)),
+                ));
 
-              if (difference.inDays <= 5 && difference.inDays >= 1 ||
-                  difference.inDays == -1 ||
-                  difference.inDays == -2) {
-                isFirtile = true;
-              }
+                // Fertile window starts 3 days after period ends
+                DateTime fertileStartDate = end.add(Duration(days: 3));
 
-              if (date.isAfter(now)) {
-                if (date.month < now.month) {
-                  isSelected = mViewModel.nextCycleDates.contains(date);
-                  if (ovulationDate.month != date.month) {
-                    isOvulation = mViewModel.ovulationDates.contains(date);
-                    isFirtile = mViewModel.firtileDates.contains(date);
+                // Ovulation occurs on the 5th day of the fertile window
+                DateTime ovulationDate = fertileStartDate.add(Duration(days: 4));
+
+                // ✅ Only store fertile/ovulation dates for the current month
+                if (fertileStartDate.month == currentMonth && fertileStartDate.year == currentYear) {
+                  fertileDates.addAll(List.generate(8, (i) => fertileStartDate.add(Duration(days: i))));
+                  if (ovulationDate.month == currentMonth && ovulationDate.year == currentYear) {
+                    ovulationDates.add(ovulationDate);
                   }
                 }
               }
 
-              // isFirtile = mViewModel.firtileDates.contains(date);
+              // Check if the date falls in previously logged periods
+              if (loggedPeriodDates.contains(date)) {
+                isSelected = true;
+              }
+
+              // Check if the date falls in predicted periods
+              if (predictedPeriodDates.contains(date)) {
+                isPredictedDate = true;
+              }
+
+              // Check if `date` is within the stored fertile dates
+              if (fertileDates.contains(date)) {
+                isFirtile = true;
+                debugPrint('Fertile Date: $date');
+              }
+
+              // Check if `date` is an ovulation day
+              if (ovulationDates.contains(date)) {
+                isOvulation = true;
+              }
             }
+
+
+
             List<int> months = [];
             for (int i = 1; i <= 1; i++) {
               DateTime monthDate = DateTime(now.year, now.month - i);
@@ -590,7 +606,8 @@ class _MonthViewState extends State<_MonthView> {
                                           Color(0xFFFFB5AE),
                                         ],
                                       )
-                                    : isOvulation
+                                    :
+                                isOvulation
                                         ? mViewModel.getGradientGreen()
                                         : isPredictedDate
                                             ? LinearGradient(

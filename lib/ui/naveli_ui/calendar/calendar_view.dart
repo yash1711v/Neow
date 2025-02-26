@@ -73,7 +73,6 @@ class _CalendarViewState extends State<CalendarView> {
   List<DateTime> dateListLatest = [];
   List<DateTime> forParentUseDateList = [];
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -83,20 +82,20 @@ class _CalendarViewState extends State<CalendarView> {
       DateTime start = DateTime.parse(dateRange.period_start_date);
       DateTime end = DateTime.parse(dateRange.period_end_date);
 
-
       debugPrint("start: $start");
       debugPrint("end: $end");
       DateTime now = DateTime.now(); // Get current date
 
-      for(DateTime i = start; i.isBefore(end) || i.isAtSameMomentAs(end); i = i.add(Duration(days: 1))) {
-
+      for (DateTime i = start;
+          i.isBefore(end) || i.isAtSameMomentAs(end);
+          i = i.add(Duration(days: 1))) {
         setState(() {
           // if(dateList.isEmpty) {
           //   debugPrint("i: $i");
           //   forParentUseDateList.add(i);
           //   dateList.add(i);
           // }
-          if(forParentUseDateList.contains(i)) {
+          if (forParentUseDateList.contains(i)) {
             forParentUseDateList.remove(i);
             dateList.remove(i);
           } else {
@@ -112,7 +111,6 @@ class _CalendarViewState extends State<CalendarView> {
       debugPrint("dateList: $dateList");
       debugPrint("forParentUseDateList: $forParentUseDateList");
     }
-
   }
 
   void _updateButtonText() {
@@ -145,7 +143,6 @@ class _CalendarViewState extends State<CalendarView> {
       dateListLatest.add(NewItem);
     }
 
-
     debugPrint("forParentUseDateList: $forParentUseDateList");
     debugPrint("dateList: $dateList");
     // });
@@ -176,8 +173,11 @@ class _CalendarViewState extends State<CalendarView> {
           mViewModel.calculateCycleDatesInYear(newDate, cycleLength);
       mViewModel.ovulationDates =
           mViewModel.calculateOvolutionDatesInYear(newDate, cycleLength);
-      mViewModel.firtileDates =
-          mViewModel.calculateFirtileDatesInYear(mViewModel.ovulationDates);
+      mViewModel.firtileDates = mViewModel.calculateFertileDatesInYear(
+          previousPeriodStartDate: newDate,
+          cycleLength: int.parse(globalUserMaster?.averageCycleLength ?? "28"),
+          periodLength:
+              int.parse(globalUserMaster?.averagePeriodLength ?? "5"));
       print("CycleDates date is :::::::::: ${gCycleDates[0].periodDay}");
       mViewModel.generateDaysList();
       print("Next date is :::::::::: ${mViewModel.nextCycleDates}");
@@ -398,37 +398,79 @@ class _CalendarViewState extends State<CalendarView> {
     String accessToken = AppPreferences.instance.getAccessToken();
     final globalUserMaster = AppPreferences.instance.getUserDetails();
 
+    // Sort Dates
     forParentUseDateList.sort();
     List<String> formattedDates = forParentUseDateList.map((dateTime) {
       return '${dateTime.toLocal().year}-${dateTime.toLocal().month.toString().padLeft(2, '0')}-${dateTime.toLocal().day.toString().padLeft(2, '0')}';
     }).toList();
 
-    List<DateTime> dates = formattedDates.map((dateString) => DateTime.parse(dateString)).toList()..sort();
+    List<DateTime> dates = formattedDates
+        .map((dateString) => DateTime.parse(dateString))
+        .toList()
+      ..sort();
+
+    // **Check for Discontinuity and Validate Gaps**
+    List<List<DateTime>> periodGroups = [];
+    List<DateTime> currentGroup = [];
+
+    for (int i = 0; i < dates.length; i++) {
+      if (currentGroup.isEmpty) {
+        currentGroup.add(dates[i]);
+      } else {
+        DateTime prevDate = currentGroup.last;
+        DateTime currentDate = dates[i];
+
+        // If the difference between consecutive dates is more than 1, separate the period groups
+        if (currentDate.difference(prevDate).inDays > 1) {
+          periodGroups.add(List.from(currentGroup));
+          currentGroup.clear();
+        }
+        currentGroup.add(currentDate);
+      }
+    }
+    if (currentGroup.isNotEmpty) periodGroups.add(currentGroup);
+
+    // **Validate Period Cycles**
+    for (int i = 1; i < periodGroups.length; i++) {
+      DateTime prevEndDate = periodGroups[i - 1].last;
+      DateTime nextStartDate = periodGroups[i].first;
+
+      int gap = nextStartDate.difference(prevEndDate).inDays;
+
+      // 🚨 **If the gap between two periods is less than 28 days, show error and stop execution**
+      if (gap < 28) {
+        CommonUtils.showSnackBar(
+            "Invalid period dates: Minimum cycle length must be 28 days.",
+            color: CommonColors.mRed);
+        CommonUtils.hideProgressDialog();
+        return;
+      }
+    }
 
     // **Group Dates by Month**
     Map<String, List<DateTime>> groupedByMonth = {};
     for (var date in dates) {
-      String key = "${date.year}${date.month.toString()}";
+      String key = "${date.year}${date.month.toString().padLeft(2, '0')}";
       groupedByMonth.putIfAbsent(key, () => []).add(date);
     }
 
     // **Find Missing Months**
     List<String> allMonths = [];
-
-    // if (dates.isNotEmpty) {
-      DateTime minDate = DateTime(dates.first.year, 1, 1); // First date of the year
-      DateTime maxDate = DateTime(dates.last.year, 12, 31); // Last date of the year
+    if (dates.isNotEmpty) {
+      DateTime minDate = DateTime(dates.first.year, 1, 1);
+      DateTime maxDate = DateTime(dates.last.year, 12, 31);
 
       for (DateTime current = minDate;
-      current.isBefore(maxDate) || current.isAtSameMomentAs(maxDate);
-      current = DateTime(current.year, current.month + 1, 1)) {
-        allMonths.add("${current.year}${current.month.toString()}");
+          current.isBefore(maxDate) || current.isAtSameMomentAs(maxDate);
+          current = DateTime(current.year, current.month + 1, 1)) {
+        allMonths
+            .add("${current.year}${current.month.toString().padLeft(2, '0')}");
       }
-    // }
+    }
 
-    debugPrint("All Months months: $allMonths");
-    List<String> missingMonths = allMonths.where((month) => !groupedByMonth.containsKey(month)).toList();
-
+    debugPrint("All Months: $allMonths");
+    List<String> missingMonths =
+        allMonths.where((month) => !groupedByMonth.containsKey(month)).toList();
     debugPrint("Missing months: $missingMonths");
 
     // **Process Each Month Separately**
@@ -444,29 +486,30 @@ class _CalendarViewState extends State<CalendarView> {
         ApiParams.period_start_date: dateFormat.format(periodStart),
         ApiParams.period_end_date: dateFormat.format(periodEnd),
         ApiParams.period_length: periodLength,
-        ApiParams.period_month_update: "${periodStart.year}${periodStart.month.toString()}",
-        if(missingMonths.isNotEmpty)
-        ApiParams.period_deleted_month: missingMonths,
+        ApiParams.period_month_update:
+            "${periodStart.year}${periodStart.month.toString().padLeft(2, '0')}",
+        if (missingMonths.isNotEmpty)
+          ApiParams.period_deleted_month: missingMonths,
       };
 
-      debugPrint("params for ${entry.key}: $params");
+      debugPrint("Params for ${entry.key}: $params");
 
       // **Make API Call**
-      PeriodInfoListResponse? master = await _services.api!.savePeriodsInfo(params: params);
+      PeriodInfoListResponse? master =
+          await _services.api!.savePeriodsInfo(params: params);
 
       if (master == null) {
         CommonUtils.oopsMSG();
-      } else if (master.success == false) {
-        CommonUtils.showSnackBar(master.message ?? "--", color: CommonColors.mRed);
-      } else if (master.success == true) {
-        CommonUtils.showSnackBar(master.message ?? "--", color: CommonColors.mRed);
+      } else {
+        CommonUtils.showSnackBar(master.message ?? "--",
+            color: (master.success ?? true)
+                ? CommonColors.greenColor
+                : CommonColors.mRed);
       }
     }
 
     CommonUtils.hideProgressDialog();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -625,7 +668,8 @@ class _CalendarViewState extends State<CalendarView> {
                     ? PagedVerticalCalendar(
                         minDate: DateTime(DateTime.now().year, 1, 1),
                         maxDate: DateTime(DateTime.now().year + 1, 12, 31),
-                        initialDate: DateTime.now().add(const Duration(days: 0)),
+                        initialDate:
+                            DateTime.now().add(const Duration(days: 0)),
                         invisibleMonthsThreshold: 1,
                         isChecked: _isChecked,
                         dateList: dateList,
@@ -664,10 +708,9 @@ class _CalendarViewState extends State<CalendarView> {
                 if (isLogEdit && selectedIndex == 1)
                   ElevatedButton(
                     onPressed: () {
-                      if(_isChecked) {
+                      if (_isChecked) {
                         _updateButtonText();
                       } else {
-
                         // for (var dateRange in peroidCustomeList) {
                         //   DateTime start = DateTime.parse(dateRange.period_start_date);
                         //   DateTime end = DateTime.parse(dateRange.period_end_date);
@@ -690,7 +733,6 @@ class _CalendarViewState extends State<CalendarView> {
                         //     // dateList.add(i);
                         //   }
                         // }
-
 
                         //
                         // setState(() {

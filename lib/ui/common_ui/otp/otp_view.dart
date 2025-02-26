@@ -52,7 +52,6 @@ class _OTPViewState extends State<OTPView> {
         return exp.stringMatch(code ?? '') ?? '';
       },
       strategies: [
-
         // SampleStrategy(),
       ],
     );

@@ -29,7 +29,7 @@ class _YearCalendarViewState extends State<YearCalendarView> {
       body: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
-          childAspectRatio: (1 / 1.2),
+          childAspectRatio: (1 / 1.4),
         ),
         itemCount: 12,
         itemBuilder: (context, index) {
@@ -117,49 +117,68 @@ class _MonthViewState extends State<MonthView> {
 
       for (var dateRange in peroidCustomeList) {
         DateTime start = DateTime.parse(dateRange.period_start_date);
-
         DateTime end = DateTime.parse(dateRange.period_end_date);
         int cycleLength = int.parse(dateRange.period_cycle_length);
+
+        // ✅ Mark period days
         if (date.isAfter(start) && date.isBefore(end) ||
             date.isAtSameMomentAs(start) ||
             date.isAtSameMomentAs(end)) {
-          print("date ==ddd> ${date},,, ${start} ,, ${end}");
           isHighlighted = true;
         }
 
-        if (date.isAtSameMomentAs(start)) {
-          ovulationDate = calculateOvulationDate(start, cycleLength);
+        // ✅ Start fertile window 4 days after the period end
+        DateTime fertileStartDate = end.add(Duration(days: 4));
+        DateTime fertileEndDate = fertileStartDate.add(Duration(days: 7)); // ✅ Fertile window lasts 8 days
+
+        // ✅ Ovulation should be exactly on the 5th day of the fertile window
+        DateTime ovulationDay = fertileStartDate.add(Duration(days: 4));
+
+        // ✅ Ensure fertile days are only marked for the **current month**
+        if ((fertileStartDate.month == widget.month || fertileEndDate.month == widget.month) &&
+            date.month == widget.month &&
+            (date.isAfter(fertileStartDate) && date.isBefore(fertileEndDate) ||
+                date.isAtSameMomentAs(fertileStartDate) ||
+                date.isAtSameMomentAs(fertileEndDate))) {
+          isFirtile = true;
+        }
+
+        // ✅ Ensure ovulation is only marked for the **current month**
+        if (ovulationDay.month == widget.month && date.isSameDay(ovulationDay)) {
+          isOvulation = true;
         }
       }
+
+
+// Mark ovulation date
       if (date.isSameDay(ovulationDate)) {
         isOvulation = true;
       }
-      // Normalize the time part to avoid issues with time
-      //
-      Duration difference = ovulationDate.difference(date);
 
-      if (difference.inDays <= 5 && difference.inDays >= 1 ||
-          difference.inDays == -1 ||
-          difference.inDays == -2) {
-        isFirtile = true;
-      }
-
+// ✅ Restrict marking of predicted dates
       if (date.isAfter(now)) {
-        isHighlighted = mViewModel.nextCycleDates.contains(date);
-        if (ovulationDate.month != date.month) {
+        bool isNextMonth = date.month == now.month + 1;
+
+        if (isNextMonth) {
+          isHighlighted = mViewModel.nextCycleDates.contains(date);
+        }
+
+        // ✅ Only mark ovulation & fertile dates if they fall within next month
+        if (ovulationDate.month == now.month + 1) {
           isOvulation = mViewModel.ovulationDates.contains(date);
           isFirtile = mViewModel.firtileDates.contains(date);
         }
 
-        if (date.month > now.month) {
-          print("ddd ----=> ${date.month}---- ${now.month}");
-          isFuturePredictedHighlighted = true;
-        } else {
-          isFuturePredictedHighlighted = false;
-        }
-
-        // isFirtile = mViewModel.firtileDates.contains(date);
+        // ✅ Future predicted highlighting only for next month
+        isFuturePredictedHighlighted = isNextMonth;
+      } else {
+        isFuturePredictedHighlighted = false;
       }
+
+
+
+      // isFirtile = mViewModel.firtileDates.contains(date);
+
 
       dayWidgets.add(
         GestureDetector(
