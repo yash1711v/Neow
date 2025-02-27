@@ -318,24 +318,11 @@ class _HomeViewState extends State<HomeView> {
   }
 
   String getUrlOntimeOut() {
-    if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-        "Period day" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Period day 1" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Period day 2" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Period day 3" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Period day 4" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Period day 5" ||
-        mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-            "Period day 6") {
+    if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate).contains("Period Day")) {
       return LocalImages.red_Static;
     } else if (mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
-        .contains("Periods late")) {
+        .contains("late")) {
       return LocalImages.white_Static;
     } else if (mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
@@ -369,7 +356,7 @@ class _HomeViewState extends State<HomeView> {
       return LocalImages.red_loader;
     }  else if (mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
-        .contains("Periods late")) {
+        .contains("late")) {
       return LocalImages.white_loader;
     }  else if (mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
@@ -1437,165 +1424,91 @@ class _HomeViewState extends State<HomeView> {
                                   height: 150,
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                        /*timeoutValue == 2
-                                            ?*/
-                                          getUrlOntimeOut()
-                                        //: getUrlForGif(),
-                                      ),
-                                      fit: /*timeoutValue == 1
-                                          ? BoxFit.none
-                                          :*/
-                                      BoxFit.contain,
+                                      image: AssetImage(getUrlOntimeOut()),
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
                                   child: Column(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      if (mViewModel
-                                          .getCycleDayOrDaysToGo(
-                                          mViewModel
-                                              .selectedDate) ==
-                                          "Period day" ||
-                                          mViewModel
-                                              .getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) ==
-                                              "Period day 1" ||
-                                          mViewModel
-                                              .getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) ==
-                                              "Period day 2" ||
-                                          mViewModel
-                                              .getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) ==
-                                              "Period day 3" ||
-                                          mViewModel
-                                              .getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) ==
-                                              "Period day 4" ||
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) ==
-                                              "Period day 5" ||
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) ==
-                                              "Period day 6")
-                                        Text(
-                                          mViewModel
-                                              .getPredictedDaySelected(
-                                              mViewModel
-                                                  .selectedDate)
-                                              ? "Period may\nstart today"
-                                              : mViewModel
-                                              .getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate).replaceAll(
-                                              "after", ""),
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            height: 1,
-                                            fontWeight: FontWeight.bold,
-                                            color: CommonColors.mWhite,
-                                          ),
-                                        ),
-                                      if (mViewModel.getCycleDayOrDaysToGo(
-                                          mViewModel
-                                              .selectedDate) ==
-                                          "Ovulation in 1 Days\n" ||
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) ==
-                                              "Ovulation in 15 Days\n")
-                                        const Text(
-                                          "",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            height: 1,
-                                            fontWeight: FontWeight.bold,
-                                            color: CommonColors
-                                                .darkPrimaryColor,
-                                          ),
-                                        ),
-                                      if (mViewModel
-                                          .getCycleDayOrDaysToGo(
-                                          mViewModel
-                                              .selectedDate) ==
-                                          "Ovulation in 0 Days\n")
-                                        const Text(
-                                          "Predection:\nDay of Ovulation",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            height: 1,
-                                            fontWeight: FontWeight.bold,
-                                            color: CommonColors
-                                                .darkPrimaryColor,
-                                          ),
-                                        ),
-                                      if (mViewModel.getCycleDayOrDaysToGo(
-                                          mViewModel.selectedDate) !=
-                                          "Ovulation in - 1 Days\n" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel.selectedDate) !=
-                                              "Ovulation in 0 Days\n" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel.selectedDate) !=
-                                              "Ovulation in 15 Days\n" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel.selectedDate) !=
-                                              "Period day" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) !=
-                                              "Period day 1" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) !=
-                                              "Period day 2" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) !=
-                                              "Period day 3" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) !=
-                                              "Period day 4" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) !=
-                                              "Period day 5" &&
-                                          mViewModel.getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate) !=
-                                              "Period day 6")
-                                        Text(
-                                          isCycleStartFromTommorw()
-                                              ? "Period may start today"
-                                              : mViewModel
-                                              .getCycleDayOrDaysToGo(
-                                              mViewModel
-                                                  .selectedDate).replaceAll(
-                                              "after", ""),
-                                          textAlign: TextAlign.center,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            height: 1,
-                                            fontWeight: FontWeight.w500,
-                                            color: CommonColors
-                                                .darkPrimaryColor,
-                                          ),
-                                        ),
-                                      // Text(timeoutValue),
+                                      Builder(
+                                        builder: (context) {
+                                          String cycleText = mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate);
+
+                                          RegExp regex = RegExp(r'(Periods? (in|after|late)?) (\d+) (day|days)');
+                                          Match? match = regex.firstMatch(cycleText);
+
+                                          if (match != null) {
+                                            String prefixText = match.group(1) ?? ""; // "Period in/after/late"
+                                            String numberText = match.group(3) ?? ""; // Number
+                                            String suffixText = match.group(4) ?? ""; // "day" or "days"
+
+                                            return RichText(
+                                              textAlign: TextAlign.center,
+                                              text: TextSpan(
+                                                children: [
+                                                  TextSpan(
+                                                    text: "$prefixText ", // "Period in/after/late"
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: cycleText.contains("after") ? Colors.white : CommonColors.darkPrimaryColor,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: numberText, // Bold and Big Number
+                                                    style: const TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: CommonColors.darkPrimaryColor,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: " ${suffixText.replaceAll("after", "")}", // "day" or "days"
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: cycleText.contains("after") ? Colors.white : CommonColors.darkPrimaryColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          } else {
+                                            return Text(
+                                              cycleText.replaceAll("after", ""),
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: cycleText.contains("after") ? Colors.white : CommonColors.darkPrimaryColor,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
+                           Padding(
+                             padding: const EdgeInsets.all(8.0),
+                             child: Row(
+                               children: [
+                                 Expanded(
+                                   child: Text(
+                                       mViewModel.getCyclePhaseMessage(),
+                                       textAlign: TextAlign.center,
+                                       style: TextStyle(
+                                           fontSize: 14,
+                                           color: CommonColors.darkPrimaryColor,
+                                           fontWeight: FontWeight.w500
+                                       )),
+                                 ),
+                               ],
+                             ),
+                           )
+
                               // kCommonSpaceV5,
                               // Container(
                               //     padding: EdgeInsets.symmetric(horizontal: 20),
@@ -1606,7 +1519,7 @@ class _HomeViewState extends State<HomeView> {
                               //         style: TextStyle(fontSize: 12)),
                               //     alignment: Alignment.center
                               // ),
-                              kCommonSpaceV5,
+                              ,kCommonSpaceV5,
                               ElevatedButton(
                                 onPressed: () {
                                   navigateToCalendarView();

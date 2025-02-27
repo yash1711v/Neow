@@ -393,7 +393,7 @@ class _MonthViewState extends State<_MonthView> {
 
               for (var dateRange in peroidCustomeList) {
                 DateTime start = DateTime.parse(dateRange.period_start_date);
-                DateTime end = DateTime.parse(dateRange.period_end_date).add(Duration(days: 1));
+                DateTime end = DateTime.parse(dateRange.period_end_date);
                 int cycleLength = int.parse(dateRange.period_cycle_length);
 
                 // Store logged period dates
@@ -406,20 +406,20 @@ class _MonthViewState extends State<_MonthView> {
                 DateTime startPredictedPeriods = DateTime.parse(dateRange.predicated_period_start_date);
                 DateTime endPredictedPeriods = DateTime.parse(dateRange.predicated_period_end_date);
                 predictedPeriodDates.addAll(List.generate(
-                  endPredictedPeriods.difference(startPredictedPeriods).inDays + 1,
+                  endPredictedPeriods.difference(startPredictedPeriods).inDays,
                       (i) => startPredictedPeriods.add(Duration(days: i)),
                 ));
 
                 // Fertile window starts 3 days after period ends
-                DateTime fertileStartDate = end.add(Duration(days: 3));
+                DateTime fertileStartDate = end.add(Duration(days: 4));
 
                 // Ovulation occurs on the 5th day of the fertile window
-                DateTime ovulationDate = fertileStartDate.add(Duration(days: 4));
+                DateTime ovulationDate = fertileStartDate.add(Duration(days: 5));
 
                 // ✅ Only store fertile/ovulation dates for the current month
-                if (fertileStartDate.month == currentMonth && fertileStartDate.year == currentYear) {
+                if (fertileStartDate.month == currentMonth || fertileStartDate.month == currentMonth - 1 || startPredictedPeriods.month == fertileStartDate.month) {
                   fertileDates.addAll(List.generate(8, (i) => fertileStartDate.add(Duration(days: i))));
-                  if (ovulationDate.month == currentMonth && ovulationDate.year == currentYear) {
+                  if (ovulationDate.month == currentMonth || ovulationDate.month == currentMonth - 1 || startPredictedPeriods.month == ovulationDate.month) {
                     ovulationDates.add(ovulationDate);
                   }
                 }

@@ -4,6 +4,7 @@ import 'package:naveli_2023/widgets/scaffold_bg.dart';
 import 'package:otp_autofill/otp_autofill.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
 import '../../../generated/i18n.dart';
 import '../../../utils/common_colors.dart';
@@ -29,57 +30,64 @@ class OTPView extends StatefulWidget {
   State<OTPView> createState() => _OTPViewState();
 }
 
-class _OTPViewState extends State<OTPView> {
+class _OTPViewState extends State<OTPView> with CodeAutoFill{
   late OTPViewModel mViewModel;
   final otpController = TextEditingController();
   String otp = "";
   var phone;
-  late OTPTextEditController controller;
-  late OTPInteractor _otpInteractor;
+
+  String? appSignature;
+  String? otpCode;
+  // late OTPTextEditController controller;
+  // late OTPInteractor _otpInteractor;
 
   @override
   void initState() {
+    super.initState();
+    // _initInteractor(); // Initialize OTP interactor properly
 
-    _initInteractor();
-    controller = OTPTextEditController(
-      codeLength: 5,
-      //ignore: avoid_print
-      onCodeReceive: (code) => print('Your Application receive code - $code'),
-      otpInteractor: _otpInteractor,
-    )..startListenUserConsent(
-          (code) {
-        final exp = RegExp(r'(\d{5})');
-        return exp.stringMatch(code ?? '') ?? '';
-      },
-      strategies: [
-        // SampleStrategy(),
-      ],
-    );
+    SmsAutoFill().listenForCode();
+
+    SmsAutoFill().getAppSignature.then((signature) {
+      setState(() {
+        appSignature = signature;
+      });
+    });
 
     Future.delayed(Duration.zero, () {
       mViewModel.attachedContext(context);
       mViewModel.userRoleId = widget.roleId;
     });
-    print(widget.phoneNumber);
-    super.initState();
   }
 
-  @override
-  void dispose() {
-    mViewModel.timer!.cancel();
-    super.dispose();
-  }
+  // Future<void> _initInteractor() async {
+  //   _otpInteractor = OTPInteractor();
+  //
+  //   // Get the app signature
+  //   final appSignature = await _otpInteractor.getAppSignature();
+  //   if (kDebugMode) {
+  //     print('Your app signature: $appSignature');
+  //   }
+  //
+  //   // Initialize OTP controller AFTER interactor is ready
+  //   controller = OTPTextEditController(
+  //     codeLength: 6,
+  //     onCodeReceive: (code) {
+  //       if (code != null) {
+  //         otpController.text = code;
+  //         setState(() {
+  //           otp = code;
+  //         });
+  //       }
+  //     },
+  //     otpInteractor: _otpInteractor,
+  //   )..startListenUserConsent((code) {
+  //     final exp = RegExp(r'(\d{6})');
+  //     return exp.stringMatch(code ?? '') ?? '';
+  //   });
+  // }
 
-  Future<void> _initInteractor() async {
-    _otpInteractor = OTPInteractor();
 
-    // You can receive your app signature by using this method.
-    final appSignature = await _otpInteractor.getAppSignature();
-
-    if (kDebugMode) {
-      print('Your app signature: $appSignature');
-    }
-  }
   @override
   Widget build(BuildContext context) {
     mViewModel = Provider.of<OTPViewModel>(context);
@@ -102,25 +110,48 @@ class _OTPViewState extends State<OTPView> {
               ),
               kCommonSpaceV30,
               kCommonSpaceV20,
-              Pinput(
-                controller: controller,
-                length: 6,
-                // androidSmsAutofillMethod:
-                //     AndroidSmsAutofillMethod.smsUserConsentApi,
-                // listenForMultipleSmsOnAndroid: true,
-                defaultPinTheme: defaultPinTheme,
-                inputFormatters: const [],
-                hapticFeedbackType: HapticFeedbackType.lightImpact,
-                onCompleted: (val) {
-                  otp = val;
-                },
-                focusedPinTheme: defaultPinTheme.copyWith(
-                  decoration: defaultPinTheme.decoration!.copyWith(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: CommonColors.primaryColor),
-                  ),
+              PinFieldAutoFill(
+                controller: otpController,
+                decoration: BoxLooseDecoration(
+                  textStyle: const TextStyle(fontSize: 20, color: Colors.black),
+                  strokeColorBuilder: FixedColorBuilder(Colors.black),
                 ),
+                currentCode: otp,
+                onCodeSubmitted: (code) {
+                  otp = code;
+                },
+                onCodeChanged: (code) {
+                 setState(() {
+                   otpController.text = code ?? "0";
+                   otp = code ?? "0";
+                 });
+                  // if (code!.length == 6) {
+                  //   FocusScope.of(context).requestFocus(FocusNode());
+                  //   otp = code;
+                  // }
+                },
               ),
+
+              //
+              // Pinput(
+              //   controller: otpController,
+              //   length: 6,
+              //   // androidSmsAutofillMethod:
+              //   //     AndroidSmsAutofillMethod.smsUserConsentApi,
+              //   // listenForMultipleSmsOnAndroid: true,
+              //   defaultPinTheme: defaultPinTheme,
+              //   inputFormatters: const [],
+              //   hapticFeedbackType: HapticFeedbackType.lightImpact,
+              //   onCompleted: (val) {
+              //     otp = val;
+              //   },
+              //   focusedPinTheme: defaultPinTheme.copyWith(
+              //     decoration: defaultPinTheme.decoration!.copyWith(
+              //       borderRadius: BorderRadius.circular(5),
+              //       border: Border.all(color: CommonColors.primaryColor),
+              //     ),
+              //   ),
+              // ),
               kCommonSpaceV20,
               kCommonSpaceV20,
               mViewModel.second == 0
@@ -198,5 +229,22 @@ class _OTPViewState extends State<OTPView> {
     } else {
       return true;
     }
+  }
+
+
+  @override
+  void codeUpdated() {
+    setState(() {
+      otp = code!;
+      otpController.text = code!;
+      debugPrint('otp $code');
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    cancel();
+    // controller.dispose();
   }
 }

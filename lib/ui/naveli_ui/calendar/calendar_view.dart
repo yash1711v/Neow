@@ -153,247 +153,268 @@ class _CalendarViewState extends State<CalendarView> {
   // String dateString = globalUserMaster?.previousPeriodsBegin ?? '';
   String daysToGo = "";
 
-  Future<void> handleSecondBloc(NewdateString) async {
-    if (gUserType == AppConstants.NEOWME || gUserType == AppConstants.BUDDY) {
-      print("Cycle length :: ${globalUserMaster?.averageCycleLength}");
-      print(
-          "Period length :: ${globalUserMaster?.averagePeriodLength} previouspreriodbegin : $NewdateString");
-      mViewModel.dateParts = NewdateString.split(RegExp(r'[\s-]+'));
-      mViewModel.year = int.parse(mViewModel.dateParts[0]);
-      mViewModel.month = int.parse(mViewModel.dateParts[1]);
-      mViewModel.day = int.parse(mViewModel.dateParts[2]);
-      DateTime previousDate =
-          DateTime(mViewModel.year, mViewModel.month, mViewModel.day);
-      DateTime newDate = previousDate.add(Duration(days: -cycleLength));
-      print("previousDate is :::::::::: $previousDate");
-      print("newDate date is :::::::::: $newDate");
-      print(" cycleLength date is :::::::::: $cycleLength");
+  // Future<void> handleSecondBloc(NewdateString) async {
+  //   if (gUserType == AppConstants.NEOWME || gUserType == AppConstants.BUDDY) {
+  //     print("Cycle length :: ${globalUserMaster?.averageCycleLength}");
+  //     print(
+  //         "Period length :: ${globalUserMaster?.averagePeriodLength} previouspreriodbegin : $NewdateString");
+  //     mViewModel.dateParts = NewdateString.split(RegExp(r'[\s-]+'));
+  //     mViewModel.year = int.parse(mViewModel.dateParts[0]);
+  //     mViewModel.month = int.parse(mViewModel.dateParts[1]);
+  //     mViewModel.day = int.parse(mViewModel.dateParts[2]);
+  //     DateTime previousDate =
+  //         DateTime(mViewModel.year, mViewModel.month, mViewModel.day);
+  //     DateTime newDate = previousDate.add(Duration(days: -cycleLength));
+  //     print("previousDate is :::::::::: $previousDate");
+  //     print("newDate date is :::::::::: $newDate");
+  //     print(" cycleLength date is :::::::::: $cycleLength");
+  //
+  //     mViewModel.nextCycleDates =
+  //         mViewModel.calculateCycleDatesInYear(newDate, cycleLength);
+  //     mViewModel.ovulationDates =
+  //         mViewModel.calculateOvolutionDatesInYear(newDate, cycleLength);
+  //     mViewModel.firtileDates = mViewModel.calculateFertileDatesInYear(
+  //         previousPeriodStartDate: newDate,
+  //         cycleLength: int.parse(globalUserMaster?.averageCycleLength ?? "28"),
+  //         periodLength:
+  //             int.parse(globalUserMaster?.averagePeriodLength ?? "5"));
+  //     print("CycleDates date is :::::::::: ${gCycleDates[0].periodDay}");
+  //     mViewModel.generateDaysList();
+  //     print("Next date is :::::::::: ${mViewModel.nextCycleDates}");
+  //
+  //     DateTime today = DateTime.now();
+  //     DateTime? nextCycleDate = mViewModel.nextCycleDates.firstWhere(
+  //       (date) => date.isAfter(today),
+  //       orElse: () => mViewModel.nextCycleDates.last,
+  //     );
+  //
+  //     // Pass the next cycle date to the calculateDaysToGo method
+  //     daysToGo = mViewModel.calculateDaysToGo(nextCycleDate);
+  //     print(
+  //         'FInal date for done :::::::::::::::::::::::::::==============> $daysToGo');
+  //
+  //     // daysToGo = mViewModel.calculateDaysToGo(mViewModel.nextCycleDates);
+  //   }
+  // }
 
-      mViewModel.nextCycleDates =
-          mViewModel.calculateCycleDatesInYear(newDate, cycleLength);
-      mViewModel.ovulationDates =
-          mViewModel.calculateOvolutionDatesInYear(newDate, cycleLength);
-      mViewModel.firtileDates = mViewModel.calculateFertileDatesInYear(
-          previousPeriodStartDate: newDate,
-          cycleLength: int.parse(globalUserMaster?.averageCycleLength ?? "28"),
-          periodLength:
-              int.parse(globalUserMaster?.averagePeriodLength ?? "5"));
-      print("CycleDates date is :::::::::: ${gCycleDates[0].periodDay}");
-      mViewModel.generateDaysList();
-      print("Next date is :::::::::: ${mViewModel.nextCycleDates}");
+  // Future<void> postData(currentMonth, lenghtForPost) async {
+  //   String accessToken = AppPreferences.instance.getAccessToken();
+  //   DateTime startMonth = DateTime.parse(currentMonth);
+  //   final url = Uri.parse(
+  //       'https://neowindia.com/api/updateUserDashboard'); // Replace with your API endpoint
+  //   final headers = {
+  //     "Content-Type": "application/json",
+  //     "Authorization": "Bearer $accessToken"
+  //   };
+  //   final body = jsonEncode({
+  //     "average_cycle_length": "${globalUserMaster?.averageCycleLength}",
+  //     "average_period_length": "${lenghtForPost}",
+  //     "previous_periods_begin":
+  //         "${startMonth.year}-${startMonth.month}-${startMonth.day}"
+  //   });
+  //   CommonUtils.showProgressDialog();
+  //   final response = await http.post(url, headers: headers, body: body);
+  //
+  //   CommonUtils.hideProgressDialog();
+  //   if (response.statusCode == 200 || response.statusCode == 201) {
+  //     // If the server returns a successful response, parse the JSON.
+  //     var data = jsonDecode(response.body);
+  //     CommonUtils.showSnackBar(
+  //       'Period Updated Successfully.',
+  //       color: CommonColors.greenColor,
+  //     );
+  //     globalUserMaster?.previousPeriodsBegin =
+  //         "${startMonth.year}-${startMonth.month}-${startMonth.day}";
+  //     String NewdateString =
+  //         "${startMonth.year}-${startMonth.month}-${startMonth.day}";
+  //
+  //     globalUserMaster?.averageCycleLength =
+  //         "${globalUserMaster?.averageCycleLength}";
+  //
+  //     handleSecondBloc(NewdateString);
+  //     // Navigator.push(
+  //     //   context,
+  //     //   MaterialPageRoute(builder: (context) => HomeView()),
+  //     // ).then((value) => setState(() {}));
+  //     // Navigator.pop(context, "Home Page View"); // popped from LoginScreen().
+  //     mViewModel.fetchData();
+  //
+  //     setState(() {});
+  //     print('Response data: $data');
+  //   } else {
+  //     // If the server did not return a 200 or 201 response, throw an exception.
+  //     throw Exception('Failed to post data: ${response.statusCode}');
+  //   }
+  // }
+  //
+  // Future<void> postDataCustomeAPI() async {
+  //   DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+  //
+  //   String accessToken = AppPreferences.instance.getAccessToken();
+  //   final globalUserMaster = AppPreferences.instance.getUserDetails();
+  //   print("ddatt: $forParentUseDateList");
+  //   forParentUseDateList.sort();
+  //   print(forParentUseDateList);
+  //
+  //   List<String> formattedDates = forParentUseDateList.map((dateTime) {
+  //     return '${dateTime.toLocal().year}-${dateTime.toLocal().month.toString().padLeft(2, '0')}-${dateTime.toLocal().day.toString().padLeft(2, '0')}';
+  //   }).toList();
+  //   print(formattedDates);
+  //   List<DateTime> dates = formattedDates
+  //       .map((dateString) => DateTime.parse(dateString))
+  //       .toList()
+  //     ..sort();
+  //
+  //   // Find lengths of nearby dates
+  //   List<int> nearbyLengths = [];
+  //
+  //   List<Object> finalArray = [];
+  //
+  //   int currentLength = 1;
+  //   String currentMonth = '';
+  //   int lenghtForPost = 0;
+  //   for (int i = 1; i < dates.length; i++) {
+  //     // Check if the current date is the next day of the previous date
+  //
+  //     if (dates[i].difference(dates[i - 1]).inDays == 1) {
+  //       currentLength++;
+  //     } else {
+  //       // Store the length of the current sequence if it's more than 1
+  //       if (currentLength > 1) {
+  //         DateTime startMonth =
+  //             DateTime.parse(dateFormat.format(dates[i - (currentLength)]));
+  //         if (startMonth.month == DateTime.now().month) {
+  //           currentMonth = dateFormat.format(dates[i - (currentLength)]);
+  //           lenghtForPost = currentLength;
+  //         }
+  //         finalArray.add({
+  //           "user_id": globalUserMaster?.id,
+  //           "period_start_date": dateFormat.format(dates[i - (currentLength)]),
+  //           // "${dates[i - (currentLength)].year}-${dates[i - (currentLength)].month}-${dates[i - (currentLength)].day}",
+  //           "period_end_date": dateFormat.format(dates[i - 1]),
+  //           // "${dates[i - 1].year}-${dates[i - 1].month}-${dates[i - 1].day}",
+  //           "period_length": currentLength,
+  //           "period_cycle_length": "${globalUserMaster?.averageCycleLength}",
+  //           "period_month_update":
+  //               dates[i - (currentLength - 1)].year.toString() +
+  //                   dates[i - (currentLength - 1)].month.toString()
+  //         });
+  //         nearbyLengths.add(currentLength);
+  //       }
+  //
+  //       currentLength = 1; // Reset for the next sequence
+  //     }
+  //   }
+  //
+  //   // Check for the last sequence
+  //   if (currentLength > 1) {
+  //     if (currentMonth == '' || lenghtForPost == 0) {
+  //       DateTime startMonth = DateTime.parse(
+  //           dateFormat.format(dates[dates.length - (currentLength)]));
+  //       if (startMonth.month == DateTime.now().month) {
+  //         currentMonth =
+  //             dateFormat.format(dates[dates.length - (currentLength)]);
+  //         lenghtForPost = currentLength;
+  //       }
+  //     }
+  //     finalArray.add({
+  //       "user_id": globalUserMaster?.id,
+  //       "period_start_date":
+  //           dateFormat.format(dates[dates.length - (currentLength)]),
+  //       // "${dates[dates.length - (currentLength)].year}-${dates[dates.length - (currentLength)].month}-${dates[dates.length - (currentLength)].day}",
+  //       "period_end_date": dateFormat.format(dates[dates.length - 1]),
+  //       // "${dates[dates.length - 1].year}-${dates[dates.length - 1].month}-${dates[dates.length - 1].day}",
+  //       "period_length": currentLength,
+  //       "period_cycle_length": "${globalUserMaster?.averageCycleLength}",
+  //       "period_month_update":
+  //           dates[dates.length - (currentLength - 1)].year.toString() +
+  //               dates[dates.length - (currentLength - 1)].month.toString()
+  //     });
+  //     nearbyLengths.add(currentLength);
+  //   }
+  //   // print('=========================user masetr');
+  //
+  //   // globalUserMaster?.id
+  //
+  //   final url = Uri.parse(
+  //       'https://neowindia.com/customeApi/periodinfo.php'); // Replace with your API endpoint
+  //   final headers = {
+  //     "Content-Type": "application/json",
+  //     "Authorization": "Bearer $accessToken"
+  //   };
+  //   // final body = finalArray;
+  //   print('Final Array =========================================');
+  //   print(
+  //     jsonEncode(finalArray),
+  //   );
+  //   CommonUtils.showProgressDialog();
+  //   final response =
+  //       await http.post(url, headers: headers, body: jsonEncode(finalArray));
+  //   CommonUtils.hideProgressDialog();
+  //   if (response.statusCode == 200 || response.statusCode == 201) {
+  //     // If the server returns a successful response, parse the JSON.
+  //     var data = jsonDecode(response.body);
+  //     CommonUtils.showSnackBar(
+  //       'Period Updated Successfully.',
+  //       color: CommonColors.greenColor,
+  //     );
+  //     globalUserMaster?.previousPeriodsBegin =
+  //         "${forParentUseDateList[0].year}-${forParentUseDateList[0].month}-${forParentUseDateList[0].day}";
+  //
+  //     globalUserMaster?.averageCycleLength =
+  //         "${globalUserMaster?.averageCycleLength}";
+  //     // Navigator.push(
+  //     //   context,
+  //     //   MaterialPageRoute(builder: (context) => HomeView()),
+  //     // ).then((value) => setState(() {}));
+  //     if (lenghtForPost == 0) {
+  //       // fetchData();
+  //     } else {
+  //       print('========================= currentMonth');
+  //       print(currentMonth);
+  //       print(lenghtForPost);
+  //       print('========================= lenghtForPost');
+  //       mViewModel.fetchData();
+  //       postData(currentMonth, lenghtForPost);
+  //     }
+  //     // Navigator.pop(context, "Home Page View"); // popped from LoginScreen().
+  //     forParentUseDateList.clear();
+  //     print('forParentUseDateList: $forParentUseDateList');
+  //     print('Response data: $data');
+  //   } else {
+  //     CommonUtils.showSnackBar(
+  //       'Period overlaps with an existing record',
+  //       color: const Color.fromARGB(255, 251, 154, 154),
+  //     );
+  //     // If the server did not return a 200 or 201 response, throw an exception.
+  //     throw Exception('Failed to post data: ${response.statusCode}');
+  //   }
+  // }
 
-      DateTime today = DateTime.now();
-      DateTime? nextCycleDate = mViewModel.nextCycleDates.firstWhere(
-        (date) => date.isAfter(today),
-        orElse: () => mViewModel.nextCycleDates.last,
-      );
+  List<String> getMissingMonths(List<DateTime> dateList) {
+    if (dateList.isEmpty) return [];
 
-      // Pass the next cycle date to the calculateDaysToGo method
-      daysToGo = mViewModel.calculateDaysToGo(nextCycleDate);
-      print(
-          'FInal date for done :::::::::::::::::::::::::::==============> $daysToGo');
+    int currentYear = DateTime.now().year;
 
-      // daysToGo = mViewModel.calculateDaysToGo(mViewModel.nextCycleDates);
-    }
-  }
+    // Extract existing months in YYYYM format
+    Set<String> existingMonths = dateList
+        .where((date) => date.year == currentYear) // Filter only current year dates
+        .map((date) => "${date.year}${date.month}") // Format as YYYYM
+        .toSet();
 
-  Future<void> postData(currentMonth, lenghtForPost) async {
-    String accessToken = AppPreferences.instance.getAccessToken();
-    DateTime startMonth = DateTime.parse(currentMonth);
-    final url = Uri.parse(
-        'https://neowindia.com/api/updateUserDashboard'); // Replace with your API endpoint
-    final headers = {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $accessToken"
-    };
-    final body = jsonEncode({
-      "average_cycle_length": "${globalUserMaster?.averageCycleLength}",
-      "average_period_length": "${lenghtForPost}",
-      "previous_periods_begin":
-          "${startMonth.year}-${startMonth.month}-${startMonth.day}"
-    });
-    CommonUtils.showProgressDialog();
-    final response = await http.post(url, headers: headers, body: body);
+    // Generate all months for the current year in YYYYM format
+    List<String> allMonths = List.generate(12, (index) => "${currentYear}${index + 1}");
 
-    CommonUtils.hideProgressDialog();
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      // If the server returns a successful response, parse the JSON.
-      var data = jsonDecode(response.body);
-      CommonUtils.showSnackBar(
-        'Period Updated Successfully.',
-        color: CommonColors.greenColor,
-      );
-      globalUserMaster?.previousPeriodsBegin =
-          "${startMonth.year}-${startMonth.month}-${startMonth.day}";
-      String NewdateString =
-          "${startMonth.year}-${startMonth.month}-${startMonth.day}";
+    // Find missing months
+    List<String> missingMonths = allMonths.where((month) => !existingMonths.contains(month)).toList();
 
-      globalUserMaster?.averageCycleLength =
-          "${globalUserMaster?.averageCycleLength}";
-
-      handleSecondBloc(NewdateString);
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => HomeView()),
-      // ).then((value) => setState(() {}));
-      // Navigator.pop(context, "Home Page View"); // popped from LoginScreen().
-      mViewModel.fetchData();
-
-      setState(() {});
-      print('Response data: $data');
-    } else {
-      // If the server did not return a 200 or 201 response, throw an exception.
-      throw Exception('Failed to post data: ${response.statusCode}');
-    }
-  }
-
-  Future<void> postDataCustomeAPI() async {
-    DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-
-    String accessToken = AppPreferences.instance.getAccessToken();
-    final globalUserMaster = AppPreferences.instance.getUserDetails();
-    print("ddatt: $forParentUseDateList");
-    forParentUseDateList.sort();
-    print(forParentUseDateList);
-
-    List<String> formattedDates = forParentUseDateList.map((dateTime) {
-      return '${dateTime.toLocal().year}-${dateTime.toLocal().month.toString().padLeft(2, '0')}-${dateTime.toLocal().day.toString().padLeft(2, '0')}';
-    }).toList();
-    print(formattedDates);
-    List<DateTime> dates = formattedDates
-        .map((dateString) => DateTime.parse(dateString))
-        .toList()
-      ..sort();
-
-    // Find lengths of nearby dates
-    List<int> nearbyLengths = [];
-
-    List<Object> finalArray = [];
-
-    int currentLength = 1;
-    String currentMonth = '';
-    int lenghtForPost = 0;
-    for (int i = 1; i < dates.length; i++) {
-      // Check if the current date is the next day of the previous date
-
-      if (dates[i].difference(dates[i - 1]).inDays == 1) {
-        currentLength++;
-      } else {
-        // Store the length of the current sequence if it's more than 1
-        if (currentLength > 1) {
-          DateTime startMonth =
-              DateTime.parse(dateFormat.format(dates[i - (currentLength)]));
-          if (startMonth.month == DateTime.now().month) {
-            currentMonth = dateFormat.format(dates[i - (currentLength)]);
-            lenghtForPost = currentLength;
-          }
-          finalArray.add({
-            "user_id": globalUserMaster?.id,
-            "period_start_date": dateFormat.format(dates[i - (currentLength)]),
-            // "${dates[i - (currentLength)].year}-${dates[i - (currentLength)].month}-${dates[i - (currentLength)].day}",
-            "period_end_date": dateFormat.format(dates[i - 1]),
-            // "${dates[i - 1].year}-${dates[i - 1].month}-${dates[i - 1].day}",
-            "period_length": currentLength,
-            "period_cycle_length": "${globalUserMaster?.averageCycleLength}",
-            "period_month_update":
-                dates[i - (currentLength - 1)].year.toString() +
-                    dates[i - (currentLength - 1)].month.toString()
-          });
-          nearbyLengths.add(currentLength);
-        }
-
-        currentLength = 1; // Reset for the next sequence
-      }
-    }
-
-    // Check for the last sequence
-    if (currentLength > 1) {
-      if (currentMonth == '' || lenghtForPost == 0) {
-        DateTime startMonth = DateTime.parse(
-            dateFormat.format(dates[dates.length - (currentLength)]));
-        if (startMonth.month == DateTime.now().month) {
-          currentMonth =
-              dateFormat.format(dates[dates.length - (currentLength)]);
-          lenghtForPost = currentLength;
-        }
-      }
-      finalArray.add({
-        "user_id": globalUserMaster?.id,
-        "period_start_date":
-            dateFormat.format(dates[dates.length - (currentLength)]),
-        // "${dates[dates.length - (currentLength)].year}-${dates[dates.length - (currentLength)].month}-${dates[dates.length - (currentLength)].day}",
-        "period_end_date": dateFormat.format(dates[dates.length - 1]),
-        // "${dates[dates.length - 1].year}-${dates[dates.length - 1].month}-${dates[dates.length - 1].day}",
-        "period_length": currentLength,
-        "period_cycle_length": "${globalUserMaster?.averageCycleLength}",
-        "period_month_update":
-            dates[dates.length - (currentLength - 1)].year.toString() +
-                dates[dates.length - (currentLength - 1)].month.toString()
-      });
-      nearbyLengths.add(currentLength);
-    }
-    // print('=========================user masetr');
-
-    // globalUserMaster?.id
-
-    final url = Uri.parse(
-        'https://neowindia.com/customeApi/periodinfo.php'); // Replace with your API endpoint
-    final headers = {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $accessToken"
-    };
-    // final body = finalArray;
-    print('Final Array =========================================');
-    print(
-      jsonEncode(finalArray),
-    );
-    CommonUtils.showProgressDialog();
-    final response =
-        await http.post(url, headers: headers, body: jsonEncode(finalArray));
-    CommonUtils.hideProgressDialog();
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      // If the server returns a successful response, parse the JSON.
-      var data = jsonDecode(response.body);
-      CommonUtils.showSnackBar(
-        'Period Updated Successfully.',
-        color: CommonColors.greenColor,
-      );
-      globalUserMaster?.previousPeriodsBegin =
-          "${forParentUseDateList[0].year}-${forParentUseDateList[0].month}-${forParentUseDateList[0].day}";
-
-      globalUserMaster?.averageCycleLength =
-          "${globalUserMaster?.averageCycleLength}";
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => HomeView()),
-      // ).then((value) => setState(() {}));
-      if (lenghtForPost == 0) {
-        // fetchData();
-      } else {
-        print('========================= currentMonth');
-        print(currentMonth);
-        print(lenghtForPost);
-        print('========================= lenghtForPost');
-        mViewModel.fetchData();
-        postData(currentMonth, lenghtForPost);
-      }
-      // Navigator.pop(context, "Home Page View"); // popped from LoginScreen().
-      forParentUseDateList.clear();
-      print('forParentUseDateList: $forParentUseDateList');
-      print('Response data: $data');
-    } else {
-      CommonUtils.showSnackBar(
-        'Period overlaps with an existing record',
-        color: const Color.fromARGB(255, 251, 154, 154),
-      );
-      // If the server did not return a 200 or 201 response, throw an exception.
-      throw Exception('Failed to post data: ${response.statusCode}');
-    }
+    return missingMonths;
   }
 
   Future<void> addPeriodInfo() async {
     CommonUtils.showProgressDialog();
-
+    HomeViewModel mViewHomeModel = Provider.of<HomeViewModel>(context, listen: false);
+    mViewHomeModel.getPeriodInfoList();
     DateFormat dateFormat = DateFormat('yyyy-MM-dd');
     String accessToken = AppPreferences.instance.getAccessToken();
     final globalUserMaster = AppPreferences.instance.getUserDetails();
@@ -403,6 +424,10 @@ class _CalendarViewState extends State<CalendarView> {
     List<String> formattedDates = forParentUseDateList.map((dateTime) {
       return '${dateTime.toLocal().year}-${dateTime.toLocal().month.toString().padLeft(2, '0')}-${dateTime.toLocal().day.toString().padLeft(2, '0')}';
     }).toList();
+
+    List<String> missingMonths = getMissingMonths(forParentUseDateList);
+
+    debugPrint("formattedDates: $missingMonths");
 
     List<DateTime> dates = formattedDates
         .map((dateString) => DateTime.parse(dateString))
@@ -420,7 +445,7 @@ class _CalendarViewState extends State<CalendarView> {
         DateTime prevDate = currentGroup.last;
         DateTime currentDate = dates[i];
 
-        // If the difference between consecutive dates is more than 1, separate the period groups
+        // Ensure dates are continuous
         if (currentDate.difference(prevDate).inDays > 1) {
           periodGroups.add(List.from(currentGroup));
           currentGroup.clear();
@@ -432,84 +457,75 @@ class _CalendarViewState extends State<CalendarView> {
 
     // **Validate Period Cycles**
     for (int i = 1; i < periodGroups.length; i++) {
-      DateTime prevEndDate = periodGroups[i - 1].last;
+      DateTime prevStartDate = periodGroups[i - 1].first;
       DateTime nextStartDate = periodGroups[i].first;
 
-      int gap = nextStartDate.difference(prevEndDate).inDays;
+      int gap = nextStartDate.difference(prevStartDate).inDays;
+      debugPrint("prevStartDate: $prevStartDate");
 
-      // 🚨 **If the gap between two periods is less than 28 days, show error and stop execution**
-      if (gap < 28) {
+      // 🚨 If the gap between two periods is less than 28 days, show error
+      if (gap < int.parse(peroidCustomeList[0].period_cycle_length ?? "28")) {
         CommonUtils.showSnackBar(
-            "Invalid period dates: Minimum cycle length must be 28 days.",
+            "🚨 Invalid period dates: Minimum cycle length must be ${int.parse(peroidCustomeList[0].period_cycle_length ?? "28")} days.",
             color: CommonColors.mRed);
         CommonUtils.hideProgressDialog();
         return;
       }
     }
 
-    // **Group Dates by Month**
-    Map<String, List<DateTime>> groupedByMonth = {};
-    for (var date in dates) {
-      String key = "${date.year}${date.month.toString().padLeft(2, '0')}";
-      groupedByMonth.putIfAbsent(key, () => []).add(date);
+    // **Validate if there are more than 2 sets of periods in the same month**
+    Map<String, int> periodCounts = {};
+    for (var group in periodGroups) {
+      String monthKey = "${group.first.year}${group.first.month.toString().padLeft(2, '0')}";
+      periodCounts[monthKey] = (periodCounts[monthKey] ?? 0) + 1;
     }
 
-    // **Find Missing Months**
-    List<String> allMonths = [];
-    if (dates.isNotEmpty) {
-      DateTime minDate = DateTime(dates.first.year, 1, 1);
-      DateTime maxDate = DateTime(dates.last.year, 12, 31);
-
-      for (DateTime current = minDate;
-          current.isBefore(maxDate) || current.isAtSameMomentAs(maxDate);
-          current = DateTime(current.year, current.month + 1, 1)) {
-        allMonths
-            .add("${current.year}${current.month.toString().padLeft(2, '0')}");
-      }
+    if (periodCounts.values.any((count) => count > 2)) {
+      CommonUtils.showSnackBar(
+          "🚨 Invalid input: A month cannot have more than two periods.",
+          color: CommonColors.mRed);
+      CommonUtils.hideProgressDialog();
+      return;
     }
 
-    debugPrint("All Months: $allMonths");
-    List<String> missingMonths =
-        allMonths.where((month) => !groupedByMonth.containsKey(month)).toList();
-    debugPrint("Missing months: $missingMonths");
-
-    // **Process Each Month Separately**
-    for (var entry in groupedByMonth.entries) {
-      List<DateTime> monthDates = entry.value;
-      monthDates.sort();
-
-      DateTime periodStart = monthDates.first;
-      DateTime periodEnd = monthDates.last;
+    // **Process Each Period Separately**
+    for (var group in periodGroups) {
+      DateTime periodStart = group.first;
+      DateTime periodEnd = group.last;
       int periodLength = periodEnd.difference(periodStart).inDays + 1;
+
+      // Ensure correct month update
+      DateTime periodUpdateMonth = periodEnd.month > periodStart.month ? periodEnd : periodStart;
 
       Map<String, dynamic> params = {
         ApiParams.period_start_date: dateFormat.format(periodStart),
         ApiParams.period_end_date: dateFormat.format(periodEnd),
         ApiParams.period_length: periodLength,
         ApiParams.period_month_update:
-            "${periodStart.year}${periodStart.month.toString().padLeft(2, '0')}",
-        if (missingMonths.isNotEmpty)
-          ApiParams.period_deleted_month: missingMonths,
+        "${periodUpdateMonth.year}${periodUpdateMonth.month.toString()}",
+        ApiParams.period_deleted_month : missingMonths,
       };
 
-      debugPrint("Params for ${entry.key}: $params");
+      debugPrint("🚨 Params for ${periodUpdateMonth.year}-${periodUpdateMonth.month}: $params");
 
       // **Make API Call**
-      PeriodInfoListResponse? master =
-          await _services.api!.savePeriodsInfo(params: params);
+        PeriodInfoListResponse? master =
+        await _services.api!.savePeriodsInfo(params: params);
 
-      if (master == null) {
-        CommonUtils.oopsMSG();
-      } else {
-        CommonUtils.showSnackBar(master.message ?? "--",
-            color: (master.success ?? true)
-                ? CommonColors.greenColor
-                : CommonColors.mRed);
-      }
+        if (master == null) {
+          CommonUtils.oopsMSG();
+        } else {
+          CommonUtils.showSnackBar(master.message ?? "--",
+              color: (master.success ?? true)
+                  ? CommonColors.greenColor
+                  : CommonColors.mRed);
+        }
     }
 
     CommonUtils.hideProgressDialog();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
