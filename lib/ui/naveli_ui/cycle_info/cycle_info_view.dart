@@ -39,7 +39,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
   );
   final mDateController = TextEditingController();
   late CycleInfoViewModel mViewModel;
-  int? selectedCycleLength = 0;
+  int? selectedCycleLength = 21;
   String? selectedPreviousPeriodDate;
   late SignInViewModel singInViewModel = SignInViewModel();
 
@@ -66,12 +66,12 @@ class _CycleInfoViewState extends State<CycleInfoView> {
     // } else {
     //   scrollController = FixedExtentScrollController();
     // }
-    scrollController = FixedExtentScrollController();
-    scrollPeriodLengthController = FixedExtentScrollController();
+    scrollController = FixedExtentScrollController(initialItem: 0);
+    scrollPeriodLengthController = FixedExtentScrollController(initialItem: 0);
     // Use a post-frame callback to animate after the widget is built.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollController.animateToItem(
-        29, // Target position
+        0, // Target position
         duration: const Duration(seconds: 2), // Animation duration
         curve: Curves.easeInOut, // Animation curve
       );
@@ -191,36 +191,35 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                           itemExtent: 100,
                           diameterRatio: .8,
                           perspective: 0.005,
-                          controller: scrollController,
+                          controller: scrollController, // Use the initialized scrollController
                           physics: FixedExtentScrollPhysics(),
                           onSelectedItemChanged: (value) {
-                            selectedCycleLength = value + 1;
-                            print("selected lenght $selectedCycleLength");
+                            selectedCycleLength = value + 21
+                            ; // Ensuring the range starts from 21
+                            print("Selected length: $selectedCycleLength");
                           },
                           children: List.generate(
-                            45,
-                                (index) =>
-                                Container(
-                                  height: 80,
-                                  width: 120,
-                                  decoration: const BoxDecoration(
-                                    color: CommonColors.mWhite,
-                                    // shape: BoxShape.circle,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    index == 0
-                                        ? "${index + 1} Day"
-                                        : "${index + 1} Days",
-                                    style: getAppStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w400,
-                                        color: CommonColors.blackColor),
-                                  ),
+                            25, // Total count (from 21 to 45) = 45 - 21 + 1
+                                (index) => Container(
+                              height: 80,
+                              width: 120,
+                              decoration: const BoxDecoration(
+                                color: CommonColors.mWhite,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "${index + 21} ${index == 0 ? 'Day' : 'Days'}",
+                                style: getAppStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w400,
+                                  color: CommonColors.blackColor,
                                 ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
+
                       // kCommonSpaceV10,
                       // Text(
                       //   S.of(context)!.days,
@@ -415,7 +414,6 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                         fit: BoxFit.cover,
                       ),
                     ),
-
                     Expanded(
                       child: ListWheelScrollView(
                         itemExtent: 100,
@@ -424,29 +422,26 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                         physics: FixedExtentScrollPhysics(),
                         perspective: 0.004,
                         onSelectedItemChanged: (value) {
-                          selectedPeriodsLength = value + 1;
+                          selectedPeriodsLength = value + 1; // Ensuring range starts from 1
                         },
                         children: List.generate(
-                          15,
-                              (index) =>
-                              Container(
-                                height: 80,
-                                width: 120,
-                                decoration: const BoxDecoration(
-                                  color: CommonColors.mWhite,
-                                  // shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  index == 0
-                                      ? "${index + 1} Day"
-                                      : "${index + 1} Days",
-                                  style: getAppStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
-                                      color: CommonColors.blackColor),
-                                ),
+                          5, // Now limited to 1–5
+                              (index) => Container(
+                            height: 80,
+                            width: 120,
+                            decoration: const BoxDecoration(
+                              color: CommonColors.mWhite,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              "${index + 1} ${index == 0 ? 'Day' : 'Days'}",
+                              style: getAppStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: CommonColors.blackColor,
                               ),
+                            ),
+                          ),
                         ),
                       ),
                     ),

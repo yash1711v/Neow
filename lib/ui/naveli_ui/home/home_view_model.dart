@@ -198,7 +198,7 @@ class HomeViewModel with ChangeNotifier {
       fertileDates.add(ovulationDate.add(Duration(days: j)));
     }
 
-    log("Fertile dates ===> $fertileDates", name: "FertileDates");
+    // log("Fertile dates ===> $fertileDates", name: "FertileDates");
     return fertileDates;
   }
 
@@ -378,15 +378,18 @@ class HomeViewModel with ChangeNotifier {
       "${periodLength + 10}-${periodLength + 14}": "Confidence peaks, and you're glowing. Embrace the energy, take on new challenges, and slay!",
       "${periodLength + 15}-${periodLength + 18}": "Vibes are chill. Take a breather, unwind, and treat yourself to some me-time.",
       "${periodLength + 19}-${cycleLength - 4}": "Cravings, mood swings, and all the feels. Nourish, slow down, and be gentle with yourself.",
-      "${cycleLength - 3}-${cycleLength}": "PMS Alert!! Feeling bloated, tired, and emotional? Hydrate, relax, and pamper yourself.",
+      "${cycleLength - 3}-$cycleLength": "PMS Alert!! Feeling bloated, tired, and emotional? Hydrate, relax, and pamper yourself.",
       "${cycleLength + 1}": "Period’s running late? Don’t stress, give it time, and let your body do its thing."
     };
 
     // Determine the corresponding phase message
     for (var range in cyclePhases.keys) {
-      List<String> parts = range.split("-");
+      List<String> parts = range.split("-").where((e) => e.isNotEmpty).toList();
+
       int start = int.parse(parts[0]);
       int end = parts.length > 1 ? int.parse(parts[1]) : start;
+
+      debugPrint("Cycle Day: $cycleDay, Range: $range, Parts: $parts , cyclePhases: ${cyclePhases[range]}, start $start, end $end");
 
       if (cycleDay >= start && cycleDay <= end) {
         return cyclePhases[range]!;

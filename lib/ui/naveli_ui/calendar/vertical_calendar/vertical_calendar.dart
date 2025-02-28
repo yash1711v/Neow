@@ -438,7 +438,7 @@ class _MonthViewState extends State<_MonthView> {
               // Check if `date` is within the stored fertile dates
               if (fertileDates.contains(date)) {
                 isFirtile = true;
-                debugPrint('Fertile Date: $date');
+                // debugPrint('Fertile Date: $date');
               }
 
               // Check if `date` is an ovulation day
