@@ -81,9 +81,9 @@ class _CalendarViewState extends State<CalendarView> {
     for (var dateRange in peroidCustomeList) {
       DateTime start = DateTime.parse(dateRange.period_start_date);
       DateTime end = DateTime.parse(dateRange.period_end_date);
-
-      debugPrint("start: $start");
-      debugPrint("end: $end");
+      //
+      // debugPrint("start: $start");
+      // debugPrint("end: $end");
       DateTime now = DateTime.now(); // Get current date
 
       for (DateTime i = start;
@@ -108,8 +108,8 @@ class _CalendarViewState extends State<CalendarView> {
         // dateList.add(i);
       }
 
-      debugPrint("dateList: $dateList");
-      debugPrint("forParentUseDateList: $forParentUseDateList");
+      // debugPrint("dateList: $dateList");
+      // debugPrint("forParentUseDateList: $forParentUseDateList");
     }
   }
 
@@ -142,9 +142,9 @@ class _CalendarViewState extends State<CalendarView> {
       dateList.add(NewItem);
       dateListLatest.add(NewItem);
     }
-
-    debugPrint("forParentUseDateList: $forParentUseDateList");
-    debugPrint("dateList: $dateList");
+    //
+    // debugPrint("forParentUseDateList: $forParentUseDateList");
+    // debugPrint("dateList: $dateList");
     // });
   }
 
@@ -445,8 +445,10 @@ class _CalendarViewState extends State<CalendarView> {
         DateTime prevDate = currentGroup.last;
         DateTime currentDate = dates[i];
 
-        // Ensure dates are continuous
-        if (currentDate.difference(prevDate).inDays > 1) {
+        int dayGap = currentDate.difference(prevDate).inDays;
+
+        // If the gap is more than or equal to 5 days, start a new cycle
+        if (dayGap >= 5) {
           periodGroups.add(List.from(currentGroup));
           currentGroup.clear();
         }
@@ -463,20 +465,18 @@ class _CalendarViewState extends State<CalendarView> {
       int gap = nextStartDate.difference(prevStartDate).inDays;
       debugPrint("prevStartDate: $prevStartDate");
 
-      // 🚨 If the gap between two periods is less than 28 days, show error
-      if (gap < int.parse(peroidCustomeList[0].period_cycle_length ?? "28")) {
+      // 🚨 If the gap between two periods is less than 14 days, show error but do not return
+      if (gap < 14) {
         CommonUtils.showSnackBar(
-            "🚨 Invalid period dates: Minimum cycle length must be ${int.parse(peroidCustomeList[0].period_cycle_length ?? "28")} days.",
+            "⚠️ Warning: Cycle gap is too short. Recommended minimum is 14 days.",
             color: CommonColors.mRed);
-        CommonUtils.hideProgressDialog();
-        return;
       }
     }
 
     // **Validate if there are more than 2 sets of periods in the same month**
     Map<String, int> periodCounts = {};
     for (var group in periodGroups) {
-      String monthKey = "${group.first.year}${group.first.month.toString().padLeft(2, '0')}";
+      String monthKey = "${group.first.year}${group.first.month.toString()}";
       periodCounts[monthKey] = (periodCounts[monthKey] ?? 0) + 1;
     }
 
@@ -489,41 +489,67 @@ class _CalendarViewState extends State<CalendarView> {
     }
 
     // **Process Each Period Separately**
-    for (var group in periodGroups) {
+    for (int i = 0; i < periodGroups.length; i++) {
+      var group = periodGroups[i];
       DateTime periodStart = group.first;
       DateTime periodEnd = group.last;
       int periodLength = periodEnd.difference(periodStart).inDays + 1;
 
-      // Ensure correct month update
-      DateTime periodUpdateMonth = periodEnd.month > periodStart.month ? periodEnd : periodStart;
+      // Determine correct period update month
+      DateTime periodUpdateMonth;
+      if (i > 0) {
+        DateTime prevPeriodEnd = periodGroups[i - 1].last;
+        int gap = periodStart.difference(prevPeriodEnd).inDays;
+
+        // 🚨 If gap ≤ 5, consider it part of the previous period
+        if (gap <= 5) {
+          periodUpdateMonth = periodEnd.month > periodStart.month ? periodEnd : periodStart;
+
+        } else {
+          periodUpdateMonth = DateTime(prevPeriodEnd.year, prevPeriodEnd.month + 1);
+          missingMonths.remove("${prevPeriodEnd.year}${prevPeriodEnd.month + 1}");
+        }
+      } else {
+        periodUpdateMonth = periodEnd.month > periodStart.month ? periodEnd : periodStart;
+      }
+
+      // Ensure valid month transition (handle December to January case)
+      if (periodUpdateMonth.month > 12) {
+        periodUpdateMonth = DateTime(periodUpdateMonth.year + 1, 1);
+      }
+
+      // Calculate missing months dynamically
+      // List<String> missingMonths = getMissingMonths(
+      //   periodGroups.expand((group) => group).toList(), // Flatten period groups into a single list
+      // );
 
       Map<String, dynamic> params = {
         ApiParams.period_start_date: dateFormat.format(periodStart),
         ApiParams.period_end_date: dateFormat.format(periodEnd),
         ApiParams.period_length: periodLength,
-        ApiParams.period_month_update:
-        "${periodUpdateMonth.year}${periodUpdateMonth.month.toString()}",
-        ApiParams.period_deleted_month : missingMonths,
+        ApiParams.period_month_update: "${periodUpdateMonth.year}${periodUpdateMonth.month.toString()}",
+        ApiParams.period_deleted_month: missingMonths,
       };
 
       debugPrint("🚨 Params for ${periodUpdateMonth.year}-${periodUpdateMonth.month}: $params");
 
       // **Make API Call**
-        PeriodInfoListResponse? master =
-        await _services.api!.savePeriodsInfo(params: params);
+      PeriodInfoListResponse? master = await _services.api!.savePeriodsInfo(params: params);
 
-        if (master == null) {
-          CommonUtils.oopsMSG();
-        } else {
-          CommonUtils.showSnackBar(master.message ?? "--",
-              color: (master.success ?? true)
-                  ? CommonColors.greenColor
-                  : CommonColors.mRed);
-        }
+      if (master == null) {
+        CommonUtils.oopsMSG();
+      } else {
+        CommonUtils.showSnackBar(master.message ?? "--",
+            color: (master.success ?? true)
+                ? CommonColors.greenColor
+                : CommonColors.mRed);
+      }
     }
+
 
     CommonUtils.hideProgressDialog();
   }
+
 
 
 
@@ -760,8 +786,8 @@ class _CalendarViewState extends State<CalendarView> {
                         //     .map((dateString) => DateTime.parse(dateString))
                         //     .toList()
                         //   ..sort();
-                        debugPrint("start: $forParentUseDateList");
-                        debugPrint("end: $dateList");
+                        // debugPrint("start: $forParentUseDateList");
+                        // debugPrint("end: $dateList");
                         _updateButtonText();
                       }
 

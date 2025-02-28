@@ -172,7 +172,7 @@ class HomeViewModel with ChangeNotifier {
       nextDate = nextDate.add(Duration(days: cycleLength));
     }
 
-    log("OvulationDates===> $ovulationDates", name: "OvulationDates");
+    // log("OvulationDates===> $ovulationDates", name: "OvulationDates");
     return ovulationDates;
   }
 
@@ -310,7 +310,7 @@ class HomeViewModel with ChangeNotifier {
     DateTime startDate = parseDDMMYYYY(DateTime.parse(cycleData.period_start_date));
     DateTime endDate = parseDDMMYYYY(DateTime.parse(cycleData.period_end_date));
 
-    debugPrint("Start Date: $startDate, End Date: $endDate, Current Date: $currentDate");
+    // debugPrint("Start Date: $startDate, End Date: $endDate, Current Date: $currentDate");
 
     // Calculate fertile window
     DateTime fertileStartDate = predictedEndDate.add(const Duration(days: 3));
@@ -389,7 +389,7 @@ class HomeViewModel with ChangeNotifier {
       int start = int.parse(parts[0]);
       int end = parts.length > 1 ? int.parse(parts[1]) : start;
 
-      debugPrint("Cycle Day: $cycleDay, Range: $range, Parts: $parts , cyclePhases: ${cyclePhases[range]}, start $start, end $end");
+      // debugPrint("Cycle Day: $cycleDay, Range: $range, Parts: $parts , cyclePhases: ${cyclePhases[range]}, start $start, end $end");
 
       if (cycleDay >= start && cycleDay <= end) {
         return cyclePhases[range]!;
@@ -720,11 +720,11 @@ bool isCurrentDateAfterOvulationRange({
   DateTime fertileEndDate = ovulationDate.add(Duration(days: 1)); // Ovulation day included
 
   // Debugging Prints
-  debugPrint("Cycle Start Date: $currentCycleStartDate");
-  debugPrint("Next Cycle Start Date: $nextCycleStartDate");
-  debugPrint("Ovulation Date: $ovulationDate");
-  debugPrint("Fertile Window Start: $fertileStartDate");
-  debugPrint("Fertile Window End: $fertileEndDate");
+  // debugPrint("Cycle Start Date: $currentCycleStartDate");
+  // debugPrint("Next Cycle Start Date: $nextCycleStartDate");
+  // debugPrint("Ovulation Date: $ovulationDate");
+  // debugPrint("Fertile Window Start: $fertileStartDate");
+  // debugPrint("Fertile Window End: $fertileEndDate");
 
   // Step 5: Check if current date is after ovulation window
   return currentDate.isAfter(fertileEndDate);
