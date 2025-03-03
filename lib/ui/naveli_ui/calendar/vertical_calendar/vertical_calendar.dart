@@ -416,7 +416,7 @@ class _MonthViewState extends State<_MonthView> {
                 // Ovulation occurs on the 5th day of the fertile window
                 DateTime ovulationDate = fertileStartDate.add(Duration(days: 5));
 
-                // ✅ Only store fertile/ovulation dates for the current month
+                // ✅ Only store fertile/ovulation dates for the current month and previous month
                 if (fertileStartDate.month == currentMonth || fertileStartDate.month == currentMonth - 1 || startPredictedPeriods.month == fertileStartDate.month) {
                   fertileDates.addAll(List.generate(8, (i) => fertileStartDate.add(Duration(days: i))));
                   if (ovulationDate.month == currentMonth || ovulationDate.month == currentMonth - 1 || startPredictedPeriods.month == ovulationDate.month) {
