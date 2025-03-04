@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:naveli_2023/models/common_master.dart';
@@ -411,8 +413,40 @@ class _CalendarViewState extends State<CalendarView> {
     return missingMonths;
   }
 
+
+  List<Map<String, String>> groupConsecutiveDates(List<DateTime> dates) {
+    dates.sort(); // Ensure they are in order
+
+    List<Map<String, String>> result = [];
+    DateTime? startDate;
+    DateTime? prevDate;
+
+    for (var date in dates) {
+      if (startDate == null) {
+        startDate = date;
+      } else if (prevDate != null && date.difference(prevDate).inDays > 1) {
+        result.add({
+          "start_date": startDate.toIso8601String().split("T")[0],
+          "end_date": prevDate.toIso8601String().split("T")[0],
+        });
+        startDate = date;
+      }
+      prevDate = date;
+    }
+
+    // Add the last range
+    if (startDate != null && prevDate != null) {
+      result.add({
+        "start_date": startDate.toIso8601String().split("T")[0],
+        "end_date": prevDate.toIso8601String().split("T")[0],
+      });
+    }
+
+    return result;
+  }
+
   Future<void> addPeriodInfo() async {
-    CommonUtils.showProgressDialog();
+    // CommonUtils.showProgressDialog();
     HomeViewModel mViewHomeModel = Provider.of<HomeViewModel>(context, listen: false);
     mViewHomeModel.getPeriodInfoList();
     DateFormat dateFormat = DateFormat('yyyy-MM-dd');
@@ -425,116 +459,17 @@ class _CalendarViewState extends State<CalendarView> {
       return '${dateTime.toLocal().year}-${dateTime.toLocal().month.toString().padLeft(2, '0')}-${dateTime.toLocal().day.toString().padLeft(2, '0')}';
     }).toList();
 
-    List<String> missingMonths = getMissingMonths(forParentUseDateList);
 
-    debugPrint("formattedDates: $missingMonths");
+    debugPrint("formattedDates: $forParentUseDateList");
 
-    List<DateTime> dates = formattedDates
-        .map((dateString) => DateTime.parse(dateString))
-        .toList()
-      ..sort();
+    List<Map<String, String>> groupedDates = groupConsecutiveDates(forParentUseDateList);
+    log("$groupedDates",name: "GRouped Dates");
 
-    // **Check for Discontinuity and Validate Gaps**
-    List<List<DateTime>> periodGroups = [];
-    List<DateTime> currentGroup = [];
+var params = {
+"month_array":  jsonEncode(groupedDates)
+};
 
-    for (int i = 0; i < dates.length; i++) {
-      if (currentGroup.isEmpty) {
-        currentGroup.add(dates[i]);
-      } else {
-        DateTime prevDate = currentGroup.last;
-        DateTime currentDate = dates[i];
-
-        int dayGap = currentDate.difference(prevDate).inDays;
-
-        // If the gap is more than or equal to 5 days, start a new cycle
-        if (dayGap >= 5) {
-          periodGroups.add(List.from(currentGroup));
-          currentGroup.clear();
-        }
-        currentGroup.add(currentDate);
-      }
-    }
-    if (currentGroup.isNotEmpty) periodGroups.add(currentGroup);
-
-    // **Validate Period Cycles**
-    for (int i = 1; i < periodGroups.length; i++) {
-      DateTime prevStartDate = periodGroups[i - 1].first;
-      DateTime nextStartDate = periodGroups[i].first;
-
-      int gap = nextStartDate.difference(prevStartDate).inDays;
-      debugPrint("prevStartDate: $prevStartDate");
-
-      // 🚨 If the gap between two periods is less than 14 days, show error but do not return
-      if (gap < 14) {
-        CommonUtils.showSnackBar(
-            "⚠️ Warning: Cycle gap is too short. Recommended minimum is 14 days.",
-            color: CommonColors.mRed);
-      }
-    }
-
-    // **Validate if there are more than 2 sets of periods in the same month**
-    Map<String, int> periodCounts = {};
-    for (var group in periodGroups) {
-      String monthKey = "${group.first.year}${group.first.month.toString()}";
-      periodCounts[monthKey] = (periodCounts[monthKey] ?? 0) + 1;
-    }
-
-    if (periodCounts.values.any((count) => count > 2)) {
-      CommonUtils.showSnackBar(
-          "🚨 Invalid input: A month cannot have more than two periods.",
-          color: CommonColors.mRed);
-      CommonUtils.hideProgressDialog();
-      return;
-    }
-
-    // **Process Each Period Separately**
-    for (int i = 0; i < periodGroups.length; i++) {
-      var group = periodGroups[i];
-      DateTime periodStart = group.first;
-      DateTime periodEnd = group.last;
-      int periodLength = periodEnd.difference(periodStart).inDays + 1;
-
-      // Determine correct period update month
-      DateTime periodUpdateMonth;
-      if (i > 0) {
-        DateTime prevPeriodEnd = periodGroups[i - 1].last;
-        int gap = periodStart.difference(prevPeriodEnd).inDays;
-
-        // 🚨 If gap ≤ 5, consider it part of the previous period
-        if (gap <= 5) {
-          periodUpdateMonth = periodEnd.month > periodStart.month ? periodEnd : periodStart;
-
-        } else {
-          periodUpdateMonth = DateTime(prevPeriodEnd.year, prevPeriodEnd.month + 1);
-          missingMonths.remove("${prevPeriodEnd.year}${prevPeriodEnd.month + 1}");
-        }
-      } else {
-        periodUpdateMonth = periodEnd.month > periodStart.month ? periodEnd : periodStart;
-      }
-
-      // Ensure valid month transition (handle December to January case)
-      if (periodUpdateMonth.month > 12) {
-        periodUpdateMonth = DateTime(periodUpdateMonth.year + 1, 1);
-      }
-
-      // Calculate missing months dynamically
-      // List<String> missingMonths = getMissingMonths(
-      //   periodGroups.expand((group) => group).toList(), // Flatten period groups into a single list
-      // );
-
-      Map<String, dynamic> params = {
-        ApiParams.period_start_date: dateFormat.format(periodStart),
-        ApiParams.period_end_date: dateFormat.format(periodEnd),
-        ApiParams.period_length: periodLength,
-        ApiParams.period_month_update: "${periodUpdateMonth.year}${periodUpdateMonth.month.toString()}",
-        ApiParams.period_deleted_month: missingMonths,
-      };
-
-      debugPrint("🚨 Params for ${periodUpdateMonth.year}-${periodUpdateMonth.month}: $params");
-
-      // **Make API Call**
-      PeriodInfoListResponse? master = await _services.api!.savePeriodsInfo(params: params);
+    PeriodInfoListResponse? master = await _services.api!.savePeriodsInfo(params: params);
 
       if (master == null) {
         CommonUtils.oopsMSG();
@@ -544,12 +479,138 @@ class _CalendarViewState extends State<CalendarView> {
                 ? CommonColors.greenColor
                 : CommonColors.mRed);
       }
-    }
 
 
-    CommonUtils.hideProgressDialog();
+
   }
 
+
+
+
+
+    // List<String> missingMonths = getMissingMonths(forParentUseDateList);
+    //
+    // debugPrint("formattedDates: $missingMonths");
+    //
+    // List<DateTime> dates = formattedDates
+    //     .map((dateString) => DateTime.parse(dateString))
+    //     .toList()
+    //   ..sort();
+    //
+    // // **Check for Discontinuity and Validate Gaps**
+    // List<List<DateTime>> periodGroups = [];
+    // List<DateTime> currentGroup = [];
+    //
+    // for (int i = 0; i < dates.length; i++) {
+    //   if (currentGroup.isEmpty) {
+    //     currentGroup.add(dates[i]);
+    //   } else {
+    //     DateTime prevDate = currentGroup.last;
+    //     DateTime currentDate = dates[i];
+    //
+    //     int dayGap = currentDate.difference(prevDate).inDays;
+    //
+    //     // If the gap is more than or equal to 5 days, start a new cycle
+    //     if (dayGap >= 5) {
+    //       periodGroups.add(List.from(currentGroup));
+    //       currentGroup.clear();
+    //     }
+    //     currentGroup.add(currentDate);
+    //   }
+    // }
+    // if (currentGroup.isNotEmpty) periodGroups.add(currentGroup);
+    //
+    // // **Validate Period Cycles**
+    // for (int i = 1; i < periodGroups.length; i++) {
+    //   DateTime prevStartDate = periodGroups[i - 1].first;
+    //   DateTime nextStartDate = periodGroups[i].first;
+    //
+    //   int gap = nextStartDate.difference(prevStartDate).inDays;
+    //   debugPrint("prevStartDate: $prevStartDate");
+    //
+    //   // 🚨 If the gap between two periods is less than 14 days, show error but do not return
+    //   if (gap < 14) {
+    //     CommonUtils.showSnackBar(
+    //         "⚠️ Warning: Cycle gap is too short. Recommended minimum is 14 days.",
+    //         color: CommonColors.mRed);
+    //   }
+    // }
+    //
+    // // **Validate if there are more than 2 sets of periods in the same month**
+    // Map<String, int> periodCounts = {};
+    // for (var group in periodGroups) {
+    //   String monthKey = "${group.first.year}${group.first.month.toString()}";
+    //   periodCounts[monthKey] = (periodCounts[monthKey] ?? 0) + 1;
+    // }
+    //
+    // if (periodCounts.values.any((count) => count > 2)) {
+    //   CommonUtils.showSnackBar(
+    //       "🚨 Invalid input: A month cannot have more than two periods.",
+    //       color: CommonColors.mRed);
+    //   CommonUtils.hideProgressDialog();
+    //   return;
+    // }
+    //
+    // // **Process Each Period Separately**
+    // for (int i = 0; i < periodGroups.length; i++) {
+    //   var group = periodGroups[i];
+    //   DateTime periodStart = group.first;
+    //   DateTime periodEnd = group.last;
+    //   int periodLength = periodEnd.difference(periodStart).inDays + 1;
+    //
+    //   // Determine correct period update month
+    //   DateTime periodUpdateMonth;
+    //   if (i > 0) {
+    //     DateTime prevPeriodEnd = periodGroups[i - 1].last;
+    //     int gap = periodStart.difference(prevPeriodEnd).inDays;
+    //
+    //     // 🚨 If gap ≤ 5, consider it part of the previous period
+    //     if (gap <= 5) {
+    //       periodUpdateMonth = periodEnd.month > periodStart.month ? periodEnd : periodStart;
+    //
+    //     } else {
+    //       periodUpdateMonth = DateTime(prevPeriodEnd.year, prevPeriodEnd.month + 1);
+    //       missingMonths.remove("${prevPeriodEnd.year}${prevPeriodEnd.month + 1}");
+    //     }
+    //   } else {
+    //     periodUpdateMonth = periodEnd.month > periodStart.month ? periodEnd : periodStart;
+    //   }
+    //
+    //   // Ensure valid month transition (handle December to January case)
+    //   if (periodUpdateMonth.month > 12) {
+    //     periodUpdateMonth = DateTime(periodUpdateMonth.year + 1, 1);
+    //   }
+    //
+    //   // Calculate missing months dynamically
+    //   // List<String> missingMonths = getMissingMonths(
+    //   //   periodGroups.expand((group) => group).toList(), // Flatten period groups into a single list
+    //   // );
+    //
+    //   Map<String, dynamic> params = {
+    //     ApiParams.period_start_date: dateFormat.format(periodStart),
+    //     ApiParams.period_end_date: dateFormat.format(periodEnd),
+    //     ApiParams.period_length: periodLength,
+    //     ApiParams.period_month_update: "${periodUpdateMonth.year}${periodUpdateMonth.month.toString()}",
+    //     ApiParams.period_deleted_month: missingMonths,
+    //   };
+    //
+    //   debugPrint("🚨 Params for ${periodUpdateMonth.year}-${periodUpdateMonth.month}: $params");
+    //
+    //   // **Make API Call**
+    //   PeriodInfoListResponse? master = await _services.api!.savePeriodsInfo(params: params);
+    //
+    //   if (master == null) {
+    //     CommonUtils.oopsMSG();
+    //   } else {
+    //     CommonUtils.showSnackBar(master.message ?? "--",
+    //         color: (master.success ?? true)
+    //             ? CommonColors.greenColor
+    //             : CommonColors.mRed);
+    //   }
+    // }
+    //
+    //
+    // CommonUtils.hideProgressDialog();
 
 
 
