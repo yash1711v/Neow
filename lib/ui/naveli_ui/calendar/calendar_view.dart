@@ -446,7 +446,7 @@ class _CalendarViewState extends State<CalendarView> {
   }
 
   Future<void> addPeriodInfo() async {
-    // CommonUtils.showProgressDialog();
+    CommonUtils.showProgressDialog();
     HomeViewModel mViewHomeModel = Provider.of<HomeViewModel>(context, listen: false);
     mViewHomeModel.getPeriodInfoList();
     DateFormat dateFormat = DateFormat('yyyy-MM-dd');
@@ -463,10 +463,12 @@ class _CalendarViewState extends State<CalendarView> {
     debugPrint("formattedDates: $forParentUseDateList");
 
     List<Map<String, String>> groupedDates = groupConsecutiveDates(forParentUseDateList);
-    log("$groupedDates",name: "GRouped Dates");
+    log("$groupedDates",name: "Grouped Dates");
+    List<Map<String, String>> data = mergeDateRanges(groupedDates);
+    log("$data",name: "data");
 
 var params = {
-"month_array":  jsonEncode(groupedDates)
+"month_array":  jsonEncode(data)
 };
 
     PeriodInfoListResponse? master = await _services.api!.savePeriodsInfo(params: params);
@@ -480,10 +482,49 @@ var params = {
                 : CommonColors.mRed);
       }
 
-
+  CommonUtils.hideProgressDialog();
 
   }
 
+
+  List<Map<String, String>> mergeDateRanges(List<Map<String, String>> ranges) {
+    if (ranges.isEmpty) return [];
+
+    List<Map<String, String>> result = [];
+    DateFormat format = DateFormat('yyyy-MM-dd');
+
+    DateTime? prevStart;
+    DateTime? prevEnd;
+
+    for (var range in ranges) {
+      DateTime start = format.parse(range['start_date']!);
+      DateTime end = format.parse(range['end_date']!);
+
+      if (prevStart == null) {
+        prevStart = start;
+        prevEnd = end;
+        continue;
+      }
+
+      int gap = start.difference(prevEnd!).inDays - 1;
+      int prevLength = prevEnd.difference(prevStart).inDays + 1;
+      int currLength = end.difference(start).inDays + 1;
+
+      if (gap <= 5 && prevLength < 10) {
+        prevEnd = end; // Merge
+      } else {
+        result.add({'start_date': format.format(prevStart), 'end_date': format.format(prevEnd)});
+        prevStart = start;
+        prevEnd = end;
+      }
+    }
+
+    if (prevStart != null && prevEnd != null) {
+      result.add({'start_date': format.format(prevStart), 'end_date': format.format(prevEnd)});
+    }
+
+    return result;
+  }
 
 
 

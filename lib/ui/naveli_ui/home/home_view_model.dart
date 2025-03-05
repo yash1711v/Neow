@@ -571,6 +571,12 @@ class HomeViewModel with ChangeNotifier {
         }
       }
 
+      globalFertileWindowStart = master.fertile_window_start;
+      globalFertileWindowEnd = master.fertile_window_end;
+
+      debugPrint("globalFertileWindowStart ====>${globalFertileWindowStart}");
+      debugPrint("globalFertileWindowEnd ====>${globalFertileWindowEnd}");
+
       //check period whithin 14 days
       if (peroidCustomeList.length > 1) {
         DateTime firstPeriodLastDate =

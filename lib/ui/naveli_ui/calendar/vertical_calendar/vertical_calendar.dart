@@ -411,10 +411,10 @@ class _MonthViewState extends State<_MonthView> {
                 ));
 
                 // Fertile window starts 3 days after period ends
-                DateTime fertileStartDate = end.add(Duration(days: 4));
+                DateTime fertileStartDate = DateTime.parse(globalFertileWindowStart ?? "2021-01-01");
 
                 // Ovulation occurs on the 5th day of the fertile window
-                DateTime ovulationDate = fertileStartDate.add(Duration(days: 5));
+                DateTime ovulationDate = DateTime.parse(globalFertileWindowEnd ?? "2021-01-05");
 
                 // ✅ Only store fertile/ovulation dates for the current month and previous month
                 if (fertileStartDate.month == currentMonth || fertileStartDate.month == currentMonth - 1 || startPredictedPeriods.month == fertileStartDate.month) {

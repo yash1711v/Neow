@@ -3,12 +3,25 @@ import 'package:flutter/cupertino.dart';
 import '../models/login_master.dart';
 import '../models/cycle_dates_master.dart';
 
+import 'package:flutter/cupertino.dart';
+
+import '../models/login_master.dart';
+import '../models/cycle_dates_master.dart';
+
 class PeriodInfoListResponse {
   PeriodObj? _data;
   bool? _success;
   String? _message;
+  String? fertile_window_start;
+  String? fertile_window_end;
 
-  PeriodInfoListResponse({PeriodObj? data, bool? success, String? message}) {
+  PeriodInfoListResponse({
+    PeriodObj? data,
+    bool? success,
+    String? message,
+    this.fertile_window_start,
+    this.fertile_window_end,
+  }) {
     if (data != null) {
       _data = data;
     }
@@ -33,27 +46,22 @@ class PeriodInfoListResponse {
   set message(String? message) => _message = message;
 
   PeriodInfoListResponse.fromJson(Map<String, dynamic> json) {
-    /*if (json['data'] != null) {
-      _data = PeriodObj>[];
-      json['data'].forEach((v) {
-        _data!.add(PeriodObj.fromJson(v));
-      });
-    }*/
     if (json['data'] != null) {
       _data = PeriodObj.fromJson(json['data']);
     }
     _success = json['success'];
     _message = json['message'];
+    fertile_window_start = json['fertile_window_start'];
+    fertile_window_end = json['fertile_window_end'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    /*if (_data != null) {
-      data['data'] = _data!.map((v) => v.toJson()).toList();
-    }*/
     data['data'] = _data;
     data['success'] = _success;
     data['message'] = _message;
+    data['fertile_window_start'] = fertile_window_start;
+    data['fertile_window_end'] = fertile_window_end;
     return data;
   }
 }
@@ -168,6 +176,8 @@ String platform = "";
 bool isWithinFourteenDays = false;
 
 List<PeriodObj> peroidCustomeList = [];
+String? globalFertileWindowStart;
+String? globalFertileWindowEnd;
 bool _isLogEdit = false;
 
 // Getter
