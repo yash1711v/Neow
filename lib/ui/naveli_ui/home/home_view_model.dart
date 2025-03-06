@@ -184,7 +184,8 @@ class HomeViewModel with ChangeNotifier {
     List<DateTime> fertileDates = [];
 
     // Predict next cycle start date
-    DateTime nextCycleStartDate = previousPeriodStartDate.add(Duration(days: cycleLength));
+    DateTime nextCycleStartDate =
+        previousPeriodStartDate.add(Duration(days: cycleLength));
 
     // Calculate ovulation date (14 days before next cycle start)
     DateTime ovulationDate = nextCycleStartDate.subtract(Duration(days: 14));
@@ -201,7 +202,6 @@ class HomeViewModel with ChangeNotifier {
     // log("Fertile dates ===> $fertileDates", name: "FertileDates");
     return fertileDates;
   }
-
 
   Future<void> getSliderVideoApi() async {
     CommonUtils.showProgressDialog();
@@ -305,9 +305,12 @@ class HomeViewModel with ChangeNotifier {
 
     final cycleData = peroidCustomeList[0];
     currentDate = parseDDMMYYYY(currentDate);
-    DateTime predictedStartDate = parseDDMMYYYY(DateTime.parse(cycleData.predicated_period_start_date));
-    DateTime predictedEndDate = parseDDMMYYYY(DateTime.parse(cycleData.predicated_period_end_date));
-    DateTime startDate = parseDDMMYYYY(DateTime.parse(cycleData.period_start_date));
+    DateTime predictedStartDate =
+        parseDDMMYYYY(DateTime.parse(cycleData.predicated_period_start_date));
+    DateTime predictedEndDate =
+        parseDDMMYYYY(DateTime.parse(cycleData.predicated_period_end_date));
+    DateTime startDate =
+        parseDDMMYYYY(DateTime.parse(cycleData.period_start_date));
     DateTime endDate = parseDDMMYYYY(DateTime.parse(cycleData.period_end_date));
 
     // debugPrint("Start Date: $startDate, End Date: $endDate, Current Date: $currentDate");
@@ -316,8 +319,6 @@ class HomeViewModel with ChangeNotifier {
     DateTime fertileStartDate = predictedEndDate.add(const Duration(days: 3));
     DateTime fertileEndDate = fertileStartDate.add(const Duration(days: 8));
 
-
-
     if ((currentDate.isAtSameMomentAs(startDate)) ||
         (currentDate.isAfter(startDate) && currentDate.isBefore(endDate)) ||
         currentDate.isAtSameMomentAs(endDate)) {
@@ -325,30 +326,27 @@ class HomeViewModel with ChangeNotifier {
       return "Period Day \n$periodDay";
     }
 
-
-
     if (currentDate.isAfter(predictedEndDate)) {
       // Case 1: Periods are late
       int numberOfDays = currentDate.difference(predictedStartDate).inDays;
       return "Periods late \n$numberOfDays ${numberOfDays == 1 ? "day" : "days"}";
     }
 
-    if (currentDate.isBefore(predictedStartDate) && currentDate.isAfter(endDate)) {
+    if (currentDate.isBefore(predictedStartDate) &&
+        currentDate.isAfter(endDate)) {
       // Case 2: Periods in X days
       int numberOfDays = predictedStartDate.difference(currentDate).inDays;
       return "Periods in \n$numberOfDays days${currentDate.isAfter(fertileStartDate) && currentDate.isBefore(fertileEndDate) ? '' : ' after'}";
     }
 
     if (currentDate.isAtSameMomentAs(predictedStartDate) ||
-        (currentDate.isAfter(predictedStartDate) && currentDate.isBefore(predictedEndDate))) {
+        (currentDate.isAfter(predictedStartDate) &&
+            currentDate.isBefore(predictedEndDate))) {
       return "Period may \nstart today";
     }
 
-
-
     return "Cycle data unavailable";
   }
-
 
   String getCyclePhaseMessage() {
     DateTime currentDate = DateTime.now();
@@ -358,9 +356,9 @@ class HomeViewModel with ChangeNotifier {
     }
 
     DateTime periodStartDate =
-    DateTime.parse(peroidCustomeList[0].period_start_date);
+        DateTime.parse(peroidCustomeList[0].period_start_date);
     DateTime periodEndDate =
-    DateTime.parse(peroidCustomeList[0].period_end_date);
+        DateTime.parse(peroidCustomeList[0].period_end_date);
     int cycleLength = int.parse(peroidCustomeList[0].period_cycle_length);
     int periodLength = int.parse(peroidCustomeList[0].period_length);
 
@@ -371,15 +369,24 @@ class HomeViewModel with ChangeNotifier {
 
     // Cycle phases based on period start & end
     Map<String, String> cyclePhases = {
-      "1-${periodLength}": "Cycle kicks in—the heavy flow, cramps, and all that! Rest, stay hydrated, and go easy on yourself.",
-      "${periodLength + 1}-${periodLength + 2}": "Period winding down—time to relax and refuel yourself.",
-      "${periodLength + 3}-${periodLength + 5}": "Energy peaks—time to set goals and stay active.",
-      "${periodLength + 6}-${periodLength + 9}": "Estrogen rising—Feeling vibrant. Go for it—be social and creative.",
-      "${periodLength + 10}-${periodLength + 14}": "Confidence peaks, and you're glowing. Embrace the energy, take on new challenges, and slay!",
-      "${periodLength + 15}-${periodLength + 18}": "Vibes are chill. Take a breather, unwind, and treat yourself to some me-time.",
-      "${periodLength + 19}-${cycleLength - 4}": "Cravings, mood swings, and all the feels. Nourish, slow down, and be gentle with yourself.",
-      "${cycleLength - 3}-$cycleLength": "PMS Alert!! Feeling bloated, tired, and emotional? Hydrate, relax, and pamper yourself.",
-      "${cycleLength + 1}": "Period’s running late? Don’t stress, give it time, and let your body do its thing."
+      "1-${periodLength}":
+          "Cycle kicks in—the heavy flow, cramps, and all that! Rest, stay hydrated, and go easy on yourself.",
+      "${periodLength + 1}-${periodLength + 2}":
+          "Period winding down—time to relax and refuel yourself.",
+      "${periodLength + 3}-${periodLength + 5}":
+          "Energy peaks—time to set goals and stay active.",
+      "${periodLength + 6}-${periodLength + 9}":
+          "Estrogen rising—Feeling vibrant. Go for it—be social and creative.",
+      "${periodLength + 10}-${periodLength + 14}":
+          "Confidence peaks, and you're glowing. Embrace the energy, take on new challenges, and slay!",
+      "${periodLength + 15}-${periodLength + 18}":
+          "Vibes are chill. Take a breather, unwind, and treat yourself to some me-time.",
+      "${periodLength + 19}-${cycleLength - 4}":
+          "Cravings, mood swings, and all the feels. Nourish, slow down, and be gentle with yourself.",
+      "${cycleLength - 3}-$cycleLength":
+          "PMS Alert!! Feeling bloated, tired, and emotional? Hydrate, relax, and pamper yourself.",
+      "${cycleLength + 1}":
+          "Period’s running late? Don’t stress, give it time, and let your body do its thing."
     };
 
     // Determine the corresponding phase message
@@ -398,8 +405,6 @@ class HomeViewModel with ChangeNotifier {
 
     return "Cycle phase not identified.";
   }
-
-
 
   // String getCycleDayOrDaysToGo(DateTime currentDate) {
   //   nextCycleDates.sort();
@@ -534,8 +539,6 @@ class HomeViewModel with ChangeNotifier {
     //CommonUtils.showProgressDialog();
     PeriodInfoListResponse? master = await _services.api!.getPeriodInfoList();
     //CommonUtils.hideProgressDialog();
-    print("master $master");
-    print("master ${master!.success!}");
     // var data = jsonDecode(master.data.toString());
     // debugPrint("data ====>$data");
 
@@ -554,25 +557,29 @@ class HomeViewModel with ChangeNotifier {
       if ((master.data!.periodData?.length ?? 0) > 0) {
         for (int i = 0; i < (master.data!.periodData?.length ?? 0); i++) {
           var data = PeriodObj(
-              user_id: master.data!.user_id,
-              period_start_date: master.data!.periodData![i].period_start_date,
-              period_end_date: master.data!.periodData![i].period_end_date,
-              period_length: master.data!.periodData![i].period_length,
-              period_cycle_length:
-                  master.data!.periodData![i].period_cycle_length,
-              period_month_update:
-                  master.data!.periodData![i].period_month_update,
-              predicated_period_start_date:
-                  master.data!.predicated_period_start_date,
-              predicated_period_end_date:
-                  master.data!.predicated_period_end_date);
+            user_id: master.data!.user_id,
+            period_start_date: master.data!.periodData![i].period_start_date,
+            period_end_date: master.data!.periodData![i].period_end_date,
+            period_length: master.data!.periodData![i].period_length,
+            period_cycle_length:
+                master.data!.periodData![i].period_cycle_length,
+            period_month_update:
+                master.data!.periodData![i].period_month_update,
+            predicated_period_start_date:
+                master.data!.predicated_period_start_date,
+            predicated_period_end_date: master.data!.predicated_period_end_date,
+            fertile_window_start: master.data!.fertile_window_start ?? "",
+            fertile_window_end: master.data!.fertile_window_end ?? "",
+            ovulation_day: master.data!.ovulation_day ?? "",
+            avg_cycle_length: master.data!.avg_cycle_length,
+          );
           peroidCustomeList.add(data);
           notifyListeners();
         }
       }
-
-      globalFertileWindowStart = master.fertile_window_start;
-      globalFertileWindowEnd = master.fertile_window_end;
+      //
+      // globalFertileWindowStart = master.fertile_window_start;
+      // globalFertileWindowEnd = master.fertile_window_end;
 
       debugPrint("globalFertileWindowStart ====>${globalFertileWindowStart}");
       debugPrint("globalFertileWindowEnd ====>${globalFertileWindowEnd}");
@@ -716,14 +723,15 @@ bool isCurrentDateAfterOvulationRange({
 
   // Step 2: Calculate the first day of the current cycle
   DateTime currentCycleStartDate =
-  nextCycleStartDate.subtract(Duration(days: cycleLength));
+      nextCycleStartDate.subtract(Duration(days: cycleLength));
 
   // Step 3: Calculate the ovulation day (14 days before next cycle start)
   DateTime ovulationDate = nextCycleStartDate.subtract(Duration(days: 14));
 
   // Step 4: Define the fertile window (5 days before ovulation + ovulation day)
   DateTime fertileStartDate = ovulationDate.subtract(Duration(days: 5));
-  DateTime fertileEndDate = ovulationDate.add(Duration(days: 1)); // Ovulation day included
+  DateTime fertileEndDate =
+      ovulationDate.add(Duration(days: 1)); // Ovulation day included
 
   // Debugging Prints
   // debugPrint("Cycle Start Date: $currentCycleStartDate");
@@ -735,7 +743,6 @@ bool isCurrentDateAfterOvulationRange({
   // Step 5: Check if current date is after ovulation window
   return currentDate.isAfter(fertileEndDate);
 }
-
 
 DateTime? getValidCycleStartDate(
     List<DateTime> nextCycleDates, DateTime currentDate, int periodLength) {

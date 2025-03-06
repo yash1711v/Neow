@@ -102,83 +102,82 @@ class _MonthViewState extends State<MonthView> {
           date.month == widget.selectedDate?.month &&
           date.year == widget.selectedDate?.year;
 
-      // final isHighlighted = mViewModel.nextCycleDates.contains(date);
-      // final isOvulation = mViewModel.ovulationDates.contains(date);
-      // final isFirtile = mViewModel.firtileDates.contains(date);
-
       bool isHighlighted = false;
       bool isFuturePredictedHighlighted = false;
-      // mViewModel.nextCycleDates.contains(date);
-      bool isOvulation = false; //mViewModel.ovulationDates.contains(date);
-      bool isFirtile = false; //mViewModel.firtileDates.contains(date);
+      bool isOvulation = false;
+      bool isFertile = false;
       DateTime now = DateTime.now();
-      // DateTime isStartDate = DateTime.now();
-      // peroidCustomeList
 
       for (var dateRange in peroidCustomeList) {
         DateTime start = DateTime.parse(dateRange.period_start_date);
         DateTime end = DateTime.parse(dateRange.period_end_date);
         int cycleLength = int.parse(dateRange.period_cycle_length);
 
-        // ✅ Mark period days
         if (date.isAfter(start) && date.isBefore(end) ||
             date.isAtSameMomentAs(start) ||
             date.isAtSameMomentAs(end)) {
           isHighlighted = true;
         }
 
-        // ✅ Start fertile window 4 days after the period end
-        DateTime fertileStartDate = end.add(Duration(days: 4));
-        DateTime fertileEndDate = fertileStartDate.add(Duration(days: 7)); // ✅ Fertile window lasts 8 days
+        DateTime previousOvulationDay = start.subtract(Duration(days: 14));
+        DateTime previousFertileStartDate = previousOvulationDay.subtract(Duration(days: 5));
+        DateTime previousFertileEndDate = previousOvulationDay.add(Duration(days: 2));
 
-        // ✅ Ovulation should be exactly on the 5th day of the fertile window
-        DateTime ovulationDay = fertileStartDate.add(Duration(days: 4));
-
-        // ✅ Ensure fertile days are only marked for the **current month**
-        if ((fertileStartDate.month == widget.month || fertileEndDate.month == widget.month) &&
-            date.month == widget.month &&
-            (date.isAfter(fertileStartDate) && date.isBefore(fertileEndDate) ||
-                date.isAtSameMomentAs(fertileStartDate) ||
-                date.isAtSameMomentAs(fertileEndDate))) {
-          isFirtile = true;
+        if (date.isSameDay(previousOvulationDay)) {
+          isOvulation = true;
         }
 
-        // ✅ Ensure ovulation is only marked for the **current month**
-        if (ovulationDay.month == widget.month && date.isSameDay(ovulationDay)) {
-          isOvulation = true;
+        if (date.isAfter(previousFertileStartDate) && date.isBefore(previousFertileEndDate) ||
+            date.isAtSameMomentAs(previousFertileStartDate) ||
+            date.isAtSameMomentAs(previousFertileEndDate)) {
+          isFertile = true;
         }
       }
 
+      for (DateTime predictedStartDate in mViewModel.nextCycleDates) {
+        DateTime predictedOvulationDay = predictedStartDate.add(Duration(days: 14));
+        DateTime predictedFertileStartDate = predictedOvulationDay.subtract(Duration(days: 5));
+        DateTime predictedFertileEndDate = predictedOvulationDay.add(Duration(days: 2));
 
-// Mark ovulation date
+        if (date.isSameDay(predictedStartDate)) {
+          isHighlighted = true;
+        }
+
+        if (date.isAfter(predictedFertileStartDate) && date.isBefore(predictedFertileEndDate) ||
+            date.isAtSameMomentAs(predictedFertileStartDate) ||
+            date.isAtSameMomentAs(predictedFertileEndDate)) {
+          isFertile = true;
+        }
+
+        if (date.isSameDay(predictedOvulationDay)) {
+          isOvulation = true;
+        }
+
+        if (date.isAfter(now) && date.month >= now.month && date.month <= now.month + 12) {
+          bool isWithinNext12Months = date.year == now.year || (date.year == now.year + 1 && date.month <= 12);
+          if (isWithinNext12Months) {
+            isFuturePredictedHighlighted = mViewModel.nextCycleDates.contains(date);
+          }
+        }
+      }
+
       if (date.isSameDay(ovulationDate)) {
         isOvulation = true;
       }
 
-// ✅ Restrict marking of predicted dates
       if (date.isAfter(now)) {
-        bool isNextMonth = date.month == now.month + 1;
+        bool isInUpcomingMonths = date.year == now.year ||
+            (date.year == now.year + 1 && date.month <= now.month);
 
-        if (isNextMonth) {
+        if (isInUpcomingMonths) {
           isHighlighted = mViewModel.nextCycleDates.contains(date);
-        }
-
-        // ✅ Only mark ovulation & fertile dates if they fall within next month
-        if (ovulationDate.month == now.month + 1) {
           isOvulation = mViewModel.ovulationDates.contains(date);
-          isFirtile = mViewModel.firtileDates.contains(date);
         }
 
-        // ✅ Future predicted highlighting only for next month
-        isFuturePredictedHighlighted = isNextMonth;
+        isFuturePredictedHighlighted = isInUpcomingMonths;
       } else {
         isFuturePredictedHighlighted = false;
       }
-
-
-
-      // isFirtile = mViewModel.firtileDates.contains(date);
-
 
       dayWidgets.add(
         GestureDetector(
@@ -187,39 +186,41 @@ class _MonthViewState extends State<MonthView> {
             child: Container(
               decoration: isHighlighted && !isFuturePredictedHighlighted
                   ? BoxDecoration(
-                      gradient: mViewModel.getGradient(),
-                      borderRadius: BorderRadius.circular(8),
-                    )
+                gradient: mViewModel.getGradient(),
+                borderRadius: BorderRadius.circular(8),
+              )
                   : isHighlighted && isFuturePredictedHighlighted
-                      ? null
-                      : isOvulation
-                          ? BoxDecoration(
-                              gradient: mViewModel.getGradientGreen(),
-                              borderRadius: BorderRadius.circular(8),
-                            )
-                          : isSelectedDate
-                              ? BoxDecoration(
-                                  color: Colors.blue,
-                                  borderRadius: BorderRadius.circular(8),
-                                )
-                              : null,
+                  ? null
+                  : isOvulation
+                  ? BoxDecoration(
+                gradient: mViewModel.getGradientGreen(),
+                borderRadius: BorderRadius.circular(8),
+              )
+                  : isSelectedDate
+                  ? BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(8),
+              )
+                  : null,
               child: DottedBorder(
-                color: isFirtile
+                color: isFertile
                     ? CommonColors.greenColor
                     : isHighlighted && isFuturePredictedHighlighted
-                        ? CommonColors.mRed
-                        : CommonColors.mTransparent,
+                    ? CommonColors.mRed
+                    : CommonColors.mTransparent,
                 dashPattern: [4, 3],
-                strokeWidth: isFirtile ? 1 : 0,
+                strokeWidth: isFertile ? 1 : 0,
                 borderType: BorderType.Circle,
                 child: Center(
                   child: Text(
                     '$i',
                     style: TextStyle(
                       fontSize: 6,
-                      color: (isSelectedDate || (isHighlighted && !isFuturePredictedHighlighted)|| isOvulation)
-                          ? Colors.white :
-                          (isHighlighted && isFuturePredictedHighlighted)?Colors.black : Colors.black,
+                      color: (isSelectedDate || (isHighlighted && !isFuturePredictedHighlighted) || isOvulation)
+                          ? Colors.white
+                          : (isHighlighted && isFuturePredictedHighlighted)
+                          ? Colors.black
+                          : Colors.black,
                     ),
                   ),
                 ),

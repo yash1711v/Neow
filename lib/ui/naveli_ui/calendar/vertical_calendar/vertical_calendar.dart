@@ -76,7 +76,6 @@ class PagedVerticalCalendar extends StatefulWidget {
 
   final List<DateTime> dateList;
 
-
   @override
   _PagedVerticalCalendarState createState() => _PagedVerticalCalendarState();
 }
@@ -371,7 +370,8 @@ class _MonthViewState extends State<_MonthView> {
             bool isSelected = false;
             bool isPredictedDate = false;
             // mViewModel.nextCycleDates.contains(date);
-            bool isOvulation = false; //mViewModel.ovulationDates.contains(date);
+            bool isOvulation =
+                false; //mViewModel.ovulationDates.contains(date);
             bool isFirtile = false; //mViewModel.firtileDates.contains(date);
             DateTime now = DateTime.now();
             // DateTime isStartDate = DateTime.now();
@@ -391,6 +391,12 @@ class _MonthViewState extends State<_MonthView> {
               List<DateTime> loggedPeriodDates = [];
               List<DateTime> predictedPeriodDates = [];
 
+              // DateTime now = DateTime.now();
+              // int currentYear = now.year;
+
+              // DateTime now = DateTime.now();
+              // int currentYear = now.year;
+
               for (var dateRange in peroidCustomeList) {
                 DateTime start = DateTime.parse(dateRange.period_start_date);
                 DateTime end = DateTime.parse(dateRange.period_end_date);
@@ -403,51 +409,103 @@ class _MonthViewState extends State<_MonthView> {
                 ));
 
                 // Predicted period dates
-                DateTime startPredictedPeriods = DateTime.parse(dateRange.predicated_period_start_date);
-                DateTime endPredictedPeriods = DateTime.parse(dateRange.predicated_period_end_date);
-                predictedPeriodDates.addAll(List.generate(
-                  endPredictedPeriods.difference(startPredictedPeriods).inDays,
-                      (i) => startPredictedPeriods.add(Duration(days: i)),
-                ));
+                DateTime startPredictedPeriods =
+                DateTime.parse(dateRange.predicated_period_start_date);
+                DateTime endPredictedPeriods =
+                DateTime.parse(dateRange.predicated_period_end_date);
+                int length = int.parse(dateRange.avg_cycle_length ?? "28");
 
-                // Fertile window starts 3 days after period ends
-                DateTime fertileStartDate = DateTime.parse(globalFertileWindowStart ?? "2021-01-01");
+                // ✅ Ensure predicted periods are added
+                if (startPredictedPeriods.year == currentYear) {
+                  predictedPeriodDates.addAll(List.generate(
+                    endPredictedPeriods.difference(startPredictedPeriods).inDays,
+                        (i) => startPredictedPeriods.add(Duration(days: i)),
+                  ));
+                }
 
-                // Ovulation occurs on the 5th day of the fertile window
-                DateTime ovulationDate = DateTime.parse(globalFertileWindowEnd ?? "2021-01-05");
+                // **Predict upcoming periods for the next 12 months (within the current year)**
+                for (int i = 0; i < 12; i++) {
+                  startPredictedPeriods = startPredictedPeriods.add(Duration(days: length));
+                  endPredictedPeriods = endPredictedPeriods.add(Duration(days: length));
 
-                // ✅ Only store fertile/ovulation dates for the current month and previous month
-                if (fertileStartDate.month == currentMonth || fertileStartDate.month == currentMonth - 1 || startPredictedPeriods.month == fertileStartDate.month) {
-                  fertileDates.addAll(List.generate(8, (i) => fertileStartDate.add(Duration(days: i))));
-                  if (ovulationDate.month == currentMonth || ovulationDate.month == currentMonth - 1 || startPredictedPeriods.month == ovulationDate.month) {
-                    ovulationDates.add(ovulationDate);
+                  // ✅ Stop if the predicted period exceeds the current year
+                  if (startPredictedPeriods.year > currentYear) break;
+
+                  // ✅ Add period dates only if they are within the current year
+                  List<DateTime> tempPeriodDates = List.generate(
+                    endPredictedPeriods.difference(startPredictedPeriods).inDays + 1,
+                        (i) => startPredictedPeriods.add(Duration(days: i)),
+                  ).where((date) => date.year == currentYear).toList();
+
+                  predictedPeriodDates.addAll(tempPeriodDates);
+
+                  // ✅ Calculate future fertile and ovulation dates
+                  DateTime futureFertileStart = endPredictedPeriods.add(Duration(days: 3));
+                  DateTime futureFertileEnd = futureFertileStart.add(Duration(days: 5));
+                  DateTime futureOvulationDay = futureFertileStart.add(Duration(days: 4));
+
+                  // ✅ Add fertile dates only if they fall within the current year
+                  if (futureFertileStart.year == currentYear && futureFertileEnd.year == currentYear) {
+                    List<DateTime> tempFertileDates = List.generate(
+                      futureFertileEnd.difference(futureFertileStart).inDays + 1,
+                          (i) => futureFertileStart.add(Duration(days: i)),
+                    ).where((date) => date.year == currentYear).toList();
+
+                    fertileDates.addAll(tempFertileDates);
                   }
+
+                  // ✅ Add ovulation date only if it's within the current year
+                  if (futureOvulationDay.year == currentYear) {
+                    ovulationDates.add(futureOvulationDay);
+                  }
+                }
+
+                // **Past Fertile Dates (Based on last period start date)**
+                DateTime lastFertileStart = end.add(Duration(days: 3));
+                DateTime lastFertileEnd = lastFertileStart.add(Duration(days: 5));
+                DateTime lastOvulationDay = lastFertileStart.add(Duration(days: 4));
+
+                if (lastFertileStart.year == currentYear) {
+                  fertileDates.addAll(List.generate(
+                    lastFertileEnd.difference(lastFertileStart).inDays + 1,
+                        (i) => lastFertileStart.add(Duration(days: i)),
+                  ));
+                }
+
+                if (lastOvulationDay.year == currentYear) {
+                  ovulationDates.add(lastOvulationDay);
                 }
               }
 
-              // Check if the date falls in previously logged periods
+// ✅ DEBUG: Check if April is included
+              bool hasAprilFertileDates =
+              fertileDates.any((date) => date.month == 4 && date.year == currentYear);
+
+              if (!hasAprilFertileDates) {
+                debugPrint("❌ April Fertile Dates Missing");
+              } else {
+                debugPrint("✅ April Fertile Dates Found");
+              }
+
+// Checking if the given `date` falls in the calculated dates
               if (loggedPeriodDates.contains(date)) {
                 isSelected = true;
               }
 
-              // Check if the date falls in predicted periods
               if (predictedPeriodDates.contains(date)) {
                 isPredictedDate = true;
               }
 
-              // Check if `date` is within the stored fertile dates
               if (fertileDates.contains(date)) {
                 isFirtile = true;
-                // debugPrint('Fertile Date: $date');
               }
 
-              // Check if `date` is an ovulation day
               if (ovulationDates.contains(date)) {
                 isOvulation = true;
               }
+
+
             }
-
-
 
             List<int> months = [];
             for (int i = 1; i <= 1; i++) {
@@ -496,8 +554,9 @@ class _MonthViewState extends State<_MonthView> {
               child: InkWell(
                 child: widget.dayBuilder?.call(context, date) ??
                     Center(
-                      child: widget.isChecked && months.contains(date.month) &&
-                            (date.isBefore(now) || date.isAtSameMomentAs(now))
+                      child: widget.isChecked &&
+                              months.contains(date.month) &&
+                              (date.isBefore(now) || date.isAtSameMomentAs(now))
                           ? GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -541,8 +600,7 @@ class _MonthViewState extends State<_MonthView> {
                                                 widget.dateList.add(
                                                     date); // Add date when checked
                                               }
-                                            }
-                                            else {
+                                            } else {
                                               widget.dateList.remove(
                                                   date); // Remove date when unchecked
                                             }
@@ -606,8 +664,7 @@ class _MonthViewState extends State<_MonthView> {
                                           Color(0xFFFFB5AE),
                                         ],
                                       )
-                                    :
-                                isOvulation
+                                    : isOvulation
                                         ? mViewModel.getGradientGreen()
                                         : isPredictedDate
                                             ? LinearGradient(
@@ -626,10 +683,11 @@ class _MonthViewState extends State<_MonthView> {
                                 color: isFirtile
                                     ? CommonColors.greenColor
                                     : isPredictedDate
-                                    ? CommonColors.mRed
-                                    : CommonColors.mTransparent,
+                                        ? CommonColors.mRed
+                                        : CommonColors.mTransparent,
                                 dashPattern: [4, 3],
-                                strokeWidth: (isFirtile || isPredictedDate)? 2 : 0,
+                                strokeWidth:
+                                    (isFirtile || isPredictedDate) ? 2 : 0,
                                 borderType: BorderType.Circle,
                                 child: Center(
                                   child: InkWell(

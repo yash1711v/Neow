@@ -425,7 +425,7 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                           selectedPeriodsLength = value + 1; // Ensuring range starts from 1
                         },
                         children: List.generate(
-                          5, // Now limited to 1–5
+                          12, // Now limited to 1–5
                               (index) => Container(
                             height: 80,
                             width: 120,

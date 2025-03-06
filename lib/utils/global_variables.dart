@@ -12,15 +12,12 @@ class PeriodInfoListResponse {
   PeriodObj? _data;
   bool? _success;
   String? _message;
-  String? fertile_window_start;
-  String? fertile_window_end;
+
 
   PeriodInfoListResponse({
     PeriodObj? data,
     bool? success,
     String? message,
-    this.fertile_window_start,
-    this.fertile_window_end,
   }) {
     if (data != null) {
       _data = data;
@@ -51,8 +48,7 @@ class PeriodInfoListResponse {
     }
     _success = json['success'];
     _message = json['message'];
-    fertile_window_start = json['fertile_window_start'];
-    fertile_window_end = json['fertile_window_end'];
+
   }
 
   Map<String, dynamic> toJson() {
@@ -60,8 +56,7 @@ class PeriodInfoListResponse {
     data['data'] = _data;
     data['success'] = _success;
     data['message'] = _message;
-    data['fertile_window_start'] = fertile_window_start;
-    data['fertile_window_end'] = fertile_window_end;
+
     return data;
   }
 }
@@ -75,6 +70,10 @@ class PeriodObj {
   String period_month_update;
   String predicated_period_start_date;
   String predicated_period_end_date;
+  String? fertile_window_start;
+  String? fertile_window_end;
+  String? ovulation_day;
+  String? avg_cycle_length;
   List<PeriodData>? periodData;
 
   PeriodObj({
@@ -86,6 +85,10 @@ class PeriodObj {
     required this.period_month_update,
     required this.predicated_period_start_date,
     required this.predicated_period_end_date,
+    required this.fertile_window_start,
+    required this.fertile_window_end,
+    required this.ovulation_day,
+    required this.avg_cycle_length,
     this.periodData,
   });
 
@@ -105,7 +108,13 @@ class PeriodObj {
         predicated_period_start_date:
             json['predicted_period_start_date'].toString() ?? "",
         predicated_period_end_date: json['predicted_period_end_date'].toString() ?? "",
-        periodData: periodDataList);
+        periodData: periodDataList,
+        fertile_window_end: json['fertile_window_end'].toString() ?? "",
+      fertile_window_start: json['fertile_window_start'].toString() ?? "",
+        ovulation_day: json['ovulation_day'].toString() ?? "", avg_cycle_length: json['avg_cycle_length'].toString() ?? "",
+
+
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -121,6 +130,10 @@ class PeriodObj {
     if (periodData != null && periodData!.isNotEmpty) {
       data['periods_info'] = periodData!.map((v) => v.toJson()).toList();
     }
+    data['fertile_window_start'] = fertile_window_start;
+    data['fertile_window_end'] = fertile_window_end;
+    data['ovulation_day'] = ovulation_day;
+    data['avg_cycle_length'] = avg_cycle_length;
     return data;
   }
 }
