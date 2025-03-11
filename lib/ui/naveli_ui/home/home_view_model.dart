@@ -326,7 +326,7 @@ class HomeViewModel with ChangeNotifier {
       return "Period Day \n$periodDay";
     }
 
-    if (currentDate.isAfter(predictedEndDate)) {
+    if (currentDate.isAfter(predictedStartDate.add(Duration(days: 1)))) {
       // Case 1: Periods are late
       int numberOfDays = currentDate.difference(predictedStartDate).inDays;
       return "Periods late \n$numberOfDays ${numberOfDays == 1 ? "day" : "days"}";
@@ -341,7 +341,7 @@ class HomeViewModel with ChangeNotifier {
 
     if (currentDate.isAtSameMomentAs(predictedStartDate) ||
         (currentDate.isAfter(predictedStartDate) &&
-            currentDate.isBefore(predictedEndDate))) {
+            currentDate.isSameDayOrBefore(predictedStartDate.add(Duration(days: 1))))) {
       return "Period may \nstart today";
     }
 
