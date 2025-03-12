@@ -532,7 +532,7 @@ class _MonthViewState extends State<_MonthView> {
                   DateTime nextPeriodStart = periodStartDates[i + 1];
 
                   // ✅ Calculate Ovulation Day (14 days before next period start)
-                  DateTime futureOvulationDay = nextPeriodStart.subtract(Duration(days: 14));
+                  DateTime futureOvulationDay = currentPeriodStart.subtract(Duration(days: 14));
 
                   // ✅ Calculate Fertile Window (5 days before & 2 days after ovulation)
                   DateTime futureFertileStart = futureOvulationDay.subtract(Duration(days: 5));

@@ -355,56 +355,87 @@ class HomeViewModel with ChangeNotifier {
       return "";
     }
 
-    DateTime periodStartDate =
-        DateTime.parse(peroidCustomeList[0].period_start_date);
-    DateTime periodEndDate =
-        DateTime.parse(peroidCustomeList[0].period_end_date);
-    int cycleLength = int.parse(peroidCustomeList[0].period_cycle_length);
-    int periodLength = int.parse(peroidCustomeList[0].period_length);
+    // Sort period data to get the latest logged period start date
+    peroidCustomeList.sort((a, b) =>
+        DateTime.parse(b.period_start_date).compareTo(DateTime.parse(a.period_start_date)));
 
-    DateTime fertileStartDate = periodEndDate.add(const Duration(days: 3));
-    DateTime fertileEndDate = fertileStartDate.add(const Duration(days: 8));
+    DateTime lastPeriodStartDate =
+    DateTime.parse(peroidCustomeList.first.period_start_date);
 
-    int cycleDay = currentDate.difference(periodStartDate).inDays + 1;
+    int dayDifference = currentDate.difference(lastPeriodStartDate).inDays + 1;
 
-    // Cycle phases based on period start & end
-    Map<String, String> cyclePhases = {
-      "1-${periodLength}":
-          "Cycle kicks in—the heavy flow, cramps, and all that! Rest, stay hydrated, and go easy on yourself.",
-      "${periodLength + 1}-${periodLength + 2}":
-          "Period winding down—time to relax and refuel yourself.",
-      "${periodLength + 3}-${periodLength + 5}":
-          "Energy peaks—time to set goals and stay active.",
-      "${periodLength + 6}-${periodLength + 9}":
-          "Estrogen rising—Feeling vibrant. Go for it—be social and creative.",
-      "${periodLength + 10}-${periodLength + 14}":
-          "Confidence peaks, and you're glowing. Embrace the energy, take on new challenges, and slay!",
-      "${periodLength + 15}-${periodLength + 18}":
-          "Vibes are chill. Take a breather, unwind, and treat yourself to some me-time.",
-      "${periodLength + 19}-${cycleLength - 4}":
-          "Cravings, mood swings, and all the feels. Nourish, slow down, and be gentle with yourself.",
-      "${cycleLength - 3}-$cycleLength":
-          "PMS Alert!! Feeling bloated, tired, and emotional? Hydrate, relax, and pamper yourself.",
-      "${cycleLength + 1}":
-          "Period’s running late? Don’t stress, give it time, and let your body do its thing."
-    };
+    print("Current date is day $dayDifference from the start date.");
 
-    // Determine the corresponding phase message
-    for (var range in cyclePhases.keys) {
-      List<String> parts = range.split("-").where((e) => e.isNotEmpty).toList();
+    int cycleLength = int.parse(peroidCustomeList.first.period_cycle_length);
+    int periodLength = int.parse(peroidCustomeList.first.period_length);
 
-      int start = int.parse(parts[0]);
-      int end = parts.length > 1 ? int.parse(parts[1]) : start;
+    // Define cycle phases based on the table provided
+    List<Map<String, dynamic>> cyclePhases = [
+      {
+        "start": 1,
+        "end": 3,
+        "message": "Cycle kicks in—heavy flow, cramps, and all that! Rest, stay hydrated, and go easy on yourself."
+      },
+      {
+        "start": 4,
+        "end": 5,
+        "message": "Period winding down—time to relax and refuel yourself."
+      },
+      {
+        "start": 6,
+        "end": 8,
+        "message": "Energy peaks—time to shine! Set goals and stay active."
+      },
+      {
+        "start": 7,
+        "end": 10,
+        "message": "Estrogen rising—feeling vibrant. Go for it—be social and creative."
+      },
+      {
+        "start": 8,
+        "end": 13,
+        "message": "Confidence peaks! Embrace the energy, take on new challenges, and slay!"
+      },
+      {
+        "start": 9,
+        "end": 15,
+        "message": "Vibes are chill. Take a breather, unwind, and treat yourself to some me-time."
+      },
+      {
+        "start": 13,
+        "end": 18,
+        "message": "Cravings, mood swings, and all the feels. Nourish, slow down, and be gentle with yourself."
+      },
+      {
+        "start": 18,
+        "end": 21,
+        "message": "PMS Alert!! Feeling bloated, tired, and emotional? Hydrate, relax, and pamper yourself."
+      },
+      {
+        "start": cycleLength - 3,
+        "end": cycleLength,
+        "message": "Your period is due soon! Stay mindful of your body and prepare accordingly."
+      },
+    ];
 
-      // debugPrint("Cycle Day: $cycleDay, Range: $range, Parts: $parts , cyclePhases: ${cyclePhases[range]}, start $start, end $end");
+    // Handle late period scenario
+    if (dayDifference > cycleLength) {
+      return "Period’s running late? Don’t stress, give it time, and let your body do its thing.";
+    }
 
-      if (cycleDay >= start && cycleDay <= end) {
-        return cyclePhases[range]!;
+    // Find the correct phase
+    for (var phase in cyclePhases) {
+      if (dayDifference >= phase["start"] && dayDifference <= phase["end"]) {
+        return phase["message"];
       }
     }
 
-    return "";
+    return "Cycle phase not identified. Please check your period data.";
   }
+
+
+
+
 
   // String getCycleDayOrDaysToGo(DateTime currentDate) {
   //   nextCycleDates.sort();
