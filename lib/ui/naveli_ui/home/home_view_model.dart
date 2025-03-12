@@ -352,7 +352,7 @@ class HomeViewModel with ChangeNotifier {
     DateTime currentDate = DateTime.now();
 
     if (peroidCustomeList.isEmpty) {
-      return "No cycle dates available";
+      return "";
     }
 
     DateTime periodStartDate =
@@ -403,7 +403,7 @@ class HomeViewModel with ChangeNotifier {
       }
     }
 
-    return "Cycle phase not identified.";
+    return "";
   }
 
   // String getCycleDayOrDaysToGo(DateTime currentDate) {
