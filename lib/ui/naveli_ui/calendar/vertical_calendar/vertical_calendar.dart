@@ -398,6 +398,21 @@ class _MonthViewState extends State<_MonthView> {
                 DateTime end = DateTime.parse(dateRange.period_end_date);
                 int cycleLength = int.parse(dateRange.period_cycle_length);
 
+                DateTime? startDate = dateRange.fertile_window_start != null
+                    ? DateTime.parse(dateRange.fertile_window_start!)
+                    : null;
+
+                DateTime? endDate = dateRange.fertile_window_end != null
+                    ? DateTime.parse(dateRange.fertile_window_end!)
+                    : null;
+
+                for (DateTime date = startDate ?? DateTime.now();
+                date.isBefore((endDate ?? DateTime.now()).add(Duration(days: 1)));
+                date = date.add(Duration(days: 1))) {
+                  fertileDates.add(date);
+                }
+                ovulationDates.add(DateTime.parse(dateRange.ovulation_day ?? ""));
+
                 // Store logged period dates
                 loggedPeriodDates.addAll(List.generate(
                   end.difference(start).inDays +
@@ -542,6 +557,7 @@ class _MonthViewState extends State<_MonthView> {
                     ).where((date) => date.year == currentYear).toList();
 
                     fertileDates.addAll(tempFertileDates);
+
                   }
                 }
 

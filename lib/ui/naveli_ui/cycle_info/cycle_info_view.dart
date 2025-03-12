@@ -660,34 +660,34 @@ class _CycleInfoViewState extends State<CycleInfoView> {
                       // ),
 
 
-                      LabelTextField(
-                        onTap: () async {
-                          DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now()
-                                  .subtract(const Duration(days: 365 * 60)),
-                              lastDate: DateTime.now());
-                          if (picked != null) {
-                            setState(() {
-                              mDateController.text =
-                                  CommonUtils.dateFormatyyyyMMDD(
-                                      picked.toString());
-                              print(mDateController.text.toString());
-                              selectedPreviousPeriodDate =
-                                  mDateController.text.toString();
-                              /* zodiac = Zodiac().getZodiac(
-                                        mDateController.text.toString()); */
-                            });
-                          } else {
-                            print(picked);
-                          }
-                        },
-                        hintText: S.of(context)!.selectDate,
-                        controller: mDateController,
-                        readOnly: true,
-                      ),
-                      Visibility(
+                    LabelTextField(
+                      onTap: () async {
+                        DateTime now = DateTime.now();
+                        DateTime firstSelectableDate = DateTime(now.year, now.month - 1, 1);
+
+                        DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: now,
+                          firstDate: firstSelectableDate,
+                          lastDate: now,
+                        );
+
+                        if (picked != null) {
+                          setState(() {
+                            mDateController.text = CommonUtils.dateFormatyyyyMMDD(picked.toString());
+                            print(mDateController.text);
+                            selectedPreviousPeriodDate = mDateController.text;
+                          });
+                        } else {
+                          print("No date selected");
+                        }
+                      },
+                      hintText: S.of(context)!.selectDate,
+                      controller: mDateController,
+                      readOnly: true,
+                    ),
+
+                    Visibility(
                         visible: calculateAge(widget
                             .welcomeData['birthdate']) >=
                             55 && isPeriodsOnAfter55,
