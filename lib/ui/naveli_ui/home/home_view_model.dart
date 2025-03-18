@@ -326,10 +326,16 @@ class HomeViewModel with ChangeNotifier {
       return "Period Day \n$periodDay";
     }
 
-    if (currentDate.isAfter(predictedStartDate.add(Duration(days: 1)))) {
+    if (currentDate.isAfter(predictedStartDate.add(Duration(days: 1))) && currentDate.month == DateTime.now().month) {
       // Case 1: Periods are late
       int numberOfDays = currentDate.difference(predictedStartDate).inDays;
       return "Periods late \n$numberOfDays ${numberOfDays == 1 ? "day" : "days"}";
+    }
+
+    if (currentDate.isAfter(predictedStartDate.add(Duration(days: 1))) && currentDate.month != DateTime.now().month) {
+      // Case 1: Periods are late
+      int periodDay = currentDate.difference(predictedStartDate).inDays + 1;
+      return "Period Day \n$periodDay";
     }
 
     if (currentDate.isBefore(predictedStartDate) &&
