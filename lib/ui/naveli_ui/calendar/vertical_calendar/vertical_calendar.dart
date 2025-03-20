@@ -441,6 +441,8 @@ class _MonthViewState extends State<_MonthView> {
 
                 // **Predict upcoming periods for the next 12 months (within the current year)**
                 for (int i = 0; i < 12; i++) {
+
+
                   startPredictedPeriods =
                       startPredictedPeriods.add(Duration(days: length));
                   endPredictedPeriods =
@@ -527,39 +529,60 @@ class _MonthViewState extends State<_MonthView> {
                 predictedPeriodDates.sort(); // Ensure correct order
 
 // ✅ Calculate Fertile Window & Ovulation Dates
-                for (int i = 0; i < periodStartDates.length - 1; i++) {
+                for (int i = 0; i < periodStartDates.length; i++) {
                   DateTime currentPeriodStart = periodStartDates[i];
-                  DateTime nextPeriodStart = periodStartDates[i + 1];
+                  DateTime? nextPeriodStart = (i + 1 < periodStartDates.length) ? periodStartDates[i + 1] : null;
 
-                  // ✅ Calculate Ovulation Day (14 days before next period start)
-                  DateTime futureOvulationDay = currentPeriodStart.subtract(Duration(days: 14));
+                  // ✅ If next period is available, calculate ovulation normally.
+                  DateTime futureOvulationDay;
+                  if (nextPeriodStart != null) {
+                    futureOvulationDay = nextPeriodStart.subtract(Duration(days: 14));
+                  } else {
+                    // ✅ Estimate ovulation for the last month using the average cycle length.
+                    int estimatedCycleLength = (i > 0)
+                        ? periodStartDates[i].difference(periodStartDates[i - 1]).inDays
+                        : 28; // Default to 28 days if no previous cycle exists.
+                    futureOvulationDay = currentPeriodStart.add(Duration(days: estimatedCycleLength - 14));
+                  }
+
+                  // ✅ Ensure one ovulation per month
+                  bool ovulationExistsInMonth = ovulationDates.any(
+                        (date) => date.year == futureOvulationDay.year && date.month == futureOvulationDay.month,
+                  );
+
+                  if (!ovulationExistsInMonth && futureOvulationDay.year == currentYear) {
+                    ovulationDates.add(futureOvulationDay);
+                  } else {
+                    // ✅ If there's already an ovulation date for the month, replace it with the latest one.
+                    ovulationDates.removeWhere(
+                            (date) => date.year == futureOvulationDay.year && date.month == futureOvulationDay.month);
+                    ovulationDates.add(futureOvulationDay);
+                  }
 
                   // ✅ Calculate Fertile Window (5 days before & 2 days after ovulation)
                   DateTime futureFertileStart = futureOvulationDay.subtract(Duration(days: 5));
                   DateTime futureFertileEnd = futureOvulationDay.add(Duration(days: 2));
 
-                  // ✅ Ensure no duplicate ovulation dates in the same fertile window
-                  bool ovulationConflict = ovulationDates.any(
-                        (date) => date.isAfter(futureFertileStart) && date.isBefore(futureFertileEnd),
+                  // ✅ Ensure each month has only one fertile window
+                  bool fertileWindowExistsInMonth = fertileDates.any(
+                        (date) => date.year == futureFertileStart.year && date.month == futureFertileStart.month,
                   );
 
-                  if (!ovulationConflict) {
-                    if (futureOvulationDay.year == currentYear) {
-                      ovulationDates.add(futureOvulationDay);
-                    }
-                  }
+                  if (!fertileWindowExistsInMonth && futureFertileStart.year == currentYear && futureFertileEnd.year == currentYear) {
+                    // ✅ Remove any previously added fertile dates for that month (if wrong)
+                    fertileDates.removeWhere(
+                            (date) => date.year == futureFertileStart.year && date.month == futureFertileStart.month);
 
-                  // ✅ Add fertile dates only if they fall within the current year
-                  if (futureFertileStart.year == currentYear && futureFertileEnd.year == currentYear) {
                     List<DateTime> tempFertileDates = List.generate(
                       futureFertileEnd.difference(futureFertileStart).inDays + 1,
                           (i) => futureFertileStart.add(Duration(days: i)),
                     ).where((date) => date.year == currentYear).toList();
 
                     fertileDates.addAll(tempFertileDates);
-
                   }
                 }
+
+
 
 
 
@@ -596,9 +619,11 @@ class _MonthViewState extends State<_MonthView> {
               if (fertileDates.contains(date)) {
                 isFirtile = true;
               }
-
+              ovulationDates.removeAt(ovulationDates.length - 1);
               if (ovulationDates.contains(date)) {
-                isOvulation = true;
+                if(date.year<date.year + 1) {
+                  isOvulation = true;
+                }
               }
             }
 

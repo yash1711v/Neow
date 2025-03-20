@@ -121,20 +121,38 @@ class _SplashViewState extends State<SplashViewVdo> {
   }
 
   skipVideo() {
-    vdo_Controller.pause();
-    vdo_Controller.removeListener(() {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-    vdo_Controller.dispose();
-    player1.stop();
-    player2.stop();
-    player1.dispose();
-    player2.dispose();
+
+
+
     if (mounted) {
-      mViewModel.onFinishGIF(); // Move to next screen or animation
+      loadSecondVideoPlayer('assets/video/logoanimation.mp4');
+      if (AppPreferences.instance.getIsFirstTime()) {
+        Future.delayed(const Duration(seconds: 7), () {
+          if (mounted) {
+            vdo_Controller.setLooping(false);
+            vdo_Controller.pause();
+            setState(() {});
+            mViewModel.onFinishGIF();
+            AppPreferences.instance.setIsFirstTime(false);
+          }
+        });
+      }
     }
+
+    // vdo_Controller.pause();
+    // vdo_Controller.removeListener(() {
+    //   if (mounted) {
+    //     setState(() {});
+    //   }
+    // });
+    // vdo_Controller.dispose();
+    // player1.stop();
+    // player2.stop();
+    // player1.dispose();
+    // player2.dispose();
+    // if (mounted) {
+    //   mViewModel.onFinishGIF(); // Move to next screen or animation
+    // }
   }
 
   @override

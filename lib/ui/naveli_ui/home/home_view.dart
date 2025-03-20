@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:naveli_2023/ui/naveli_ui/home/quiz/quiz_view.dart';
 import 'package:naveli_2023/ui/naveli_ui/home/shorts/short_view.dart';
 import 'package:naveli_2023/ui/naveli_ui/home/track/track_view.dart';
@@ -21,6 +22,7 @@ import '../../../generated/i18n.dart';
 import '../../../utils/constant.dart';
 import '../../../utils/global_variables.dart';
 import '../../../widgets/common_daily_insight_container.dart';
+import '../../../widgets/horiozntal.dart';
 import '../calendar/calendar_view.dart';
 import '../health_mix/health_mix_view_model.dart';
 import '../health_mix/post_list.dart';
@@ -92,6 +94,7 @@ class _HomeViewState extends State<HomeView> {
         print("diipppka1");
         //mViewModel.fetchData();
         _setTimeout();
+        mViewModel.updateSelectedDate(DateTime.now());
       });
     });
 
@@ -331,7 +334,9 @@ class _HomeViewState extends State<HomeView> {
       return LocalImages.not_fertile;
     } else if(mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
-        .contains("Period in")){
+        .contains("Ovulation Day") || mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("Ovulation in")){
       return LocalImages.green_Static;
     } else {
       return LocalImages.white_Static;
@@ -372,6 +377,8 @@ class _HomeViewState extends State<HomeView> {
     }
   }
 
+
+
   @override
   void dispose() {
     _timer.cancel();
@@ -379,6 +386,7 @@ class _HomeViewState extends State<HomeView> {
     mViewModel.timerSlider?.cancel();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -510,505 +518,530 @@ class _HomeViewState extends State<HomeView> {
     //   ),
     // );
 
-    var calender2 = SizedBox(
-      height: 80.0,
-      child: Container(
-        padding: const EdgeInsets.only(left: 15, right: 15),
-        color: Color(bgColor),
-        child: SingleChildScrollView(
-          // Container(const BoxDecoration(backgroundColor:CommonColors.bglightPinkColor)),
+    var calender2 = HorizontalCalendar(mViewModel: mViewModel,);
 
-          scrollDirection: Axis.horizontal,
-          // padding: const EdgeInsets.only(left: 12, right: 12),
-          child: ListView.separated(
-            itemCount: mViewModel.daysList.length,
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            separatorBuilder: (context, index) {
-              DateTime currentDate = mViewModel.daysList[index];
-              String weekDay = mViewModel.getWeekDay(currentDate);
-              String formattedDate = '${currentDate.day}';
-              bool isCycleDate = false;
-              int countDay = 0;
-
-              for (var dateRange in peroidCustomeList) {
-                DateTime start = DateTime.parse(dateRange.period_start_date);
-                DateTime end = DateTime.parse(dateRange.period_end_date);
-                int cycleLength = int.parse(dateRange.period_cycle_length);
-                if (currentDate.isAfter(start) && currentDate.isBefore(end) ||
-                    currentDate.isAtSameMomentAs(start) ||
-                    currentDate.isAtSameMomentAs(end)) {
-                  isCycleDate = true;
-                  print('countDay:  $countDay');
-                }
-              }
-              countDay++;
-
-              int clen = int.parse(peroidCustomeList.last.period_length ?? "5");
-              double opc = 0.0;
-
-              if (isCycleDate) {
-                no++;
-                opc = (1 - ((1 / clen) * no)).clamp(0.0, 1.0);
-              }
-              if (no > clen) {
-                no = 0;
-              }
-
-              //
-              // WidgetsBinding.instance.addPostFrameCallback((_) async {
-              //   mViewModel.getPeriodInfoList();
-              //   await handleFirstBloc();
-              //   // await mViewModel.handleSecondBloc(dateString);
-              //   await handleThirdBloc();
-              //   print("diipppka1");
-              //   //mViewModel.fetchData();
-              //   _setTimeout();
-              // });
-
-              return Container(
-                color: isCycleDate
-                    ? (no < clen
-                    ? Color(0xFFFFB5AE).withOpacity(opc)
-                    : Color(bgColor))
-                    : Color(bgColor),
-                width: 35,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 40.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(bgColor),
-                          borderRadius: BorderRadius.vertical(
-                              bottom: Radius.elliptical(20.0, 8.0)),
-                        ),
-                      ),
-                    ),
-                    kCommonSpaceV10,
-                    SizedBox(
-                      height: 30.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(bgColor),
-                          borderRadius: BorderRadius.vertical(
-                              top: Radius.elliptical(15.0, 8.0)),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-            itemBuilder: (context, index) {
-              DateTime currentDate = mViewModel.daysList[index];
-              String weekDay = mViewModel.getWeekDay(currentDate);
-              String formattedDate = '${currentDate.day}';
-              bool isCycleDate = false;
-              bool isPredictedDate = false;
-
-              for (var dateRange in peroidCustomeList) {
-                DateTime start = DateTime.parse(dateRange.period_start_date);
-                DateTime end = DateTime.parse(dateRange.period_end_date)
-                    .add(Duration(days: 1));
-                cycleLength = int.parse(dateRange.period_cycle_length);
-
-                if ((currentDate.isAfter(start) && currentDate.isBefore(end)) ||
-                    currentDate.isAtSameMomentAs(start) ||
-                    currentDate.isAtSameMomentAs(end)) {
-                  isCycleDate = true;
-                  break;
-                }
-
-                DateTime startPredicated =
-                DateTime.parse(dateRange.predicated_period_start_date);
-                DateTime endPredicated =
-                DateTime.parse(dateRange.predicated_period_end_date)
-                    .add(Duration(days: 1));
-
-                if ((currentDate.isAfter(startPredicated) &&
-                    currentDate.isBefore(endPredicated)) ||
-                    currentDate.isAtSameMomentAs(startPredicated) ||
-                    currentDate.isAtSameMomentAs(endPredicated)) {
-                  isPredictedDate = true;
-                  break;
-                }
-              }
-
-              DateTime today = DateTime.now();
-              bool isToday = currentDate.isAtSameMomentAs(today);
-              bool isSelectedDate =
-              currentDate.isAtSameMomentAs(mViewModel.selectedDate);
-              int clen = int.parse(peroidCustomeList.last.period_length ?? "5");
-              double opc =
-              isCycleDate ? (1 - ((1 / clen) * no)).clamp(0.0, 1.0) : 0.0;
-
-              return Container(
-                decoration: BoxDecoration(color: Color(bgColor)),
-                child: Column(
-                  children: [
-                    Text(
-                      isToday ? "Today" : weekDay,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16.0,
-                          color: Colors.black),
-                    ),
-                    GestureDetector(
-                      onTap: () => mViewModel.updateSelectedDate(currentDate),
-                      child: Container(
-                        height: 45.0,
-                        width: 42.0,
-                        decoration: BoxDecoration(
-                          gradient: isSelectedDate
-                              ? isCycleDate
-                              ? LinearGradient(
-                              colors: [Colors.white, Colors.white])
-                              : LinearGradient(colors: [
-                            Color(0xFFDBDBDB),
-                            Color(0xFFDBDBDB)
-                          ])
-                              : isCycleDate
-                              ? LinearGradient(colors: [
-                            Color(0xFFFF9D93),
-                            Color(0xFFFFB5AE).withOpacity(opc)
-                          ])
-                              : isPredictedDate
-                              ? LinearGradient(
-                              colors: [Colors.white, Colors.white])
-                              : null,
-                          shape: BoxShape.circle,
-                        ),
-                        child: DottedBorder(
-                          color: isSelectedDate
-                              ? (isCycleDate
-                              ? CommonColors.mRed
-                              : CommonColors.mTransparent)
-                              : (isPredictedDate
-                              ? CommonColors.mRed
-                              : CommonColors.mTransparent),
-                          dashPattern: [4, 3],
-                          strokeWidth:
-                          isSelectedDate || isPredictedDate ? 2 : 0,
-                          borderType: BorderType.Circle,
-                          child: Center(
-                            child: Text(
-                              formattedDate,
-                              style: TextStyle(
-                                color: isSelectedDate
-                                    ? Colors.black
-                                    : (isCycleDate
-                                    ? CommonColors.mRed
-                                    : Colors.black),
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-
-          // ListView.separated(
-          //   // backgroundColor:CommonColors.bglightPinkColor,
-          //   itemCount: mViewModel.daysList.length,
-          //   shrinkWrap: true,
-          //   // padding: const EdgeInsets.only(left: 5.0),
-          //   physics: const ClampingScrollPhysics(),
-          //   scrollDirection: Axis.horizontal,
-          //   separatorBuilder: (context, index) {
-          //     DateTime currentDate = mViewModel.daysList[index];
-          //     String weekDay = mViewModel.getWeekDay(currentDate);
-          //     String formattedDate = '${currentDate.day}';
-          //     bool isCycleDate = false;
-          //     int countDay = 0;
-          //     for (var dateRange in peroidCustomeList) {
-          //       DateTime start = DateTime.parse(dateRange.period_start_date);
-          //
-          //       DateTime end = DateTime.parse(dateRange.period_end_date);
-          //       int cycleLength = int.parse(dateRange.period_cycle_length);
-          //       if (currentDate.isAfter(start) && currentDate.isBefore(end) ||
-          //           currentDate.isAtSameMomentAs(start) ||
-          //           currentDate.isAtSameMomentAs(end)) {
-          //         isCycleDate = true;
-          //         print('countDay:  $countDay');
-          //       }
-          //     }
-          //
-          //     countDay++;
-          //     // bool isCycleDate = mViewModel.nextCycleDates.any((date) =>
-          //     //     date.year == currentDate.year &&
-          //     //     date.month == currentDate.month &&
-          //     //     date.day == currentDate.day);
-          //     /* CycleDates cd = gCycleDates.any((cycleDate)=>
-          //     cycleDate.date.year == currentDate.year &&
-          //     cycleDate.date.month == currentDate.month &&
-          //     cycleDate.date.day == currentDate.day
-          //   );
-          //   bool isCycleDate = false
-          //   int cycleDay = 0;
-          //   if(cd!=null){
-          //     isCycleDate = true;
-          //     cycleDay = cd.periodDay;
-          //   } */
-          //
-          //     // int clen = int.parse(globalUserMaster?.averagePeriodLength ?? "5");
-          //     int clen = int.parse(
-          //         peroidCustomeList[peroidCustomeList.length - 1]
-          //             .period_length ?? "5");
-          //     double opc = 0.0;
-          //     /* no++;
-          //   print(no); */
-          //     if (isCycleDate) {
-          //       no++;
-          //       opc = 1 - ((1 / clen) * no);
-          //     }
-          //     if (no > clen) {
-          //       no = 0;
-          //     }
-          //
-          //     // opc = (1 - ((1 / clen) * no)).clamp(0.0, 1.0);
-          //
-          //     return
-          //     //   SizedBox(
-          //     //   width: 35,
-          //     // );
-          //
-          //       Container(
-          //         color:
-          //         isCycleDate ? no < clen
-          //             ? Color(0xFFFFB5AE).withOpacity(opc)
-          //             : Color(bgColor)
-          //             : Color(bgColor),
-          //         width: 35,
-          //         // padding: EdgeInsets.only(left: 0.0, right: 0.0),
-          //         child: Column(
-          //           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //           children: [
-          //             SizedBox(
-          //                 height: 40.0,
-          //                 child: Container(
-          //                   decoration: BoxDecoration(
-          //                     color: Color(bgColor),
-          //                     borderRadius: BorderRadius.vertical(
-          //                         bottom: Radius.elliptical(20.0, 8.0)),
-          //                   ),
-          //                 )),
-          //             kCommonSpaceV10,
-          //             SizedBox(
-          //                 height: 30.0,
-          //                 child: Container(
-          //                   decoration: BoxDecoration(
-          //                     color: Color(bgColor),
-          //                     borderRadius: BorderRadius.vertical(
-          //                         top: Radius.elliptical(15.0, 8.0)),
-          //                   ),
-          //                 )),
-          //           ],
-          //         ));
-          //   },
-          //   itemBuilder: (context, index) {
-          //     DateTime currentDate = mViewModel.daysList[index];
-          //     String weekDay = mViewModel.getWeekDay(currentDate);
-          //     String formattedDate = '${currentDate.day}';
-          //
-          //     bool isCycleDate = false;
-          //     bool isPredictedDate = false;
-          //
-          //     for (var dateRange in peroidCustomeList) {
-          //       DateTime start = DateTime.parse(dateRange.period_start_date);
-          //       DateTime end = DateTime.parse(dateRange.period_end_date);
-          //
-          //       // Add 1 day to the end date
-          //       end = end.add(Duration(days: 1));
-          //
-          //       cycleLength = int.parse(dateRange.period_cycle_length);
-          //
-          //       // Check if the current date is within the range, considering the adjusted end date
-          //       if ((currentDate.isAfter(start) && currentDate.isBefore(end)) ||
-          //           currentDate.isAtSameMomentAs(start) ||
-          //           currentDate.isAtSameMomentAs(end)) {
-          //         isCycleDate = true;
-          //         break; // Exit loop once you find the matching range
-          //       }
-          //
-          //       ///This calculation for future predicated dates
-          //       DateTime startPredicatedPeriods = DateTime.parse(
-          //           dateRange.predicated_period_start_date);
-          //       DateTime endPredicatedPeriods = DateTime.parse(
-          //           dateRange.predicated_period_end_date);
-          //
-          //       // Add 1 day to the end date
-          //       endPredicatedPeriods =
-          //           endPredicatedPeriods.add(Duration(days: 1));
-          //
-          //       if ((currentDate.isAfter(startPredicatedPeriods) &&
-          //           currentDate.isBefore(endPredicatedPeriods)) ||
-          //           currentDate.isAtSameMomentAs(startPredicatedPeriods) ||
-          //           currentDate.isAtSameMomentAs(endPredicatedPeriods)) {
-          //         isPredictedDate = true;
-          //         break; // Exit loop once you find the matching range
-          //       }
-          //     }
-          //     // bool isCycleDate = mViewModel.nextCycleDates.any((date) =>
-          //     //     date.year == currentDate.year &&
-          //     //     date.month == currentDate.month &&
-          //     //     date.day == currentDate.day);
-          //
-          //     DateTime today = DateTime.now();
-          //     bool isToday = currentDate.year == today.year &&
-          //         currentDate.month == today.month &&
-          //         currentDate.day == today.day;
-          //     bool isSelectedDate =
-          //         currentDate.year == mViewModel.selectedDate.year &&
-          //             currentDate.month == mViewModel.selectedDate.month &&
-          //             currentDate.day == mViewModel.selectedDate.day;
-          //     int clen = int.parse(
-          //         peroidCustomeList[peroidCustomeList.length - 1]
-          //             .period_length ?? "5");
-          //     /*int.parse(globalUserMaster?.averagePeriodLength ?? "5");*/
-          //     double opc = 0.0;
-          //     /* no++;
-          //   print(no); */
-          //     if (isCycleDate) {
-          //       // no++;
-          //       opc = 1 - ((1 / clen) * no);
-          //       /* if(no>0){
-          //       opc == 1/no;
-          //     } */
-          //       print(opc);
-          //     }
-          //     /* if(no>clen){
-          //     no = 0;
-          //   } */
-          //     /* bool isOvulation = mViewModel.ovulationDates.any((date) =>
-          //       date.year == currentDate.year &&
-          //       date.month == currentDate.month &&
-          //       date.day == currentDate.day);
-          //
-          //   bool isFirtile = mViewModel.firtileDates.any((date) =>
-          //       date.year == currentDate.year &&
-          //       date.month == currentDate.month &&
-          //       date.day == currentDate.day); */
-          //
-          //     return Container(
-          //       padding: const EdgeInsets.only(left: 0, right: 0),
-          //       decoration: BoxDecoration(
-          //         color: Color(bgColor),
-          //       ),
-          //       child: Column(
-          //         mainAxisSize: MainAxisSize.min,
-          //         crossAxisAlignment: CrossAxisAlignment.center,
-          //         children: [
-          //           Text(
-          //             isToday ? "Today" : weekDay,
-          //             style: TextStyle(
-          //               fontWeight: FontWeight.w500,
-          //               fontSize: 16.0,
-          //               color: Colors.black,
-          //             ),
-          //           ),
-          //           GestureDetector(
-          //             onTap: () {
-          //               mViewModel.updateSelectedDate(currentDate);
-          //             },
-          //             child: Container(
-          //               height: 45.0,
-          //               width: 42.0,
-          //               padding: const EdgeInsets.all(0.0),
-          //               // padding: const EdgeInsets.only(left: 12, right: 12),
-          //               decoration: BoxDecoration(
-          //                 gradient: isSelectedDate
-          //                     ? isCycleDate
-          //                     ? const LinearGradient(
-          //                   begin: Alignment.topCenter,
-          //                   end: Alignment.bottomCenter,
-          //                   colors: [
-          //                     Color(0xFFFFFFFF),
-          //                     Color(0xFFFFFFFF),
-          //                   ],
-          //                 )
-          //                     : const LinearGradient(
-          //                   begin: Alignment.topCenter,
-          //                   end: Alignment.bottomCenter,
-          //                   colors: [
-          //                     Color(0xFFDBDBDB),
-          //                     Color(0xFFDBDBDB),
-          //                   ],
-          //                 )
-          //                     : isCycleDate
-          //                     ? LinearGradient(
-          //                   begin: Alignment.centerLeft,
-          //                   end: Alignment.centerRight,
-          //                   colors: [
-          //                     Color(0xFFFF9D93),
-          //                     Color(0xFFFFB5AE).withOpacity(opc),
-          //                   ],
-          //                 )
-          //                     : isPredictedDate ? LinearGradient(
-          //                   begin: Alignment.topCenter,
-          //                   end: Alignment.bottomCenter,
-          //                   colors: [
-          //                     Color(0xFFFFFFFF),
-          //                     Color(0xFFFFFFFF),
-          //                   ],
-          //                 ) : null,
-          //                 shape: BoxShape.circle,
-          //                 // border: Border.all(width: 1.5, color: CommonColors.mRed,style:BorderStyle.solid)
-          //               ),
-          //               child: DottedBorder(
-          //                 color: isSelectedDate
-          //                     ? isCycleDate
-          //                     ? CommonColors.mRed
-          //                     : CommonColors.mTransparent
-          //                     : isPredictedDate
-          //                     ? CommonColors.mRed
-          //                     : CommonColors.mTransparent,
-          //                 dashPattern: [4, 3],
-          //                 strokeWidth: isSelectedDate
-          //                     ? isCycleDate
-          //                     ? 2
-          //                     : 0
-          //                     : isPredictedDate ? 2 : 0,
-          //                 borderType: BorderType.Circle,
-          //                 child: Padding(
-          //                   padding: const EdgeInsets.only(
-          //                     top: 0,
-          //                     left: 0,
-          //                     right: 0,
-          //                   ),
-          //                   child: Center(
-          //                     child: Text(
-          //                       formattedDate,
-          //                       style: TextStyle(
-          //                         color: isSelectedDate
-          //                             ? Colors.black
-          //                             : isCycleDate
-          //                             ? CommonColors.mRed
-          //                             : Colors.black,
-          //                         fontWeight: FontWeight.w500,
-          //                         fontSize: 15.0,
-          //                       ),
-          //                     ),
-          //                   ),
-          //                 ),
-          //               ),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     );
-          //   },
-          // ),
-        ),
-      ),
-    );
+    // Column(
+    //   children: [
+    //
+    //     Container(
+    //       color: Color(bgColor),
+    //       child: Row(
+    //         mainAxisAlignment: MainAxisAlignment.center,
+    //         children: [
+    //           Text(DateFormat('MMMM').format(mViewModel.selectedDate),style: TextStyle(
+    //             fontWeight: FontWeight.w500,
+    //             fontSize: 25.0,
+    //           ) ,)
+    //         ],
+    //       ),
+    //     ),
+    //     Container(
+    //       color: Color(bgColor),
+    //       height: 10,),
+    //     SizedBox(
+    //       height: 80.0,
+    //       child: Container(
+    //         padding: const EdgeInsets.only(left: 15, right: 15),
+    //         color: Color(bgColor),
+    //         child: SingleChildScrollView(
+    //           // Container(const BoxDecoration(backgroundColor:CommonColors.bglightPinkColor)),
+    //
+    //           scrollDirection: Axis.horizontal,
+    //           // padding: const EdgeInsets.only(left: 12, right: 12),
+    //           child: ListView.separated(
+    //             itemCount: mViewModel.daysList.length,
+    //             shrinkWrap: true,
+    //             physics: const ClampingScrollPhysics(),
+    //             scrollDirection: Axis.horizontal,
+    //             separatorBuilder: (context, index) {
+    //               DateTime currentDate = mViewModel.daysList[index];
+    //               String weekDay = mViewModel.getWeekDay(currentDate);
+    //               String formattedDate = '${currentDate.day}';
+    //               bool isCycleDate = false;
+    //               int countDay = 0;
+    //
+    //               for (var dateRange in peroidCustomeList) {
+    //                 DateTime start = DateTime.parse(dateRange.period_start_date);
+    //                 DateTime end = DateTime.parse(dateRange.period_end_date);
+    //                 int cycleLength = int.parse(dateRange.period_cycle_length);
+    //                 if (currentDate.isAfter(start) && currentDate.isBefore(end) ||
+    //                     currentDate.isAtSameMomentAs(start) ||
+    //                     currentDate.isAtSameMomentAs(end)) {
+    //                   isCycleDate = true;
+    //                   print('countDay:  $countDay');
+    //                 }
+    //               }
+    //               countDay++;
+    //
+    //               int clen = int.parse(peroidCustomeList.last.period_length ?? "5");
+    //               double opc = 0.0;
+    //
+    //               if (isCycleDate) {
+    //                 no++;
+    //                 opc = (1 - ((1 / clen) * no)).clamp(0.0, 1.0);
+    //               }
+    //               if (no > clen) {
+    //                 no = 0;
+    //               }
+    //
+    //               //
+    //               // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //               //   mViewModel.getPeriodInfoList();
+    //               //   await handleFirstBloc();
+    //               //   // await mViewModel.handleSecondBloc(dateString);
+    //               //   await handleThirdBloc();
+    //               //   print("diipppka1");
+    //               //   //mViewModel.fetchData();
+    //               //   _setTimeout();
+    //               // });
+    //
+    //               return Container(
+    //                 color: isCycleDate
+    //                     ? (no < clen
+    //                     ? Color(0xFFFFB5AE).withOpacity(opc)
+    //                     : Color(bgColor))
+    //                     : Color(bgColor),
+    //                 width: 35,
+    //                 child: Column(
+    //                   children: [
+    //                     SizedBox(
+    //                       height: 40.0,
+    //                       child: Container(
+    //                         decoration: BoxDecoration(
+    //                           color: Color(bgColor),
+    //                           borderRadius: BorderRadius.vertical(
+    //                               bottom: Radius.elliptical(20.0, 8.0)),
+    //                         ),
+    //                       ),
+    //                     ),
+    //                     kCommonSpaceV10,
+    //                     SizedBox(
+    //                       height: 30.0,
+    //                       child: Container(
+    //                         decoration: BoxDecoration(
+    //                           color: Color(bgColor),
+    //                           borderRadius: BorderRadius.vertical(
+    //                               top: Radius.elliptical(15.0, 8.0)),
+    //                         ),
+    //                       ),
+    //                     ),
+    //                   ],
+    //                 ),
+    //               );
+    //             },
+    //             itemBuilder: (context, index) {
+    //               DateTime currentDate = mViewModel.daysList[index];
+    //               String weekDay = mViewModel.getWeekDay(currentDate);
+    //               String formattedDate = '${currentDate.day}';
+    //               bool isCycleDate = false;
+    //               bool isPredictedDate = false;
+    //
+    //               for (var dateRange in peroidCustomeList) {
+    //                 DateTime start = DateTime.parse(dateRange.period_start_date);
+    //                 DateTime end = DateTime.parse(dateRange.period_end_date)
+    //                     .add(Duration(days: 1));
+    //                 cycleLength = int.parse(dateRange.period_cycle_length);
+    //
+    //                 if ((currentDate.isAfter(start) && currentDate.isBefore(end)) ||
+    //                     currentDate.isAtSameMomentAs(start) ||
+    //                     currentDate.isAtSameMomentAs(end)) {
+    //                   isCycleDate = true;
+    //                   break;
+    //                 }
+    //
+    //                 DateTime startPredicated =
+    //                 DateTime.parse(dateRange.predicated_period_start_date);
+    //                 DateTime endPredicated =
+    //                 DateTime.parse(dateRange.predicated_period_end_date);
+    //
+    //                 if ((currentDate.isAfter(startPredicated) &&
+    //                     currentDate.isBefore(endPredicated)) ||
+    //                     currentDate.isAtSameMomentAs(startPredicated) ||
+    //                     currentDate.isAtSameMomentAs(endPredicated)) {
+    //                   isPredictedDate = true;
+    //                   break;
+    //                 }
+    //               }
+    //
+    //               DateTime today = DateTime.now();
+    //               bool isToday = currentDate.year == today.year &&
+    //                   currentDate.month == today.month &&
+    //                   currentDate.day == today.day;
+    //               bool isSelectedDate = currentDate.year == mViewModel.selectedDate.year &&
+    //                   currentDate.month == mViewModel.selectedDate.month &&
+    //                   currentDate.day == mViewModel.selectedDate.day;
+    //               // currentDate.isAtSameMomentAs(mViewModel.selectedDate);
+    //               int clen = int.parse(peroidCustomeList.last.period_length ?? "5");
+    //               double opc =
+    //               isCycleDate ? (1 - ((1 / clen) * no)).clamp(0.0, 1.0) : 0.0;
+    //
+    //               return Container(
+    //                 decoration: BoxDecoration(color: Color(bgColor)),
+    //                 child: Column(
+    //                   children: [
+    //                     Text(
+    //                       isToday ? "Today" : weekDay,
+    //                       style: TextStyle(
+    //                           fontWeight: FontWeight.w500,
+    //                           fontSize: 16.0,
+    //                           color: Colors.black),
+    //                     ),
+    //                     GestureDetector(
+    //                       onTap: () => mViewModel.updateSelectedDate(currentDate),
+    //                       child: Container(
+    //                         height: 45.0,
+    //                         width: 42.0,
+    //                         decoration: BoxDecoration(
+    //                           gradient: isSelectedDate
+    //                               ? isCycleDate
+    //                               ? LinearGradient(
+    //                               colors: [Colors.white, Colors.white])
+    //                               : LinearGradient(colors: [
+    //                             Color(0xFFDBDBDB),
+    //                             Color(0xFFDBDBDB)
+    //                           ])
+    //                               : isCycleDate
+    //                               ? LinearGradient(colors: [
+    //                             Color(0xFFFF9D93),
+    //                             Color(0xFFFFB5AE).withOpacity(opc)
+    //                           ])
+    //                               : isPredictedDate
+    //                               ? LinearGradient(
+    //                               colors: [Colors.white, Colors.white])
+    //                               : null,
+    //                           shape: BoxShape.circle,
+    //                         ),
+    //                         child: DottedBorder(
+    //                           color: isSelectedDate
+    //                               ? (isCycleDate
+    //                               ? CommonColors.mRed
+    //                               : CommonColors.mTransparent)
+    //                               : (isPredictedDate
+    //                               ? CommonColors.mRed
+    //                               : CommonColors.mTransparent),
+    //                           dashPattern: [4, 3],
+    //                           strokeWidth:
+    //                           isSelectedDate || isPredictedDate ? 2 : 0,
+    //                           borderType: BorderType.Circle,
+    //                           child: Center(
+    //                             child: Text(
+    //                               formattedDate,
+    //                               style: TextStyle(
+    //                                 color: isSelectedDate
+    //                                     ? Colors.black
+    //                                     : (isCycleDate
+    //                                     ? CommonColors.mRed
+    //                                     : Colors.black),
+    //                                 fontWeight: FontWeight.w500,
+    //                                 fontSize: 15.0,
+    //                               ),
+    //                             ),
+    //                           ),
+    //                         ),
+    //                       ),
+    //                     ),
+    //                   ],
+    //                 ),
+    //               );
+    //             },
+    //           ),
+    //
+    //           // ListView.separated(
+    //           //   // backgroundColor:CommonColors.bglightPinkColor,
+    //           //   itemCount: mViewModel.daysList.length,
+    //           //   shrinkWrap: true,
+    //           //   // padding: const EdgeInsets.only(left: 5.0),
+    //           //   physics: const ClampingScrollPhysics(),
+    //           //   scrollDirection: Axis.horizontal,
+    //           //   separatorBuilder: (context, index) {
+    //           //     DateTime currentDate = mViewModel.daysList[index];
+    //           //     String weekDay = mViewModel.getWeekDay(currentDate);
+    //           //     String formattedDate = '${currentDate.day}';
+    //           //     bool isCycleDate = false;
+    //           //     int countDay = 0;
+    //           //     for (var dateRange in peroidCustomeList) {
+    //           //       DateTime start = DateTime.parse(dateRange.period_start_date);
+    //           //
+    //           //       DateTime end = DateTime.parse(dateRange.period_end_date);
+    //           //       int cycleLength = int.parse(dateRange.period_cycle_length);
+    //           //       if (currentDate.isAfter(start) && currentDate.isBefore(end) ||
+    //           //           currentDate.isAtSameMomentAs(start) ||
+    //           //           currentDate.isAtSameMomentAs(end)) {
+    //           //         isCycleDate = true;
+    //           //         print('countDay:  $countDay');
+    //           //       }
+    //           //     }
+    //           //
+    //           //     countDay++;
+    //           //     // bool isCycleDate = mViewModel.nextCycleDates.any((date) =>
+    //           //     //     date.year == currentDate.year &&
+    //           //     //     date.month == currentDate.month &&
+    //           //     //     date.day == currentDate.day);
+    //           //     /* CycleDates cd = gCycleDates.any((cycleDate)=>
+    //           //     cycleDate.date.year == currentDate.year &&
+    //           //     cycleDate.date.month == currentDate.month &&
+    //           //     cycleDate.date.day == currentDate.day
+    //           //   );
+    //           //   bool isCycleDate = false
+    //           //   int cycleDay = 0;
+    //           //   if(cd!=null){
+    //           //     isCycleDate = true;
+    //           //     cycleDay = cd.periodDay;
+    //           //   } */
+    //           //
+    //           //     // int clen = int.parse(globalUserMaster?.averagePeriodLength ?? "5");
+    //           //     int clen = int.parse(
+    //           //         peroidCustomeList[peroidCustomeList.length - 1]
+    //           //             .period_length ?? "5");
+    //           //     double opc = 0.0;
+    //           //     /* no++;
+    //           //   print(no); */
+    //           //     if (isCycleDate) {
+    //           //       no++;
+    //           //       opc = 1 - ((1 / clen) * no);
+    //           //     }
+    //           //     if (no > clen) {
+    //           //       no = 0;
+    //           //     }
+    //           //
+    //           //     // opc = (1 - ((1 / clen) * no)).clamp(0.0, 1.0);
+    //           //
+    //           //     return
+    //           //     //   SizedBox(
+    //           //     //   width: 35,
+    //           //     // );
+    //           //
+    //           //       Container(
+    //           //         color:
+    //           //         isCycleDate ? no < clen
+    //           //             ? Color(0xFFFFB5AE).withOpacity(opc)
+    //           //             : Color(bgColor)
+    //           //             : Color(bgColor),
+    //           //         width: 35,
+    //           //         // padding: EdgeInsets.only(left: 0.0, right: 0.0),
+    //           //         child: Column(
+    //           //           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //           //           children: [
+    //           //             SizedBox(
+    //           //                 height: 40.0,
+    //           //                 child: Container(
+    //           //                   decoration: BoxDecoration(
+    //           //                     color: Color(bgColor),
+    //           //                     borderRadius: BorderRadius.vertical(
+    //           //                         bottom: Radius.elliptical(20.0, 8.0)),
+    //           //                   ),
+    //           //                 )),
+    //           //             kCommonSpaceV10,
+    //           //             SizedBox(
+    //           //                 height: 30.0,
+    //           //                 child: Container(
+    //           //                   decoration: BoxDecoration(
+    //           //                     color: Color(bgColor),
+    //           //                     borderRadius: BorderRadius.vertical(
+    //           //                         top: Radius.elliptical(15.0, 8.0)),
+    //           //                   ),
+    //           //                 )),
+    //           //           ],
+    //           //         ));
+    //           //   },
+    //           //   itemBuilder: (context, index) {
+    //           //     DateTime currentDate = mViewModel.daysList[index];
+    //           //     String weekDay = mViewModel.getWeekDay(currentDate);
+    //           //     String formattedDate = '${currentDate.day}';
+    //           //
+    //           //     bool isCycleDate = false;
+    //           //     bool isPredictedDate = false;
+    //           //
+    //           //     for (var dateRange in peroidCustomeList) {
+    //           //       DateTime start = DateTime.parse(dateRange.period_start_date);
+    //           //       DateTime end = DateTime.parse(dateRange.period_end_date);
+    //           //
+    //           //       // Add 1 day to the end date
+    //           //       end = end.add(Duration(days: 1));
+    //           //
+    //           //       cycleLength = int.parse(dateRange.period_cycle_length);
+    //           //
+    //           //       // Check if the current date is within the range, considering the adjusted end date
+    //           //       if ((currentDate.isAfter(start) && currentDate.isBefore(end)) ||
+    //           //           currentDate.isAtSameMomentAs(start) ||
+    //           //           currentDate.isAtSameMomentAs(end)) {
+    //           //         isCycleDate = true;
+    //           //         break; // Exit loop once you find the matching range
+    //           //       }
+    //           //
+    //           //       ///This calculation for future predicated dates
+    //           //       DateTime startPredicatedPeriods = DateTime.parse(
+    //           //           dateRange.predicated_period_start_date);
+    //           //       DateTime endPredicatedPeriods = DateTime.parse(
+    //           //           dateRange.predicated_period_end_date);
+    //           //
+    //           //       // Add 1 day to the end date
+    //           //       endPredicatedPeriods =
+    //           //           endPredicatedPeriods.add(Duration(days: 1));
+    //           //
+    //           //       if ((currentDate.isAfter(startPredicatedPeriods) &&
+    //           //           currentDate.isBefore(endPredicatedPeriods)) ||
+    //           //           currentDate.isAtSameMomentAs(startPredicatedPeriods) ||
+    //           //           currentDate.isAtSameMomentAs(endPredicatedPeriods)) {
+    //           //         isPredictedDate = true;
+    //           //         break; // Exit loop once you find the matching range
+    //           //       }
+    //           //     }
+    //           //     // bool isCycleDate = mViewModel.nextCycleDates.any((date) =>
+    //           //     //     date.year == currentDate.year &&
+    //           //     //     date.month == currentDate.month &&
+    //           //     //     date.day == currentDate.day);
+    //           //
+    //           //     DateTime today = DateTime.now();
+    //           //     bool isToday = currentDate.year == today.year &&
+    //           //         currentDate.month == today.month &&
+    //           //         currentDate.day == today.day;
+    //           //     bool isSelectedDate =
+    //           //         currentDate.year == mViewModel.selectedDate.year &&
+    //           //             currentDate.month == mViewModel.selectedDate.month &&
+    //           //             currentDate.day == mViewModel.selectedDate.day;
+    //           //     int clen = int.parse(
+    //           //         peroidCustomeList[peroidCustomeList.length - 1]
+    //           //             .period_length ?? "5");
+    //           //     /*int.parse(globalUserMaster?.averagePeriodLength ?? "5");*/
+    //           //     double opc = 0.0;
+    //           //     /* no++;
+    //           //   print(no); */
+    //           //     if (isCycleDate) {
+    //           //       // no++;
+    //           //       opc = 1 - ((1 / clen) * no);
+    //           //       /* if(no>0){
+    //           //       opc == 1/no;
+    //           //     } */
+    //           //       print(opc);
+    //           //     }
+    //           //     /* if(no>clen){
+    //           //     no = 0;
+    //           //   } */
+    //           //     /* bool isOvulation = mViewModel.ovulationDates.any((date) =>
+    //           //       date.year == currentDate.year &&
+    //           //       date.month == currentDate.month &&
+    //           //       date.day == currentDate.day);
+    //           //
+    //           //   bool isFirtile = mViewModel.firtileDates.any((date) =>
+    //           //       date.year == currentDate.year &&
+    //           //       date.month == currentDate.month &&
+    //           //       date.day == currentDate.day); */
+    //           //
+    //           //     return Container(
+    //           //       padding: const EdgeInsets.only(left: 0, right: 0),
+    //           //       decoration: BoxDecoration(
+    //           //         color: Color(bgColor),
+    //           //       ),
+    //           //       child: Column(
+    //           //         mainAxisSize: MainAxisSize.min,
+    //           //         crossAxisAlignment: CrossAxisAlignment.center,
+    //           //         children: [
+    //           //           Text(
+    //           //             isToday ? "Today" : weekDay,
+    //           //             style: TextStyle(
+    //           //               fontWeight: FontWeight.w500,
+    //           //               fontSize: 16.0,
+    //           //               color: Colors.black,
+    //           //             ),
+    //           //           ),
+    //           //           GestureDetector(
+    //           //             onTap: () {
+    //           //               mViewModel.updateSelectedDate(currentDate);
+    //           //             },
+    //           //             child: Container(
+    //           //               height: 45.0,
+    //           //               width: 42.0,
+    //           //               padding: const EdgeInsets.all(0.0),
+    //           //               // padding: const EdgeInsets.only(left: 12, right: 12),
+    //           //               decoration: BoxDecoration(
+    //           //                 gradient: isSelectedDate
+    //           //                     ? isCycleDate
+    //           //                     ? const LinearGradient(
+    //           //                   begin: Alignment.topCenter,
+    //           //                   end: Alignment.bottomCenter,
+    //           //                   colors: [
+    //           //                     Color(0xFFFFFFFF),
+    //           //                     Color(0xFFFFFFFF),
+    //           //                   ],
+    //           //                 )
+    //           //                     : const LinearGradient(
+    //           //                   begin: Alignment.topCenter,
+    //           //                   end: Alignment.bottomCenter,
+    //           //                   colors: [
+    //           //                     Color(0xFFDBDBDB),
+    //           //                     Color(0xFFDBDBDB),
+    //           //                   ],
+    //           //                 )
+    //           //                     : isCycleDate
+    //           //                     ? LinearGradient(
+    //           //                   begin: Alignment.centerLeft,
+    //           //                   end: Alignment.centerRight,
+    //           //                   colors: [
+    //           //                     Color(0xFFFF9D93),
+    //           //                     Color(0xFFFFB5AE).withOpacity(opc),
+    //           //                   ],
+    //           //                 )
+    //           //                     : isPredictedDate ? LinearGradient(
+    //           //                   begin: Alignment.topCenter,
+    //           //                   end: Alignment.bottomCenter,
+    //           //                   colors: [
+    //           //                     Color(0xFFFFFFFF),
+    //           //                     Color(0xFFFFFFFF),
+    //           //                   ],
+    //           //                 ) : null,
+    //           //                 shape: BoxShape.circle,
+    //           //                 // border: Border.all(width: 1.5, color: CommonColors.mRed,style:BorderStyle.solid)
+    //           //               ),
+    //           //               child: DottedBorder(
+    //           //                 color: isSelectedDate
+    //           //                     ? isCycleDate
+    //           //                     ? CommonColors.mRed
+    //           //                     : CommonColors.mTransparent
+    //           //                     : isPredictedDate
+    //           //                     ? CommonColors.mRed
+    //           //                     : CommonColors.mTransparent,
+    //           //                 dashPattern: [4, 3],
+    //           //                 strokeWidth: isSelectedDate
+    //           //                     ? isCycleDate
+    //           //                     ? 2
+    //           //                     : 0
+    //           //                     : isPredictedDate ? 2 : 0,
+    //           //                 borderType: BorderType.Circle,
+    //           //                 child: Padding(
+    //           //                   padding: const EdgeInsets.only(
+    //           //                     top: 0,
+    //           //                     left: 0,
+    //           //                     right: 0,
+    //           //                   ),
+    //           //                   child: Center(
+    //           //                     child: Text(
+    //           //                       formattedDate,
+    //           //                       style: TextStyle(
+    //           //                         color: isSelectedDate
+    //           //                             ? Colors.black
+    //           //                             : isCycleDate
+    //           //                             ? CommonColors.mRed
+    //           //                             : Colors.black,
+    //           //                         fontWeight: FontWeight.w500,
+    //           //                         fontSize: 15.0,
+    //           //                       ),
+    //           //                     ),
+    //           //                   ),
+    //           //                 ),
+    //           //               ),
+    //           //             ),
+    //           //           ),
+    //           //         ],
+    //           //       ),
+    //           //     );
+    //           //   },
+    //           // ),
+    //         ),
+    //       ),
+    //     ),
+    //   ],
+    // );
 
     ///
 
@@ -1434,7 +1467,7 @@ class _HomeViewState extends State<HomeView> {
                                       Builder(
                                         builder: (context) {
                                           String cycleText = mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate);
-
+                                           debugPrint("cycleText: $cycleText");
                                           RegExp regex = RegExp(r'(Periods? (in|after|late)?) (\d+) (day|days)');
                                           Match? match = regex.firstMatch(cycleText);
 

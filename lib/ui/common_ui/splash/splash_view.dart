@@ -172,10 +172,12 @@ class _SplashViewState extends State<SplashView> {
     Future.delayed(Duration.zero, () {
       mViewModel.checkIsFirstTime();
     });
+
     player1 = AudioPlayer();
     player2 = AudioPlayer();
     player1.setAsset(LocalImages.au_knock_door);
     player2.setAsset(LocalImages.knock_door_full_video);
+
   }
 
   void onFinished() {
