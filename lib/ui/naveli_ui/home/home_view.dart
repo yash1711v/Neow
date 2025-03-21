@@ -336,7 +336,9 @@ class _HomeViewState extends State<HomeView> {
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
         .contains("Ovulation Day") || mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
-        .contains("Ovulation in")){
+        .contains("Ovulation in") || mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("before")){
       return LocalImages.green_Static;
     } else {
       return LocalImages.white_Static;

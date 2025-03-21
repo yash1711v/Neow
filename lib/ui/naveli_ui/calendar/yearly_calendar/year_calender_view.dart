@@ -108,76 +108,258 @@ class _MonthViewState extends State<MonthView> {
       bool isFertile = false;
       DateTime now = DateTime.now();
 
+
+      List<DateTime> fertileDates = [];
+      List<DateTime> ovulationDates = [];
+      List<DateTime> loggedPeriodDates = [];
+      List<DateTime> predictedPeriodDates = [];
+
+      // DateTime now = DateTime.now();
+      int currentYear = now.year;
+
+      // DateTime now = DateTime.now();
+      // int currentYear = now.year;
+
       for (var dateRange in peroidCustomeList) {
         DateTime start = DateTime.parse(dateRange.period_start_date);
         DateTime end = DateTime.parse(dateRange.period_end_date);
         int cycleLength = int.parse(dateRange.period_cycle_length);
 
-        if (date.isAfter(start) && date.isBefore(end) ||
-            date.isAtSameMomentAs(start) ||
-            date.isAtSameMomentAs(end)) {
-          isHighlighted = true;
+        DateTime? startDate = dateRange.fertile_window_start != null
+            ? DateTime.parse(dateRange.fertile_window_start!)
+            : null;
+
+        DateTime? endDate = dateRange.fertile_window_end != null
+            ? DateTime.parse(dateRange.fertile_window_end!)
+            : null;
+
+        for (DateTime date = startDate ?? DateTime.now();
+        date.isBefore((endDate ?? DateTime.now()).add(Duration(days: 1)));
+        date = date.add(Duration(days: 1))) {
+          fertileDates.add(date);
+        }
+        ovulationDates.add(DateTime.parse(dateRange.ovulation_day ?? ""));
+
+        loggedPeriodDates.addAll(List.generate(
+          end.difference(start).inDays + 1, // +1 to include 'end' date
+              (i) => start.add(Duration(days: i)),
+        ).where((date) =>
+        date.isBefore(DateTime.now()) ||
+            date.isAtSameMomentAs(DateTime.now())));
+
+        DateTime startPredictedPeriods =
+        DateTime.parse(dateRange.predicated_period_start_date);
+        DateTime endPredictedPeriods =
+        DateTime.parse(dateRange.predicated_period_end_date);
+        int length = int.parse(dateRange.avg_cycle_length ?? "28");
+
+        if (startPredictedPeriods.year == now.year) {
+          predictedPeriodDates.addAll(List.generate(
+            endPredictedPeriods.difference(startPredictedPeriods).inDays,
+                (i) => startPredictedPeriods.add(Duration(days: i)),
+          ));
+        }
+        debugPrint("Days between last and current date ${DateTime.now().difference(end).inDays}");
+
+        // ✅ Only calculate future dates if the last period ended within 40 days
+        if (DateTime.now().difference(end).inDays <= 40) {
+          for (int i = 0; i < 12; i++) {
+            startPredictedPeriods =
+                startPredictedPeriods.add(Duration(days: length));
+            endPredictedPeriods =
+                startPredictedPeriods.add(Duration(days: int.parse(dateRange.period_length)));
+
+            if (startPredictedPeriods.year > now.year) break;
+
+            List<DateTime> tempPeriodDates = List.generate(
+              int.parse(dateRange.period_length),
+                  (i) => startPredictedPeriods.add(Duration(days: i)),
+            ).where((date) => date.year == now.year).toList();
+
+            int actualPeriodLength = end.difference(start).inDays + 1;
+            int averagePeriodLength =
+            int.parse(globalUserMaster?.averagePeriodLength ?? "5");
+
+            int remainingDays = averagePeriodLength - actualPeriodLength;
+
+            if (remainingDays > 0) {
+              tempPeriodDates.addAll(List.generate(
+                remainingDays,
+                    (i) => end.add(Duration(days: i + 1)),
+              ));
+            }
+
+            predictedPeriodDates.addAll(tempPeriodDates);
+          }
         }
 
-        DateTime previousOvulationDay = start.subtract(Duration(days: 14));
-        DateTime previousFertileStartDate = previousOvulationDay.subtract(Duration(days: 5));
-        DateTime previousFertileEndDate = previousOvulationDay.add(Duration(days: 2));
+        predictedPeriodDates.sort();
 
-        if (date.isSameDay(previousOvulationDay)) {
-          isOvulation = true;
+        List<DateTime> periodStartDates = [];
+        List<DateTime> periodEndDates = [];
+
+        for (int i = 0; i < predictedPeriodDates.length; i++) {
+          if (i == 0 || predictedPeriodDates[i].difference(predictedPeriodDates[i - 1]).inDays > 1) {
+            periodStartDates.add(predictedPeriodDates[i]);
+
+            if (i > 0) {
+              periodEndDates.add(predictedPeriodDates[i - 1]);
+            }
+          }
         }
 
-        if (date.isAfter(previousFertileStartDate) && date.isBefore(previousFertileEndDate) ||
-            date.isAtSameMomentAs(previousFertileStartDate) ||
-            date.isAtSameMomentAs(previousFertileEndDate)) {
-          isFertile = true;
-        }
-      }
-
-      for (DateTime predictedStartDate in mViewModel.nextCycleDates) {
-        DateTime predictedOvulationDay = predictedStartDate.add(Duration(days: 14));
-        DateTime predictedFertileStartDate = predictedOvulationDay.subtract(Duration(days: 5));
-        DateTime predictedFertileEndDate = predictedOvulationDay.add(Duration(days: 2));
-
-        if (date.isSameDay(predictedStartDate)) {
-          isHighlighted = true;
+        if (predictedPeriodDates.isNotEmpty) {
+          periodEndDates.add(predictedPeriodDates.last);
         }
 
-        if (date.isAfter(predictedFertileStartDate) && date.isBefore(predictedFertileEndDate) ||
-            date.isAtSameMomentAs(predictedFertileStartDate) ||
-            date.isAtSameMomentAs(predictedFertileEndDate)) {
-          isFertile = true;
-        }
+        predictedPeriodDates.sort();
 
-        if (date.isSameDay(predictedOvulationDay)) {
-          isOvulation = true;
-        }
+        for (int i = 0; i < periodStartDates.length; i++) {
+          DateTime currentPeriodStart = periodStartDates[i];
+          DateTime? nextPeriodStart = (i + 1 < periodStartDates.length) ? periodStartDates[i + 1] : null;
 
-        if (date.isAfter(now) && date.month >= now.month && date.month <= now.month + 12) {
-          bool isWithinNext12Months = date.year == now.year || (date.year == now.year + 1 && date.month <= 12);
-          if (isWithinNext12Months) {
-            isFuturePredictedHighlighted = mViewModel.nextCycleDates.contains(date);
+          DateTime futureOvulationDay;
+          if (nextPeriodStart != null) {
+            futureOvulationDay = nextPeriodStart.subtract(Duration(days: 14));
+          } else {
+            int estimatedCycleLength = (i > 0)
+                ? periodStartDates[i].difference(periodStartDates[i - 1]).inDays
+                : 28;
+            futureOvulationDay = currentPeriodStart.add(Duration(days: estimatedCycleLength - 14));
+          }
+
+          bool ovulationExistsInMonth = ovulationDates.any(
+                (date) => date.year == futureOvulationDay.year && date.month == futureOvulationDay.month,
+          );
+
+          if (!ovulationExistsInMonth && futureOvulationDay.year == currentYear) {
+            ovulationDates.add(futureOvulationDay);
+          } else {
+            ovulationDates.removeWhere(
+                    (date) => date.year == futureOvulationDay.year && date.month == futureOvulationDay.month);
+            ovulationDates.add(futureOvulationDay);
+          }
+
+          DateTime futureFertileStart = futureOvulationDay.subtract(Duration(days: 5));
+          DateTime futureFertileEnd = futureOvulationDay.add(Duration(days: 2));
+
+          bool fertileWindowExistsInMonth = fertileDates.any(
+                (date) => date.year == futureFertileStart.year && date.month == futureFertileStart.month,
+          );
+
+          if (!fertileWindowExistsInMonth && futureFertileStart.year == currentYear && futureFertileEnd.year == currentYear) {
+            fertileDates.removeWhere(
+                    (date) => date.year == futureFertileStart.year && date.month == futureFertileStart.month);
+
+            List<DateTime> tempFertileDates = List.generate(
+              futureFertileEnd.difference(futureFertileStart).inDays + 1,
+                  (i) => futureFertileStart.add(Duration(days: i)),
+            ).where((date) => date.year == now.year).toList();
+
+            fertileDates.addAll(tempFertileDates);
           }
         }
       }
 
-      if (date.isSameDay(ovulationDate)) {
-        isOvulation = true;
+
+
+// Checking if the given `date` falls in the calculated dates
+      if (loggedPeriodDates.contains(date)) {
+        isHighlighted = true;
       }
 
-      if (date.isAfter(now)) {
-        bool isInUpcomingMonths = date.year == now.year ||
-            (date.year == now.year + 1 && date.month <= now.month);
+      if (predictedPeriodDates.contains(date)) {
+        isFuturePredictedHighlighted = true;
+      }
 
-        if (isInUpcomingMonths) {
-          isHighlighted = mViewModel.nextCycleDates.contains(date);
-          isOvulation = mViewModel.ovulationDates.contains(date);
+      if (fertileDates.contains(date)) {
+        isFertile = true;
+      }
+      ovulationDates.removeAt(ovulationDates.length - 1);
+      if (ovulationDates.contains(date)) {
+        if(date.year<date.year + 1) {
+          isOvulation = true;
         }
-
-        isFuturePredictedHighlighted = isInUpcomingMonths;
-      } else {
-        isFuturePredictedHighlighted = false;
       }
+
+
+
+
+      // for (var dateRange in peroidCustomeList) {
+      //   DateTime start = DateTime.parse(dateRange.period_start_date);
+      //   DateTime end = DateTime.parse(dateRange.period_end_date);
+      //   int cycleLength = int.parse(dateRange.period_cycle_length);
+      //
+      //   if (date.isAfter(start) && date.isBefore(end) ||
+      //       date.isAtSameMomentAs(start) ||
+      //       date.isAtSameMomentAs(end)) {
+      //     isHighlighted = true;
+      //   }
+      //
+      //   DateTime previousOvulationDay = start.subtract(Duration(days: 14));
+      //   DateTime previousFertileStartDate = previousOvulationDay.subtract(Duration(days: 5));
+      //   DateTime previousFertileEndDate = previousOvulationDay.add(Duration(days: 2));
+      //
+      //   if (date.isSameDay(previousOvulationDay)) {
+      //     isOvulation = true;
+      //   }
+      //
+      //   if (date.isAfter(previousFertileStartDate) && date.isBefore(previousFertileEndDate) ||
+      //       date.isAtSameMomentAs(previousFertileStartDate) ||
+      //       date.isAtSameMomentAs(previousFertileEndDate)) {
+      //     isFertile = true;
+      //   }
+      // }
+      //
+      // for (DateTime predictedStartDate in mViewModel.nextCycleDates) {
+      //   if (predictedStartDate.difference(now).inDays > 40) {
+      //     continue; // Skip predictions if they are more than 40 days away
+      //   }
+      //
+      //   DateTime predictedOvulationDay = predictedStartDate.add(Duration(days: 14));
+      //   DateTime predictedFertileStartDate = predictedOvulationDay.subtract(Duration(days: 5));
+      //   DateTime predictedFertileEndDate = predictedOvulationDay.add(Duration(days: 2));
+      //
+      //   if (date.isSameDay(predictedStartDate)) {
+      //     isHighlighted = true;
+      //   }
+      //
+      //   if (date.isAfter(predictedFertileStartDate) && date.isBefore(predictedFertileEndDate) ||
+      //       date.isAtSameMomentAs(predictedFertileStartDate) ||
+      //       date.isAtSameMomentAs(predictedFertileEndDate)) {
+      //     isFertile = true;
+      //   }
+      //
+      //   if (date.isSameDay(predictedOvulationDay)) {
+      //     isOvulation = true;
+      //   }
+      //
+      //   if (date.isAfter(now) && date.month >= now.month && date.month <= now.month + 12) {
+      //     bool isWithinNext12Months = date.year == now.year || (date.year == now.year + 1 && date.month <= 12);
+      //     if (isWithinNext12Months) {
+      //       isFuturePredictedHighlighted = mViewModel.nextCycleDates.contains(date);
+      //     }
+      //   }
+      // }
+      //
+      // if (date.isSameDay(ovulationDate)) {
+      //   isOvulation = true;
+      // }
+      //
+      // if (date.isAfter(now)) {
+      //   bool isInUpcomingMonths = date.year == now.year ||
+      //       (date.year == now.year + 1 && date.month <= now.month);
+      //
+      //   if (isInUpcomingMonths && date.difference(now).inDays <= 40) {
+      //     isHighlighted = mViewModel.nextCycleDates.contains(date);
+      //     isOvulation = mViewModel.ovulationDates.contains(date);
+      //     isFuturePredictedHighlighted = true;
+      //   } else {
+      //     isFuturePredictedHighlighted = false;
+      //   }
+      // } else {
+      //   isFuturePredictedHighlighted = false;
+      // }
 
       dayWidgets.add(
         GestureDetector(
@@ -205,7 +387,7 @@ class _MonthViewState extends State<MonthView> {
               child: DottedBorder(
                 color: isFertile
                     ? CommonColors.greenColor
-                    : isHighlighted && isFuturePredictedHighlighted
+                    : isFuturePredictedHighlighted
                     ? CommonColors.mRed
                     : CommonColors.mTransparent,
                 dashPattern: [4, 3],
@@ -230,6 +412,7 @@ class _MonthViewState extends State<MonthView> {
         ),
       );
     }
+
 
     return Container(
       color: Colors.white,

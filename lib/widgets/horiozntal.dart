@@ -28,9 +28,9 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     super.initState();
     dates = _generateDates();
     // Scroll to the current date position
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToCurrentDate();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _scrollToCurrentDate();
+    // });
   }
 
   List<DateTime> _generateDates() {
@@ -55,7 +55,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
         date.day == widget.mViewModel.selectedDate.day);
 
     if (currentIndex != -1) {
-      _scrollController.jumpTo(currentIndex * 60.0);
+      _scrollController.jumpTo(currentIndex * 0.0);
     }
   }
 
@@ -113,222 +113,148 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
                     : null;
 
                 for (DateTime date = startDate ?? DateTime.now();
-                    date.isBefore(
-                        (endDate ?? DateTime.now()).add(Duration(days: 1)));
-                    date = date.add(Duration(days: 1))) {
+                date.isBefore((endDate ?? DateTime.now()).add(Duration(days: 1)));
+                date = date.add(Duration(days: 1))) {
                   fertileDates.add(date);
                 }
-                ovulationDates
-                    .add(DateTime.parse(dateRange.ovulation_day ?? ""));
 
-                // Store logged period dates
+                if (dateRange.ovulation_day != null && dateRange.ovulation_day!.isNotEmpty) {
+                  DateTime ovulationDay = DateTime.parse(dateRange.ovulation_day!);
+                  ovulationDates.add(ovulationDay);
+
+                  // Ensure fertile window exists for this ovulation date
+                  DateTime fertileStart = ovulationDay.subtract(Duration(days: 5));
+                  DateTime fertileEnd = ovulationDay.add(Duration(days: 2));
+
+                  List<DateTime> tempFertileDates = List.generate(
+                    fertileEnd.difference(fertileStart).inDays + 1,
+                        (i) => fertileStart.add(Duration(days: i)),
+                  );
+
+                  for (var date in tempFertileDates) {
+                    if (!fertileDates.contains(date)) {
+                      fertileDates.add(date);
+                    }
+                  }
+                }
+
                 loggedPeriodDates.addAll(List.generate(
-                  end.difference(start).inDays +
-                      1, // +1 to include the 'end' date
-                  (i) => start.add(Duration(days: i)),
-                ).where((date) =>
-                    date.isBefore(DateTime.now()) ||
-                    date.isAtSameMomentAs(DateTime.now())));
+                  end.difference(start).inDays + 1,
+                      (i) => start.add(Duration(days: i)),
+                ).where((date) => date.isBefore(DateTime.now()) || date.isAtSameMomentAs(DateTime.now())));
 
-                // Predicted period dates
-                DateTime startPredictedPeriods =
-                    DateTime.parse(dateRange.predicated_period_start_date);
-                DateTime endPredictedPeriods =
-                    DateTime.parse(dateRange.predicated_period_end_date);
+                DateTime startPredictedPeriods = DateTime.parse(dateRange.predicated_period_start_date);
+                DateTime endPredictedPeriods = DateTime.parse(dateRange.predicated_period_end_date);
                 int length = int.parse(dateRange.avg_cycle_length ?? "28");
 
-                // ✅ Ensure predicted periods are added
                 if (startPredictedPeriods.year == currentYear) {
                   predictedPeriodDates.addAll(List.generate(
-                    endPredictedPeriods
-                        .difference(startPredictedPeriods)
-                        .inDays,
-                    (i) => startPredictedPeriods.add(Duration(days: i)),
+                    endPredictedPeriods.difference(startPredictedPeriods).inDays,
+                        (i) => startPredictedPeriods.add(Duration(days: i)),
                   ));
                 }
 
-                // **Predict upcoming periods for the next 12 months (within the current year)**
-                for (int i = 0; i < 12; i++) {
-                  startPredictedPeriods =
-                      startPredictedPeriods.add(Duration(days: length));
-                  endPredictedPeriods = startPredictedPeriods
-                      .add(Duration(days: int.parse(dateRange.period_length)));
+                if (DateTime.now().difference(end).inDays <= 40) {
+                  for (int i = 0; i < 12; i++) {
+                    startPredictedPeriods = startPredictedPeriods.add(Duration(days: length));
+                    endPredictedPeriods = startPredictedPeriods.add(Duration(days: int.parse(dateRange.period_length)));
 
-                  // ✅ Stop if the predicted period exceeds the current year
-                  if (startPredictedPeriods.year > currentYear) break;
+                    if (startPredictedPeriods.year > currentYear) break;
 
-                  List<DateTime> tempPeriodDates = List.generate(
-                    int.parse(dateRange.period_length),
-                    (i) => startPredictedPeriods.add(Duration(days: i)),
-                  ).where((date) => date.year == currentYear).toList();
+                    List<DateTime> tempPeriodDates = List.generate(
+                      int.parse(dateRange.period_length),
+                          (i) => startPredictedPeriods.add(Duration(days: i)),
+                    ).where((date) => date.year == currentYear).toList();
 
-// Calculate the period length from user-marked dates
-                  int actualPeriodLength = end.difference(start).inDays + 1;
-                  int averagePeriodLength =
-                      int.parse(globalUserMaster?.averagePeriodLength ?? "5");
+                    int actualPeriodLength = end.difference(start).inDays + 1;
+                    int averagePeriodLength = int.parse(globalUserMaster?.averagePeriodLength ?? "5");
 
-// Find the remaining days needed
-                  int remainingDays = averagePeriodLength - actualPeriodLength;
+                    int remainingDays = averagePeriodLength - actualPeriodLength;
 
-// If the user marked fewer days than the average, add the missing days
-                  if (remainingDays > 0) {
-                    tempPeriodDates.addAll(List.generate(
-                      remainingDays,
-                      (i) => end.add(Duration(
-                          days: i +
-                              1)), // Start adding from the next day after `end`
-                    ));
+                    if (remainingDays > 0) {
+                      tempPeriodDates.addAll(List.generate(
+                        remainingDays,
+                            (i) => end.add(Duration(days: i + 1)),
+                      ));
+                    }
+
+                    predictedPeriodDates.addAll(tempPeriodDates);
                   }
-
-                  predictedPeriodDates.addAll(tempPeriodDates);
-
-                  // DateTime futureFertileStart =
-                  // endPredictedPeriods.add(Duration(days: 3));
-                  // DateTime futureFertileEnd =
-                  // futureFertileStart.add(Duration(days: 5));
-                  // DateTime futureOvulationDay =
-                  // futureFertileStart.add(Duration(days: 4));
-                  //
-                  // // ✅ Add fertile dates only if they fall within the current year
-                  // if (futureFertileStart.year == currentYear &&
-                  //     futureFertileEnd.year == currentYear) {
-                  //   List<DateTime> tempFertileDates = List.generate(
-                  //     futureFertileEnd.difference(futureFertileStart).inDays +
-                  //         1,
-                  //         (i) => futureFertileStart.add(Duration(days: i)),
-                  //   ).where((date) => date.year == currentYear).toList();
-                  //
-                  //   fertileDates.addAll(tempFertileDates);
-                  // }
-                  //
-                  // // ✅ Add ovulation date only if it's within the current year
-                  // if (futureOvulationDay.year == currentYear) {
-                  //   ovulationDates.add(futureOvulationDay);
-                  // }
                 }
 
-                predictedPeriodDates.sort(); // Ensure dates are in order
+                predictedPeriodDates.sort();
 
                 List<DateTime> periodStartDates = [];
                 List<DateTime> periodEndDates = [];
 
-// ✅ Separate start and end dates
                 for (int i = 0; i < predictedPeriodDates.length; i++) {
-                  if (i == 0 ||
-                      predictedPeriodDates[i]
-                              .difference(predictedPeriodDates[i - 1])
-                              .inDays >
-                          1) {
-                    // Start of a new period
+                  if (i == 0 || predictedPeriodDates[i].difference(predictedPeriodDates[i - 1]).inDays > 1) {
                     periodStartDates.add(predictedPeriodDates[i]);
 
-                    // Previous end date (if exists)
                     if (i > 0) {
                       periodEndDates.add(predictedPeriodDates[i - 1]);
                     }
                   }
                 }
-// Add the last period end date
+
                 if (predictedPeriodDates.isNotEmpty) {
                   periodEndDates.add(predictedPeriodDates.last);
                 }
 
-                predictedPeriodDates.sort(); // Ensure correct order
+                predictedPeriodDates.sort();
 
-// ✅ Calculate Fertile Window & Ovulation Dates
                 for (int i = 0; i < periodStartDates.length; i++) {
                   DateTime currentPeriodStart = periodStartDates[i];
-                  DateTime? nextPeriodStart = (i + 1 < periodStartDates.length)
-                      ? periodStartDates[i + 1]
-                      : null;
+                  DateTime? nextPeriodStart = (i + 1 < periodStartDates.length) ? periodStartDates[i + 1] : null;
 
-                  // ✅ If next period is available, calculate ovulation normally.
                   DateTime futureOvulationDay;
                   if (nextPeriodStart != null) {
-                    futureOvulationDay =
-                        nextPeriodStart.subtract(Duration(days: 14));
+                    futureOvulationDay = nextPeriodStart.subtract(Duration(days: 14));
                   } else {
-                    // ✅ Estimate ovulation for the last month using the average cycle length.
                     int estimatedCycleLength = (i > 0)
-                        ? periodStartDates[i]
-                            .difference(periodStartDates[i - 1])
-                            .inDays
-                        : 28; // Default to 28 days if no previous cycle exists.
-                    futureOvulationDay = currentPeriodStart
-                        .add(Duration(days: estimatedCycleLength - 14));
+                        ? periodStartDates[i].difference(periodStartDates[i - 1]).inDays
+                        : 28;
+                    futureOvulationDay = currentPeriodStart.add(Duration(days: estimatedCycleLength - 14));
                   }
 
-                  // ✅ Ensure one ovulation per month
                   bool ovulationExistsInMonth = ovulationDates.any(
-                    (date) =>
-                        date.year == futureOvulationDay.year &&
-                        date.month == futureOvulationDay.month,
+                        (date) => date.year == futureOvulationDay.year && date.month == futureOvulationDay.month,
                   );
 
-                  if (!ovulationExistsInMonth &&
-                      futureOvulationDay.year == currentYear) {
+                  if (!ovulationExistsInMonth && futureOvulationDay.year == currentYear) {
                     ovulationDates.add(futureOvulationDay);
                   } else {
-                    // ✅ If there's already an ovulation date for the month, replace it with the latest one.
-                    ovulationDates.removeWhere((date) =>
-                        date.year == futureOvulationDay.year &&
-                        date.month == futureOvulationDay.month);
+                    ovulationDates.removeWhere(
+                            (date) => date.year == futureOvulationDay.year && date.month == futureOvulationDay.month);
                     ovulationDates.add(futureOvulationDay);
                   }
 
-                  // ✅ Calculate Fertile Window (5 days before & 2 days after ovulation)
-                  DateTime futureFertileStart =
-                      futureOvulationDay.subtract(Duration(days: 5));
-                  DateTime futureFertileEnd =
-                      futureOvulationDay.add(Duration(days: 2));
+                  DateTime futureFertileStart = futureOvulationDay.subtract(Duration(days: 5));
+                  DateTime futureFertileEnd = futureOvulationDay.add(Duration(days: 2));
 
-                  // ✅ Ensure each month has only one fertile window
                   bool fertileWindowExistsInMonth = fertileDates.any(
-                    (date) =>
-                        date.year == futureFertileStart.year &&
-                        date.month == futureFertileStart.month,
+                        (date) => date.year == futureFertileStart.year && date.month == futureFertileStart.month,
                   );
 
-                  if (!fertileWindowExistsInMonth &&
-                      futureFertileStart.year == currentYear &&
-                      futureFertileEnd.year == currentYear) {
-                    // ✅ Remove any previously added fertile dates for that month (if wrong)
-                    fertileDates.removeWhere((date) =>
-                        date.year == futureFertileStart.year &&
-                        date.month == futureFertileStart.month);
+                  if (!fertileWindowExistsInMonth && futureFertileStart.year == currentYear && futureFertileEnd.year == currentYear) {
+                    fertileDates.removeWhere(
+                            (date) => date.year == futureFertileStart.year && date.month == futureFertileStart.month);
 
                     List<DateTime> tempFertileDates = List.generate(
-                      futureFertileEnd.difference(futureFertileStart).inDays +
-                          1,
-                      (i) => futureFertileStart.add(Duration(days: i)),
+                      futureFertileEnd.difference(futureFertileStart).inDays + 1,
+                          (i) => futureFertileStart.add(Duration(days: i)),
                     ).where((date) => date.year == currentYear).toList();
 
                     fertileDates.addAll(tempFertileDates);
                   }
                 }
-
-                // // **Past Fertile Dates (Based on last period start date)**
-                // DateTime lastFertileStart = end.add(Duration(days: 3));
-                // DateTime lastFertileEnd =
-                //     lastFertileStart.add(Duration(days: 5));
-                // DateTime lastOvulationDay =
-                //     lastFertileStart.add(Duration(days: 4));
-                //
-                // if (lastFertileStart.year == currentYear) {
-                //   fertileDates.addAll(List.generate(
-                //     lastFertileEnd.difference(lastFertileStart).inDays + 1,
-                //     (i) => lastFertileStart.add(Duration(days: i)),
-                //   ));
-                // }
-                //
-                // if (lastOvulationDay.year == currentYear) {
-                //   ovulationDates.add(lastOvulationDay);
-                // }
               }
+
+
 
               // Checking if the given `date` falls in the calculated dates
               if (loggedPeriodDates.contains(date)) {
-                isSelected = true;
+                PriodDates = true;
               }
 
               if (predictedPeriodDates.contains(date)) {
