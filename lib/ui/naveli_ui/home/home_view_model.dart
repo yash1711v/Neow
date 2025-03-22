@@ -588,14 +588,14 @@ debugPrint("predictedPeriodDates===> ${predictedPeriodDates}");
       int index = predictedPeriodDates.indexOf(date);
 
       if (date.month == DateTime.now().month) {
+        int periodDay = date.difference(recentPeriodStart!).inDays;
         // If it's the same month and Day 1 or Day 2, show "Period may start today"
-        if (index == 0 || index == 1) {
+        if (periodDay == 0 || periodDay == 1) {
           return "Period may start today";
         }
         // If the period is late, show how many days late
         else if (date.isAfter(recentPeriodStart!)) {
-          int daysLate = date.difference(recentPeriodStart).inDays;
-          return "Period is late by $daysLate days";
+          return "Period late by ${periodDay + 1} days";
         }
       } else {
 
@@ -792,7 +792,11 @@ debugPrint("predictedPeriodDates===> ${predictedPeriodDates}");
   // }
 
   void updateSelectedDate(DateTime date) {
-    selectedDate = date;
+
+    // Setting time to 00:00:00.000
+    DateTime modifiedDate = DateTime(date.year, date.month, date.day);
+    selectedDate = modifiedDate;
+    getCycleDayOrDaysToGo(selectedDate);
     notifyListeners();
   }
 
