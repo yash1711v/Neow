@@ -1,3 +1,4 @@
+import 'package:http/http.dart';
 import 'package:naveli_2023/models/signup_master.dart';
 
 import '../models/about_us_master.dart';
@@ -48,6 +49,8 @@ abstract class BaseServices {
   Future<LoginMaster?> login({required Map<String, dynamic> params});
 
   Future<CommonMaster?> verifyMobile({required Map<String, dynamic> params});
+
+  Future<Response> getDateWiseText({required Map<String, dynamic> params});
 
   Future<UserDetailMaster?> getUserDetails();
 

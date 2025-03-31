@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 import 'package:naveli_2023/models/about_us_master.dart';
 import 'package:naveli_2023/models/buddy_request_master.dart';
 import 'package:naveli_2023/models/login_master.dart';
@@ -71,6 +72,22 @@ class ApiServices extends BaseServices {
       }
     } else {
       return null;
+    }
+  }
+
+  @override
+  Future<Response> getDateWiseText({required Map<String, dynamic> params}) async {
+    dynamic response = await appBaseClient.postApiWithoutTokenCall(
+        url: ApiUrl.DynamicText, postParams: params);
+    if (response != null) {
+      try {
+        return response;
+      } on Exception catch (e) {
+        log("Exception :: $e");
+        return response;
+      }
+    } else {
+      return response;
     }
   }
 

@@ -88,6 +88,7 @@ class _HomeViewState extends State<HomeView> {
           Provider.of<LogYourSymptomsModel>(context, listen: false);
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         mViewModel.getPeriodInfoList();
+        mViewModel.getDateWiseText();
         await handleFirstBloc();
         // await mViewModel.handleSecondBloc(dateString);
         await handleThirdBloc();
@@ -175,18 +176,18 @@ class _HomeViewState extends State<HomeView> {
   }
 
   bool isCycleStartFromTommorw() {
-    if (peroidCustomeList.isNotEmpty) {
-      DateTime startPredicatedPeriods =
-      DateTime.parse(peroidCustomeList[0].predicated_period_start_date);
-      // Get the current date and add one day to it
-      DateTime tomorrow = DateTime.now().add(Duration(days: 1));
-// Check if startDate is tomorrow
-      bool isTomorrow = startPredicatedPeriods.year == tomorrow.year &&
-          startPredicatedPeriods.month == tomorrow.month &&
-          startPredicatedPeriods.day == tomorrow.day;
-
-      return isTomorrow;
-    }
+//     if (peroidCustomeList.isNotEmpty) {
+//       DateTime startPredicatedPeriods =
+//       // DateTime.parse(peroidCustomeList[0].predicated_period_start_date);
+//       // Get the current date and add one day to it
+// //       DateTime tomorrow = DateTime.now().add(Duration(days: 1));
+// // // Check if startDate is tomorrow
+// //       bool isTomorrow = startPredicatedPeriods.year == tomorrow.year &&
+// //           startPredicatedPeriods.month == tomorrow.month &&
+// //           startPredicatedPeriods.day == tomorrow.day;
+//
+//       // return isTomorrow;
+//     }
     return false;
   }
 

@@ -79,10 +79,10 @@ class _CalendarViewState extends State<CalendarView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+debugPrint("data==> $peroidCustomeList");
     for (var dateRange in peroidCustomeList) {
-      DateTime start = DateTime.parse(dateRange.period_start_date);
-      DateTime end = DateTime.parse(dateRange.period_end_date);
+      DateTime start = DateTime.parse(dateRange.periodData![0].periodStartDate);
+      DateTime end = DateTime.parse(dateRange.periodData![0].periodEndDate);
       //
       // debugPrint("start: $start");
       // debugPrint("end: $end");
