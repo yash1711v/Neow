@@ -7,10 +7,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:naveli_2023/utils/date_utils.dart';
 
 import '../../../database/app_preferences.dart';
 import '../../../models/cycle_dates_master.dart';
+import '../../../models/period_phase_model.dart';
 import '../../../models/slider_video_master.dart';
 import '../../../services/api_para.dart';
 import '../../../services/index.dart';
@@ -644,98 +646,10 @@ class HomeViewModel with ChangeNotifier {
         : "date2";
   }
 
-  String getCyclePhaseMessage() {
-    //
-    //
-    // String value = getCycleDayOrDaysToGo(selectedDate);
-    //
-    // if(value == "Period late"){
-    //
-    //   return "uh oh! Seems like you haven't logged your period yet";
-    // }
-    //
-    //  DateTime currentDate = selectedDate;
-    //
-    //  if (peroidCustomeList.isEmpty) {
-    //    return "";
-    //  }
-    //
-    //  // Sort period data to get the latest logged period start date
-    //  // peroidCustomeList.sort((a, b) =>
-    //  //     DateTime.parse(b.period_start_date).compareTo(DateTime.parse(a.period_start_date)));
-    //
-    //  // DateTime lastPeriodStartDate =
-    //  // DateTime.parse(peroidCustomeList.first.period_start_date);
-    //
-    //  // int dayDifference = currentDate.difference(lastPeriodStartDate).inDays + 1;
-    //
-    //  // print("Current date is day $dayDifference from the start date.");
-    //
-    //  // int cycleLength = int.parse(peroidCustomeList.first.period_cycle_length);
-    //  // int periodLength = int.parse(peroidCustomeList.first.period_length);
-    //
-    //  // Define cycle phases based on the table provided
-    //  List<Map<String, dynamic>> cyclePhases = [
-    //    {
-    //      "start": 1,
-    //      "end": 3,
-    //      "message": "Cycle kicks in—heavy flow, cramps, and all that! Rest, stay hydrated, and go easy on yourself."
-    //    },
-    //    {
-    //      "start": 4,
-    //      "end": 5,
-    //      "message": "Period winding down—time to relax and refuel yourself."
-    //    },
-    //    {
-    //      "start": 6,
-    //      "end": 8,
-    //      "message": "Energy peaks—time to shine! Set goals and stay active."
-    //    },
-    //    {
-    //      "start": 7,
-    //      "end": 10,
-    //      "message": "Estrogen rising—feeling vibrant. Go for it—be social and creative."
-    //    },
-    //    {
-    //      "start": 8,
-    //      "end": 13,
-    //      "message": "Confidence peaks! Embrace the energy, take on new challenges, and slay!"
-    //    },
-    //    {
-    //      "start": 9,
-    //      "end": 15,
-    //      "message": "Vibes are chill. Take a breather, unwind, and treat yourself to some me-time."
-    //    },
-    //    {
-    //      "start": 13,
-    //      "end": 18,
-    //      "message": "Cravings, mood swings, and all the feels. Nourish, slow down, and be gentle with yourself."
-    //    },
-    //    {
-    //      "start": 18,
-    //      "end": 21,
-    //      "message": "PMS Alert!! Feeling bloated, tired, and emotional? Hydrate, relax, and pamper yourself."
-    //    },
-    //    {
-    //      "start": cycleLength - 3,
-    //      "end": cycleLength,
-    //      "message": "Your period is due soon! Stay mindful of your body and prepare accordingly."
-    //    },
-    //  ];
-    //
-    //  // Handle late period scenario
-    //  if (dayDifference > cycleLength) {
-    //    return "Period’s running late? Don’t stress, give it time, and let your body do its thing.";
-    //  }
-    //
-    //  // Find the correct phase
-    //  for (var phase in cyclePhases) {
-    //    if (dayDifference >= phase["start"] && dayDifference <= phase["end"]) {
-    //      return phase["message"];
-    //    }
-    //  }
-
-    return "Cycle phase not identified. Please check your period data.";
+  String getCyclePhaseMessage({required HomeViewModel mViewModel}) {
+    getDateWiseText();
+    Future.delayed(Duration(seconds: 1));
+    return mViewModel.dateWiseTextList.msg.description;
   }
 
   // String getCycleDayOrDaysToGo(DateTime currentDate) {
@@ -781,8 +695,9 @@ class HomeViewModel with ChangeNotifier {
     // Setting time to 00:00:00.000
     DateTime modifiedDate = DateTime(date.year, date.month, date.day);
     selectedDate = modifiedDate;
-    getCycleDayOrDaysToGo(selectedDate);
     notifyListeners();
+    getDateWiseText();
+
   }
 
   void startSlider() {
@@ -893,6 +808,7 @@ await Future.delayed(Duration(seconds: 1));
       var data = PeriodObj.fromJson(master.data!.toJson());
       peroidCustomeList.add(data);
       notifyListeners();
+      getDateWiseText();
       // if ((master.data!.periodData?.length ?? 0) > 0) {
       //   for (int i = 0; i < (master.data!.periodData?.length ?? 0); i++) {
       //
@@ -905,6 +821,7 @@ await Future.delayed(Duration(seconds: 1));
 
       //check period whithin 14 days
       if (peroidCustomeList.length > 1) {
+
         // DateTime firstPeriodLastDate =
         //     DateTime.parse(peroidCustomeList[0].period_end_date);
         // DateTime secondPeriodStartDate =
@@ -937,17 +854,49 @@ await Future.delayed(Duration(seconds: 1));
     notifyListeners();
   }
 
+
   Future<void> getDateWiseText() async {
     //CommonUtils.showProgressDialog();
-    http.Response response = await _services.api!.getDateWiseText(params: {
-      "clicked_date": selectedDate.toString(),
-      "avg_cycle_length": peroidCustomeList[0].avgCycleLength,
-    });
+    dynamic body = {};
+    peroidCustomeList.forEach((element){
+      // element.
+      debugPrint("element ====>${element.avgCycleLength}");
+      element.predictions.forEach((data){
 
+        debugPrint("month ====>${data.month}");
+        debugPrint("month2 ====>${DateTime.parse(DateFormat('yyyy-MM-dd').format(selectedDate)).month.toString()}");
+
+        if(data.month.toString() == DateTime.parse(DateFormat('yyyy-MM-dd').format(selectedDate)).month.toString())
+        {
+          debugPrint("month ====>${data.month}");
+          debugPrint("month2 ====>${DateTime.parse(DateFormat('yyyy-MM-dd').format(selectedDate)).month.toString()}");
+          body = {
+            "clicked_date": DateFormat('yyyy-MM-dd').format(selectedDate).toString(),
+            "avg_cycle_length": element.avgCycleLength,
+            "predicted_start": data.predictedStart,
+            "predicted_end": data.predictedEnd,
+            "ovulation_day": data.ovulationDay,
+            "fertile_window_start": data.fertileWindowStart,
+            "fertile_window_end": data.fertileWindowEnd,
+          };
+        }
+      });
+    });
+    debugPrint("selectedDate ====>${DateFormat('yyyy-MM-dd').format(selectedDate)}");
+    Map<String,dynamic> response = await _services.api!.getDateWiseText(params: body);
+
+    debugPrint("response in main response====>${response}");
+
+
+    dateWiseTextList = ApiResponse.fromJson(response);
+
+    debugPrint("dateWiseTextList ====>${dateWiseTextList}");
     notifyListeners();
   }
 
   DateTime previousDateLocal = DateTime.now();
+
+  ApiResponse dateWiseTextList = ApiResponse(status: 0, msg: Message(title: "", description: "", color: "", periodMsg: ''));
 
   Future<void> handleSecondBloc(
     String dt,

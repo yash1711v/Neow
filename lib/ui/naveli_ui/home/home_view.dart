@@ -88,7 +88,8 @@ class _HomeViewState extends State<HomeView> {
           Provider.of<LogYourSymptomsModel>(context, listen: false);
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         mViewModel.getPeriodInfoList();
-        mViewModel.getDateWiseText();
+
+
         await handleFirstBloc();
         // await mViewModel.handleSecondBloc(dateString);
         await handleThirdBloc();
@@ -1440,12 +1441,7 @@ class _HomeViewState extends State<HomeView> {
                                 height: 150,
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                    image: AssetImage(
-                                      /*timeoutValue == 2
-                                            ?*/
-                                        getUrlForGif()
-                                      //: getUrlForGif(),
-                                    ),
+                                    image: AssetImage(getUrlForGif()),
                                     fit: /*timeoutValue == 1
                                           ? BoxFit.none
                                           :*/
@@ -1460,71 +1456,13 @@ class _HomeViewState extends State<HomeView> {
                                   height: 150,
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: AssetImage(getUrlOntimeOut()),
+                                      image: NetworkImage(mViewModel.dateWiseTextList.msg.color),
                                       fit: BoxFit.contain,
                                     ),
                                   ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Builder(
-                                        builder: (context) {
-                                          String cycleText = mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate);
-                                           debugPrint("cycleText: $cycleText");
-                                          RegExp regex = RegExp(r'(Periods? (in|after|late)?) (\d+) (day|days)');
-                                          Match? match = regex.firstMatch(cycleText);
-
-                                          if (match != null) {
-                                            String prefixText = match.group(1) ?? ""; // "Period in/after/late"
-                                            String numberText = match.group(3) ?? ""; // Number
-                                            String suffixText = match.group(4) ?? ""; // "day" or "days"
-
-                                            return RichText(
-                                              textAlign: TextAlign.center,
-                                              text: TextSpan(
-                                                children: [
-                                                  TextSpan(
-                                                    text: "$prefixText ", // "Period in/after/late"
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: cycleText.contains("after") ? Colors.white : CommonColors.darkPrimaryColor,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: numberText, // Bold and Big Number
-                                                    style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: CommonColors.darkPrimaryColor,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: " ${suffixText.replaceAll("after", "")}", // "day" or "days"
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: cycleText.contains("after") ? Colors.white : CommonColors.darkPrimaryColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          } else {
-                                            return Text(
-                                              cycleText.replaceAll("after", ""),
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: cycleText.contains("after") ? Colors.white : CommonColors.darkPrimaryColor,
-                                              ),
-                                            );
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
+                                  child: Center(
+                                    child: Text(mViewModel.dateWiseTextList.msg.periodMsg,style: TextStyle(color: Colors.white),),
+                                  )
                                 ),
                               ),
                            Padding(
@@ -1533,7 +1471,7 @@ class _HomeViewState extends State<HomeView> {
                                children: [
                                  Expanded(
                                    child: Text(
-                                       mViewModel.getCyclePhaseMessage(),
+                                       mViewModel.dateWiseTextList.msg.description,
                                        textAlign: TextAlign.center,
                                        style: TextStyle(
                                            fontSize: 14,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -75,21 +76,16 @@ class ApiServices extends BaseServices {
     }
   }
 
+
   @override
-  Future<Response> getDateWiseText({required Map<String, dynamic> params}) async {
-    dynamic response = await appBaseClient.postApiWithoutTokenCall(
+  Future<Map<String,dynamic>> getDateWiseText({required Map<String, dynamic> params}) async {
+    dynamic response = await appBaseClient.postApiWithTokenCall(
         url: ApiUrl.DynamicText, postParams: params);
-    if (response != null) {
-      try {
-        return response;
-      } on Exception catch (e) {
-        log("Exception :: $e");
-        return response;
-      }
-    } else {
-      return response;
-    }
+    debugPrint("response in overriding $response");
+
+  return response;
   }
+
 
   @override
   Future<LoginMaster?> login({required Map<String, dynamic> params}) async {
@@ -1279,4 +1275,5 @@ class ApiServices extends BaseServices {
       return null;
     }
   }
+
 }

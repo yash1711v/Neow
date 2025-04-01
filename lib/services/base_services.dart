@@ -50,7 +50,7 @@ abstract class BaseServices {
 
   Future<CommonMaster?> verifyMobile({required Map<String, dynamic> params});
 
-  Future<Response> getDateWiseText({required Map<String, dynamic> params});
+  Future<Map<String,dynamic>> getDateWiseText({required Map<String, dynamic> params});
 
   Future<UserDetailMaster?> getUserDetails();
 
