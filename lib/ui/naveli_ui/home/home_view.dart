@@ -89,7 +89,6 @@ class _HomeViewState extends State<HomeView> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         mViewModel.getPeriodInfoList();
 
-
         await handleFirstBloc();
         // await mViewModel.handleSecondBloc(dateString);
         await handleThirdBloc();
@@ -196,7 +195,7 @@ class _HomeViewState extends State<HomeView> {
     if (gUserType == AppConstants.BUDDY) {
       await mViewYourNaveliModel.getBuddyAlreadySendRequestApi();
       for (var buddyData
-      in mViewYourNaveliModel.buddyAlreadySendRequestDataList) {
+          in mViewYourNaveliModel.buddyAlreadySendRequestDataList) {
         if (buddyData.notificationStatus == "accepted") {
           acceptedUniqueId = buddyData.uniqueId;
           break;
@@ -215,7 +214,7 @@ class _HomeViewState extends State<HomeView> {
   Future<void> handleThirdBloc() async {
     DateTime currentDate = DateTime.now();
     DateTime dateWithoutTime =
-    DateTime(currentDate.year, currentDate.month, currentDate.day);
+        DateTime(currentDate.year, currentDate.month, currentDate.day);
     // mViewModel.startSlider();
     mViewHealthMixModel.getHealthMixPostsApi(titleId: 7);
     /* mViewModel.getSliderVideoApi().whenComplete(
@@ -239,7 +238,7 @@ class _HomeViewState extends State<HomeView> {
   void checkForCompulsorySymptoms() {
     mViewModel.timerSymptoms = Timer.periodic(
       const Duration(minutes: 3),
-          (timer) {
+      (timer) {
         if (gUserType == AppConstants.NEOWME &&
             (mViewSymptomsModel?.userSymptomsData?.staining == null ||
                 mViewSymptomsModel?.userSymptomsData?.clotSize == null ||
@@ -261,7 +260,7 @@ class _HomeViewState extends State<HomeView> {
                 push(const CompulsorySymptomsLogView()).then((value) =>
                     mViewSymptomsModel
                         ?.getUserSymptomsLogApi(
-                        date: globalUserMaster?.previousPeriodsBegin ?? '')
+                            date: globalUserMaster?.previousPeriodsBegin ?? '')
                         .whenComplete(() => checkForCompulsorySymptoms()));
               });
               return AlertDialog(
@@ -283,10 +282,7 @@ class _HomeViewState extends State<HomeView> {
                     Image.asset(
                       LocalImages.img_pl_log_symptoms,
                       fit: BoxFit.cover,
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height / 3.5,
+                      height: MediaQuery.of(context).size.height / 3.5,
                     ),
                   ],
                 ),
@@ -303,7 +299,7 @@ class _HomeViewState extends State<HomeView> {
 
   bool getLogSymtopmActive() {
     if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-        "Period day" ||
+            "Period day" ||
         mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
             "Period day 1" ||
         mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
@@ -323,7 +319,9 @@ class _HomeViewState extends State<HomeView> {
   }
 
   String getUrlOntimeOut() {
-    if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate).contains("Period Day")) {
+    if (mViewModel
+        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+        .contains("Period Day")) {
       return LocalImages.red_Static;
     } else if (mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
@@ -334,13 +332,15 @@ class _HomeViewState extends State<HomeView> {
         .contains("after")) {
       //red
       return LocalImages.not_fertile;
-    } else if(mViewModel
-        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
-        .contains("Ovulation Day") || mViewModel
-        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
-        .contains("Ovulation in") || mViewModel
-        .getCycleDayOrDaysToGo(mViewModel.selectedDate)
-        .contains("before")){
+    } else if (mViewModel
+            .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+            .contains("Ovulation Day") ||
+        mViewModel
+            .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+            .contains("Ovulation in") ||
+        mViewModel
+            .getCycleDayOrDaysToGo(mViewModel.selectedDate)
+            .contains("before")) {
       return LocalImages.green_Static;
     } else {
       return LocalImages.white_Static;
@@ -349,7 +349,7 @@ class _HomeViewState extends State<HomeView> {
 
   String getUrlForGif() {
     if (mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
-        "Period day" ||
+            "Period day" ||
         mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
             "Period day 1" ||
         mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
@@ -363,25 +363,23 @@ class _HomeViewState extends State<HomeView> {
         mViewModel.getCycleDayOrDaysToGo(mViewModel.selectedDate) ==
             "Period day 6") {
       return LocalImages.red_loader;
-    }  else if (mViewModel
+    } else if (mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
         .contains("late")) {
       return LocalImages.white_loader;
-    }  else if (mViewModel
+    } else if (mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
         .contains("after")) {
       //red
       return LocalImages.not_fertile_loader;
-    } else if(mViewModel
+    } else if (mViewModel
         .getCycleDayOrDaysToGo(mViewModel.selectedDate)
-        .contains("Period in")){
+        .contains("Period in")) {
       return LocalImages.green_loader;
-    }  else {
+    } else {
       return LocalImages.white_loader;
     }
   }
-
-
 
   @override
   void dispose() {
@@ -390,7 +388,6 @@ class _HomeViewState extends State<HomeView> {
     mViewModel.timerSlider?.cancel();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -522,7 +519,9 @@ class _HomeViewState extends State<HomeView> {
     //   ),
     // );
 
-    var calender2 = HorizontalCalendar(mViewModel: mViewModel,);
+    var calender2 = HorizontalCalendar(
+      mViewModel: mViewModel,
+    );
 
     // Column(
     //   children: [
@@ -1393,10 +1392,7 @@ class _HomeViewState extends State<HomeView> {
                             // width:500,
                             borderRadius: BorderRadius.vertical(
                                 bottom: Radius.elliptical(
-                                    MediaQuery
-                                        .of(context)
-                                        .size
-                                        .width, 90.0)),
+                                    MediaQuery.of(context).size.width, 90.0)),
                             /* borderRadius: BorderRadius.only(
                                           bottomLeft: Radius.circular(360),
                                           bottomRight: Radius.circular(360),
@@ -1437,51 +1433,58 @@ class _HomeViewState extends State<HomeView> {
                             children: [
                               (timeoutValue == 1)
                                   ? Container(
-                                width: 150,
-                                height: 150,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(getUrlForGif()),
-                                    fit: /*timeoutValue == 1
+                                      width: 150,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(getUrlForGif()),
+                                          fit: /*timeoutValue == 1
                                           ? BoxFit.none
                                           :*/
-                                    BoxFit.contain,
-                                  ),
+                                              BoxFit.contain,
+                                        ),
+                                      ),
+                                    )
+                                  : Visibility(
+                                      visible: timeoutValue == 2,
+                                      child: Container(
+                                          width: 150,
+                                          height: 150,
+                                          decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                              image: NetworkImage(mViewModel
+                                                  .dateWiseTextList.msg.color),
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              mViewModel.dateWiseTextList.msg
+                                                  .periodMsg,
+                                              style: TextStyle(
+                                                  color: mViewModel.dateWiseTextList.msg
+                                                      .periodMsg.contains("Ovulation")?Colors.black:Colors.white),
+                                            ),
+                                          )),
+                                    ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                          mViewModel
+                                              .dateWiseTextList.msg.description,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color:
+                                                  CommonColors.darkPrimaryColor,
+                                              fontWeight: FontWeight.w500)),
+                                    ),
+                                  ],
                                 ),
                               )
-                                  : Visibility(
-                                visible: timeoutValue == 2,
-                                child: Container(
-                                  width: 150,
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: NetworkImage(mViewModel.dateWiseTextList.msg.color),
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(mViewModel.dateWiseTextList.msg.periodMsg,style: TextStyle(color: Colors.white),),
-                                  )
-                                ),
-                              ),
-                           Padding(
-                             padding: const EdgeInsets.all(8.0),
-                             child: Row(
-                               children: [
-                                 Expanded(
-                                   child: Text(
-                                       mViewModel.dateWiseTextList.msg.description,
-                                       textAlign: TextAlign.center,
-                                       style: TextStyle(
-                                           fontSize: 14,
-                                           color: CommonColors.darkPrimaryColor,
-                                           fontWeight: FontWeight.w500
-                                       )),
-                                 ),
-                               ],
-                             ),
-                           )
 
                               // kCommonSpaceV5,
                               // Container(
@@ -1493,7 +1496,8 @@ class _HomeViewState extends State<HomeView> {
                               //         style: TextStyle(fontSize: 12)),
                               //     alignment: Alignment.center
                               // ),
-                              ,kCommonSpaceV5,
+                              ,
+                              kCommonSpaceV5,
                               ElevatedButton(
                                 onPressed: () {
                                   navigateToCalendarView();
@@ -1504,11 +1508,11 @@ class _HomeViewState extends State<HomeView> {
                                         120.0, 30.0), // Button width and height
                                   ),
                                   backgroundColor:
-                                  WidgetStateProperty.all<Color>(
-                                      CommonColors.primaryColor),
+                                      WidgetStateProperty.all<Color>(
+                                          CommonColors.primaryColor),
                                   foregroundColor:
-                                  WidgetStateProperty.all<Color>(
-                                      Colors.white),
+                                      WidgetStateProperty.all<Color>(
+                                          Colors.white),
                                 ),
                                 child: Text('Log Period',
                                     style: TextStyle(fontSize: 14)),
@@ -2071,36 +2075,36 @@ class _HomeViewState extends State<HomeView> {
                         itemBuilder: (context, index) {
                           return index == 0
                               ? Padding(
-                            padding: const EdgeInsets.only(
-                                left: 12, right: 12, bottom: 20),
-                            child: Container(
-                                padding: const EdgeInsets.only(
-                                    left: 10, right: 10, top: 10),
-                                height: 160,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: ShapeDecoration(
-                                  color: CommonColors.bglightPinkColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(10),
-                                  ),
-                                  shadows: const [
-                                    BoxShadow(
-                                      color: Color(0x3F000000),
-                                      blurRadius: 5,
-                                      offset: Offset(0, 2),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                ),
-                                child: Stack(children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          /*Text(
+                                  padding: const EdgeInsets.only(
+                                      left: 12, right: 12, bottom: 20),
+                                  child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 10, right: 10, top: 10),
+                                      height: 160,
+                                      clipBehavior: Clip.antiAlias,
+                                      decoration: ShapeDecoration(
+                                        color: CommonColors.bglightPinkColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        shadows: const [
+                                          BoxShadow(
+                                            color: Color(0x3F000000),
+                                            blurRadius: 5,
+                                            offset: Offset(0, 2),
+                                            spreadRadius: 0,
+                                          )
+                                        ],
+                                      ),
+                                      child: Stack(children: [
+                                        Align(
+                                          alignment: Alignment.topLeft,
+                                          child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                /*Text(
                                                   'You may experience cramps today',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w500,
@@ -2108,49 +2112,49 @@ class _HomeViewState extends State<HomeView> {
                                                   ),
                                                 ),
                                                 kCommonSpaceV10,*/
-                                          Text(
-                                            'Let\'s take a dive\ninto your day!',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20,
-                                            ),
-                                          ),
-                                          kCommonSpaceV10,
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              push(
-                                                  const SymptomsBotView());
-                                            },
-                                            style: ButtonStyle(
-                                              padding: WidgetStateProperty
-                                                  .all<EdgeInsets>(
-                                                  EdgeInsets.zero),
-                                              fixedSize:
-                                              WidgetStateProperty.all<
-                                                  Size>(
-                                                Size(90.0,
-                                                    25.0), // Button width and height
-                                              ),
-                                              backgroundColor:
-                                              WidgetStateProperty.all<
-                                                  Color>(
-                                                  Color.fromARGB(255,
-                                                      242, 94, 180)),
-                                              foregroundColor:
-                                              WidgetStateProperty.all<
-                                                  Color>(
-                                                  Colors.white),
-                                            ),
-                                            child: Text('Chat Now',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                    FontWeight.bold,
-                                                    fontSize: 12)),
-                                          ),
-                                        ]),
-                                  ),
+                                                Text(
+                                                  'Let\'s take a dive\ninto your day!',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20,
+                                                  ),
+                                                ),
+                                                kCommonSpaceV10,
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    push(
+                                                        const SymptomsBotView());
+                                                  },
+                                                  style: ButtonStyle(
+                                                    padding: WidgetStateProperty
+                                                        .all<EdgeInsets>(
+                                                            EdgeInsets.zero),
+                                                    fixedSize:
+                                                        WidgetStateProperty.all<
+                                                            Size>(
+                                                      Size(90.0,
+                                                          25.0), // Button width and height
+                                                    ),
+                                                    backgroundColor:
+                                                        WidgetStateProperty.all<
+                                                                Color>(
+                                                            Color.fromARGB(255,
+                                                                242, 94, 180)),
+                                                    foregroundColor:
+                                                        WidgetStateProperty.all<
+                                                                Color>(
+                                                            Colors.white),
+                                                  ),
+                                                  child: Text('Chat Now',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 12)),
+                                                ),
+                                              ]),
+                                        ),
 
-                                  /* Align(
+                                        /* Align(
                                               alignment: Alignment.topLeft,
                                               child: InkWell(
                                                 onTap: () {
@@ -2160,104 +2164,104 @@ class _HomeViewState extends State<HomeView> {
                                               ),
                                             ), */
 
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: InkWell(
-                                      /* onTap: () {
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: InkWell(
+                                            /* onTap: () {
                                                   push(const ReminderView());
                                                 }, */
-                                      child: Image.asset(
-                                        LocalImages.img_welcome_home,
-                                        fit: BoxFit.contain,
-                                        height: 150,
-                                      ),
-                                    ),
-                                  ),
-                                ])),
-                          )
+                                            child: Image.asset(
+                                              LocalImages.img_welcome_home,
+                                              fit: BoxFit.contain,
+                                              height: 150,
+                                            ),
+                                          ),
+                                        ),
+                                      ])),
+                                )
                               : index == 1
-                              ? Padding(
-                            padding: const EdgeInsets.only(
-                                left: 12, right: 12, bottom: 20),
-                            child: Container(
-                                padding: const EdgeInsets.only(
-                                    left: 10, right: 10, top: 10),
-                                height: 160,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: ShapeDecoration(
-                                  color: Color(0xFFDDEBFF),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(10),
-                                  ),
-                                  shadows: const [
-                                    BoxShadow(
-                                      color: Color(0x3F000000),
-                                      blurRadius: 5,
-                                      offset: Offset(0, 2),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                ),
-                                child: Stack(children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Have any questions, our experts\n are here to guide',
-                                            style: TextStyle(
-                                              fontWeight:
-                                              FontWeight.w500,
-                                              color:
-                                              Color(0xFF8B8B8B),
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 12, right: 12, bottom: 20),
+                                      child: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 10, right: 10, top: 10),
+                                          height: 160,
+                                          clipBehavior: Clip.antiAlias,
+                                          decoration: ShapeDecoration(
+                                            color: Color(0xFFDDEBFF),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
+                                            shadows: const [
+                                              BoxShadow(
+                                                color: Color(0x3F000000),
+                                                blurRadius: 5,
+                                                offset: Offset(0, 2),
+                                                spreadRadius: 0,
+                                              )
+                                            ],
                                           ),
-                                          kCommonSpaceV10,
-                                          Text(
-                                            'Ask A Doctor',
-                                            style: TextStyle(
-                                              fontWeight:
-                                              FontWeight.bold,
-                                              fontSize: 20,
+                                          child: Stack(children: [
+                                            Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Have any questions, our experts\n are here to guide',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color:
+                                                            Color(0xFF8B8B8B),
+                                                      ),
+                                                    ),
+                                                    kCommonSpaceV10,
+                                                    Text(
+                                                      'Ask A Doctor',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                    kCommonSpaceV10,
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        push(
+                                                            const SymptomsBotView());
+                                                      },
+                                                      style: ButtonStyle(
+                                                        fixedSize:
+                                                            WidgetStateProperty
+                                                                .all<Size>(
+                                                          Size(90.0,
+                                                              25.0), // Button width and height
+                                                        ),
+                                                        backgroundColor:
+                                                            WidgetStateProperty
+                                                                .all<Color>(Color(
+                                                                    0xFF3D73BF)),
+                                                        foregroundColor:
+                                                            WidgetStateProperty
+                                                                .all<Color>(
+                                                                    Colors
+                                                                        .white),
+                                                      ),
+                                                      child: Text('Here',
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 12)),
+                                                    ),
+                                                  ]),
                                             ),
-                                          ),
-                                          kCommonSpaceV10,
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              push(
-                                                  const SymptomsBotView());
-                                            },
-                                            style: ButtonStyle(
-                                              fixedSize:
-                                              WidgetStateProperty
-                                                  .all<Size>(
-                                                Size(90.0,
-                                                    25.0), // Button width and height
-                                              ),
-                                              backgroundColor:
-                                              WidgetStateProperty
-                                                  .all<Color>(Color(
-                                                  0xFF3D73BF)),
-                                              foregroundColor:
-                                              WidgetStateProperty
-                                                  .all<Color>(
-                                                  Colors
-                                                      .white),
-                                            ),
-                                            child: Text('Here',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .bold,
-                                                    fontSize: 12)),
-                                          ),
-                                        ]),
-                                  ),
 
-                                  /* Align(
+                                            /* Align(
                                               alignment: Alignment.topLeft,
                                               child: InkWell(
                                                 onTap: () {
@@ -2267,107 +2271,107 @@ class _HomeViewState extends State<HomeView> {
                                               ),
                                             ), */
 
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: InkWell(
-                                      /* onTap: () {
+                                            Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: InkWell(
+                                                /* onTap: () {
                                                   push(const ReminderView());
                                                 }, */
-                                      child: Image.asset(
-                                        LocalImages.img_naveli_nurse,
-                                        fit: BoxFit.contain,
-                                        height: 150,
-                                      ),
-                                    ),
-                                  ),
-                                ])),
-                          )
-                              : index == 2
-                              ? Padding(
-                            padding: const EdgeInsets.only(
-                                left: 12, right: 12, bottom: 20),
-                            child: Container(
-                                padding: const EdgeInsets.only(
-                                    left: 10, right: 10, top: 10),
-                                height: 160,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: ShapeDecoration(
-                                  color: Color(0XFFFFEEEE),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(10),
-                                  ),
-                                  shadows: const [
-                                    BoxShadow(
-                                      color: Color(0x3F000000),
-                                      blurRadius: 5,
-                                      offset: Offset(0, 2),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                ),
-                                child: Stack(children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment
-                                            .start,
-                                        children: [
-                                          Text(
-                                            'Leading Ladies: Women making\nHeadlines',
-                                            style: TextStyle(
-                                              fontWeight:
-                                              FontWeight.w500,
-                                            ),
-                                          ),
-                                          kCommonSpaceV10,
-                                          Text(
-                                            'The Neow Story',
-                                            style: TextStyle(
-                                              fontWeight:
-                                              FontWeight.bold,
-                                              fontSize: 20,
-                                            ),
-                                          ),
-                                          kCommonSpaceV10,
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              push(PostList(
-                                                  position: 0,
-                                                  selectedTabIndex:
-                                                  0));
-                                            },
-                                            style: ButtonStyle(
-                                              fixedSize:
-                                              WidgetStateProperty
-                                                  .all<Size>(
-                                                Size(90.0,
-                                                    25.0), // Button width and height
+                                                child: Image.asset(
+                                                  LocalImages.img_naveli_nurse,
+                                                  fit: BoxFit.contain,
+                                                  height: 150,
+                                                ),
                                               ),
-                                              backgroundColor:
-                                              WidgetStateProperty
-                                                  .all<Color>(
-                                                  Color(
-                                                      0xFFD15151)),
-                                              foregroundColor:
-                                              WidgetStateProperty
-                                                  .all<Color>(
-                                                  Colors
-                                                      .white),
                                             ),
-                                            child: Text('Here',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .bold,
-                                                    fontSize:
-                                                    12)),
-                                          ),
-                                        ]),
-                                  ),
+                                          ])),
+                                    )
+                                  : index == 2
+                                      ? Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 12, right: 12, bottom: 20),
+                                          child: Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10, right: 10, top: 10),
+                                              height: 160,
+                                              clipBehavior: Clip.antiAlias,
+                                              decoration: ShapeDecoration(
+                                                color: Color(0XFFFFEEEE),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                shadows: const [
+                                                  BoxShadow(
+                                                    color: Color(0x3F000000),
+                                                    blurRadius: 5,
+                                                    offset: Offset(0, 2),
+                                                    spreadRadius: 0,
+                                                  )
+                                                ],
+                                              ),
+                                              child: Stack(children: [
+                                                Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Leading Ladies: Women making\nHeadlines',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                        kCommonSpaceV10,
+                                                        Text(
+                                                          'The Neow Story',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 20,
+                                                          ),
+                                                        ),
+                                                        kCommonSpaceV10,
+                                                        ElevatedButton(
+                                                          onPressed: () {
+                                                            push(PostList(
+                                                                position: 0,
+                                                                selectedTabIndex:
+                                                                    0));
+                                                          },
+                                                          style: ButtonStyle(
+                                                            fixedSize:
+                                                                WidgetStateProperty
+                                                                    .all<Size>(
+                                                              Size(90.0,
+                                                                  25.0), // Button width and height
+                                                            ),
+                                                            backgroundColor:
+                                                                WidgetStateProperty
+                                                                    .all<Color>(
+                                                                        Color(
+                                                                            0xFFD15151)),
+                                                            foregroundColor:
+                                                                WidgetStateProperty
+                                                                    .all<Color>(
+                                                                        Colors
+                                                                            .white),
+                                                          ),
+                                                          child: Text('Here',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize:
+                                                                      12)),
+                                                        ),
+                                                      ]),
+                                                ),
 
-                                  /* Align(
+                                                /* Align(
                                               alignment: Alignment.topLeft,
                                               child: InkWell(
                                                 onTap: () {
@@ -2377,122 +2381,122 @@ class _HomeViewState extends State<HomeView> {
                                               ),
                                             ), */
 
-                                  Align(
-                                    alignment:
-                                    Alignment.bottomRight,
-                                    child: InkWell(
-                                      /* onTap: () {
+                                                Align(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  child: InkWell(
+                                                    /* onTap: () {
                                                   push(const ReminderView());
                                                 }, */
-                                      child: Image.asset(
-                                        LocalImages
-                                            .img_naveli_mike,
-                                        fit: BoxFit.contain,
-                                        height: 150,
-                                      ),
-                                    ),
-                                  ),
-                                ])),
-                          )
-                              : Padding(
-                            padding: const EdgeInsets.only(
-                                left: 12, right: 12, bottom: 20),
-                            child: Container(
-                                padding: const EdgeInsets.only(
-                                    left: 10, right: 10, top: 10),
-                                height: 160,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: ShapeDecoration(
-                                  color: Color(0XFFFFEEEE),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(10),
-                                  ),
-                                  shadows: const [
-                                    BoxShadow(
-                                      color: Color(0x3F000000),
-                                      blurRadius: 5,
-                                      offset: Offset(0, 2),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                ),
-                                child: Stack(children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment
-                                            .start,
-                                        children: [
-                                          Text(
-                                            'Leading Ladies: Women Making Headlines',
-                                            style: TextStyle(
-                                              fontWeight:
-                                              FontWeight.w500,
-                                            ),
-                                          ),
-                                          kCommonSpaceV10,
-                                          Text(
-                                            'Groove with Neow',
-                                            style: TextStyle(
-                                              fontWeight:
-                                              FontWeight.bold,
-                                              fontSize: 20,
-                                            ),
-                                          ),
-                                          kCommonSpaceV10,
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              push(PostList(
-                                                  position: 0,
-                                                  selectedTabIndex:
-                                                  0));
-                                            },
-                                            style: ButtonStyle(
-                                              fixedSize:
-                                              WidgetStateProperty
-                                                  .all<Size>(
-                                                Size(90.0,
-                                                    25.0), // Button width and height
+                                                    child: Image.asset(
+                                                      LocalImages
+                                                          .img_naveli_mike,
+                                                      fit: BoxFit.contain,
+                                                      height: 150,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ])),
+                                        )
+                                      : Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 12, right: 12, bottom: 20),
+                                          child: Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10, right: 10, top: 10),
+                                              height: 160,
+                                              clipBehavior: Clip.antiAlias,
+                                              decoration: ShapeDecoration(
+                                                color: Color(0XFFFFEEEE),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                shadows: const [
+                                                  BoxShadow(
+                                                    color: Color(0x3F000000),
+                                                    blurRadius: 5,
+                                                    offset: Offset(0, 2),
+                                                    spreadRadius: 0,
+                                                  )
+                                                ],
                                               ),
-                                              backgroundColor:
-                                              WidgetStateProperty.all<
-                                                  Color>(
-                                                  Color.fromARGB(
-                                                      255,
-                                                      175,
-                                                      34,
-                                                      34)),
-                                              foregroundColor:
-                                              WidgetStateProperty
-                                                  .all<Color>(
-                                                  Colors
-                                                      .white),
-                                            ),
-                                            child: Text('Here',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .bold,
-                                                    fontSize:
-                                                    12)),
-                                          ),
-                                        ]),
-                                  ),
-                                  Align(
-                                    alignment:
-                                    Alignment.bottomRight,
-                                    child: InkWell(
-                                      child: Image.asset(
-                                        LocalImages.grovewithnew,
-                                        fit: BoxFit.contain,
-                                        height: 150,
-                                      ),
-                                    ),
-                                  ),
-                                ])),
-                          );
+                                              child: Stack(children: [
+                                                Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Leading Ladies: Women Making Headlines',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                        kCommonSpaceV10,
+                                                        Text(
+                                                          'Groove with Neow',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 20,
+                                                          ),
+                                                        ),
+                                                        kCommonSpaceV10,
+                                                        ElevatedButton(
+                                                          onPressed: () {
+                                                            push(PostList(
+                                                                position: 0,
+                                                                selectedTabIndex:
+                                                                    0));
+                                                          },
+                                                          style: ButtonStyle(
+                                                            fixedSize:
+                                                                WidgetStateProperty
+                                                                    .all<Size>(
+                                                              Size(90.0,
+                                                                  25.0), // Button width and height
+                                                            ),
+                                                            backgroundColor:
+                                                                WidgetStateProperty.all<
+                                                                        Color>(
+                                                                    Color.fromARGB(
+                                                                        255,
+                                                                        175,
+                                                                        34,
+                                                                        34)),
+                                                            foregroundColor:
+                                                                WidgetStateProperty
+                                                                    .all<Color>(
+                                                                        Colors
+                                                                            .white),
+                                                          ),
+                                                          child: Text('Here',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize:
+                                                                      12)),
+                                                        ),
+                                                      ]),
+                                                ),
+                                                Align(
+                                                  alignment:
+                                                      Alignment.bottomRight,
+                                                  child: InkWell(
+                                                    child: Image.asset(
+                                                      LocalImages.grovewithnew,
+                                                      fit: BoxFit.contain,
+                                                      height: 150,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ])),
+                                        );
                         },
                       ),
                       Align(
@@ -2560,7 +2564,7 @@ class _HomeViewState extends State<HomeView> {
                               push(const LogYourSymptoms()).then((value) =>
                                   mViewSymptomsModel?.getUserSymptomsLogApi(
                                       date: globalUserMaster
-                                          ?.previousPeriodsBegin ??
+                                              ?.previousPeriodsBegin ??
                                           ''));
                               // if (getLogSymtopmActive() == true) {
                               //   push(const LogYourSymptoms()).then((value) =>
@@ -2696,7 +2700,7 @@ class _HomeViewState extends State<HomeView> {
                                         decoration: BoxDecoration(
                                           color: Color(0xFFFFE6D7),
                                           borderRadius:
-                                          BorderRadius.circular(10),
+                                              BorderRadius.circular(10),
                                         ),
                                         child: Align(
                                             alignment: Alignment.center,
@@ -2730,7 +2734,7 @@ class _HomeViewState extends State<HomeView> {
                                         decoration: BoxDecoration(
                                           color: Color(0xFFFFEDED),
                                           borderRadius:
-                                          BorderRadius.circular(10),
+                                              BorderRadius.circular(10),
                                         ),
                                         child: Align(
                                             alignment: Alignment.center,
@@ -2773,7 +2777,7 @@ class _HomeViewState extends State<HomeView> {
                                         decoration: BoxDecoration(
                                           color: Color(0xFFE9F4FF),
                                           borderRadius:
-                                          BorderRadius.circular(10),
+                                              BorderRadius.circular(10),
                                         ),
                                         child: Align(
                                             alignment: Alignment.center,
@@ -2807,7 +2811,7 @@ class _HomeViewState extends State<HomeView> {
                                         decoration: BoxDecoration(
                                           color: Color(0xFFFFFFE5),
                                           borderRadius:
-                                          BorderRadius.circular(10),
+                                              BorderRadius.circular(10),
                                         ),
                                         child: Align(
                                             alignment: Alignment.center,
@@ -2848,7 +2852,7 @@ class _HomeViewState extends State<HomeView> {
                             // Define the action when the text is clicked
                             push(ShortsView(
                                 healthPostsList:
-                                mViewHealthMixModel.healthPostsList));
+                                    mViewHealthMixModel.healthPostsList));
                           },
                           child: Text(
                             "Shorts",
@@ -2871,8 +2875,8 @@ class _HomeViewState extends State<HomeView> {
                       padding: const EdgeInsets.only(
                           right: 12, left: 12, top: 3, bottom: 8),
                       child: Container(
-                        // width: kDeviceWidth / 1,
-                        // height: kDeviceHeight / 2.2,
+                          // width: kDeviceWidth / 1,
+                          // height: kDeviceHeight / 2.2,
                           clipBehavior: Clip.antiAlias,
                           decoration: ShapeDecoration(
                             color: CommonColors.mWhite,
@@ -2924,9 +2928,9 @@ class _HomeViewState extends State<HomeView> {
                                     ), */
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         'Monarch population soars\n 4,900',
@@ -2939,7 +2943,7 @@ class _HomeViewState extends State<HomeView> {
                                       kCommonSpaceV10,
                                       Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Nutrition',
@@ -2954,7 +2958,7 @@ class _HomeViewState extends State<HomeView> {
                                                 height: 20,
                                                 child: Container(
                                                     padding:
-                                                    const EdgeInsets.only(
+                                                        const EdgeInsets.only(
                                                       left: 5,
                                                     ),
                                                     decoration: BoxDecoration(
@@ -2968,8 +2972,8 @@ class _HomeViewState extends State<HomeView> {
                                             kCommonSpaceH10,
                                             Text(
                                               mViewHealthMixModel
-                                                  .healthPostsList[index]
-                                                  .diffrenceTime ??
+                                                      .healthPostsList[index]
+                                                      .diffrenceTime ??
                                                   '',
                                               style: getAppStyle(
                                                 color: CommonColors.mGrey,
@@ -2998,7 +3002,7 @@ class _HomeViewState extends State<HomeView> {
                               ],
                             ),
                           )
-                        /*Column(
+                          /*Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ,
@@ -3167,7 +3171,7 @@ class _HomeViewState extends State<HomeView> {
                             )
                           ],
                         ),*/
-                      ),
+                          ),
                     );
                   },
                 ),
@@ -3410,18 +3414,17 @@ class _HomeViewState extends State<HomeView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
         4,
-            (index) =>
-            Container(
-              width: 8.0,
-              height: 8.0,
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: mViewModel.currentPage == index
-                    ? CommonColors.primaryColor
-                    : CommonColors.mGrey,
-              ),
-            ),
+        (index) => Container(
+          width: 8.0,
+          height: 8.0,
+          margin: const EdgeInsets.symmetric(horizontal: 4.0),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: mViewModel.currentPage == index
+                ? CommonColors.primaryColor
+                : CommonColors.mGrey,
+          ),
+        ),
       ),
     );
   }
