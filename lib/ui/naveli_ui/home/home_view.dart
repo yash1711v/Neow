@@ -5,6 +5,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:naveli_2023/ui/naveli_ui/home/quiz/quiz_view.dart';
 import 'package:naveli_2023/ui/naveli_ui/home/shorts/short_view.dart';
 import 'package:naveli_2023/ui/naveli_ui/home/track/track_view.dart';
@@ -1431,20 +1432,8 @@ class _HomeViewState extends State<HomeView> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              (timeoutValue == 1)
-                                  ? Container(
-                                      width: 150,
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: AssetImage(getUrlForGif()),
-                                          fit: /*timeoutValue == 1
-                                          ? BoxFit.none
-                                          :*/
-                                              BoxFit.contain,
-                                        ),
-                                      ),
-                                    )
+                              (mViewModel.isLoading)
+                                  ? Lottie.asset("assets/icons/Flow.json",width: 250,height: 180)
                                   : Visibility(
                                       visible: timeoutValue == 2,
                                       child: Container(
@@ -1453,7 +1442,7 @@ class _HomeViewState extends State<HomeView> {
                                           decoration: BoxDecoration(
                                             image: DecorationImage(
                                               image: NetworkImage(mViewModel
-                                                  .dateWiseTextList.msg.color),
+                                                  .dateWiseTextList.msg.image),
                                               fit: BoxFit.contain,
                                             ),
                                           ),
@@ -1463,7 +1452,7 @@ class _HomeViewState extends State<HomeView> {
                                                   .periodMsg,
                                               style: TextStyle(
                                                   color: mViewModel.dateWiseTextList.msg
-                                                      .periodMsg.contains("Ovulation")?Colors.black:Colors.white),
+                                                      .color.contains("black")?Colors.black:Colors.white),
                                             ),
                                           )),
                                     ),
@@ -1473,7 +1462,7 @@ class _HomeViewState extends State<HomeView> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                          mViewModel
+                                        mViewModel
                                               .dateWiseTextList.msg.description,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(

@@ -857,6 +857,7 @@ await Future.delayed(Duration(seconds: 1));
 
   Future<void> getDateWiseText() async {
     //CommonUtils.showProgressDialog();
+    isLoading = true;
     dynamic body = {};
     peroidCustomeList.forEach((element){
       // element.
@@ -883,21 +884,29 @@ await Future.delayed(Duration(seconds: 1));
       });
     });
     debugPrint("selectedDate ====>${DateFormat('yyyy-MM-dd').format(selectedDate)}");
-    Map<String,dynamic> response = await _services.api!.getDateWiseText(params: body);
+    debugPrint("selectedDate ====>${body}");
+    if(body.isEmpty)
+    {
+      dateWiseTextList = ApiResponse(status: 0, msg: Message(title: "", description: "uh oh! Seems like you haven't logged your period yet", image: "https://neowindia.com/public/assets/log_images/gry1.png", periodMsg: "Period Late", color: "black"));
+    } else {
+      Map<String, dynamic> response =
+          await _services.api!.getDateWiseText(params: body);
+      debugPrint("response in main response====>${response}");
+      dateWiseTextList = ApiResponse.fromJson(response);
+    }
 
-    debugPrint("response in main response====>${response}");
 
-
-    dateWiseTextList = ApiResponse.fromJson(response);
 
     debugPrint("dateWiseTextList ====>${dateWiseTextList}");
+    isLoading = false;
     notifyListeners();
   }
 
   DateTime previousDateLocal = DateTime.now();
 
-  ApiResponse dateWiseTextList = ApiResponse(status: 0, msg: Message(title: "", description: "", color: "", periodMsg: ''));
+  ApiResponse dateWiseTextList = ApiResponse(status: 0, msg: Message(title: "", description: "", color: "", periodMsg: '', image: ''));
 
+  bool isLoading = false;
   Future<void> handleSecondBloc(
     String dt,
   ) async {

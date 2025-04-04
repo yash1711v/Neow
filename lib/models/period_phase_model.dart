@@ -25,16 +25,18 @@ class Message {
   final String title;
   final String description;
   final String periodMsg;
+  final String image;
   final String color;
 
- const Message({required this.title, required this.description, required this.color, required this.periodMsg});
+ const Message({required this.title, required this.description, required this.image, required this.periodMsg,  required this.color});
 
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
-      title: json['title'],
-      description: json['description'],
-      color: json['image'],
+      title: json['title'] ?? "",
+      description: json['description'] ?? "",
+      image: json['image'],
       periodMsg: json['periodMsg'] ?? json['ovlOrNextPeriodMsg'],
+      color: json['textColor']
     );
   }
 
@@ -42,7 +44,8 @@ class Message {
     return {
       'title': title,
       'description': description,
-      'color': color,
+      'image': image,
+      "textColor":color
     };
   }
 }
