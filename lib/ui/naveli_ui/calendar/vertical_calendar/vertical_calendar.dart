@@ -666,8 +666,16 @@ class _MonthViewState extends State<_MonthView> {
                                 height: 70,
                                 width: 70.0,
                                 decoration: BoxDecoration(
+                                    gradient:  isPredictedDate ? LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Color(0xFFFFFFFF),
+                                        Color(0xFFFFFFFF),
+                                      ],
+                                    ) : null
                                     // Optional: Add decoration if needed (e.g., background color, border, etc.)
-                                    ),
+                                    ) ,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment
                                       .center, // Center the content vertically

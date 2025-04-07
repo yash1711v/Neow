@@ -885,6 +885,7 @@ await Future.delayed(Duration(seconds: 1));
     });
     debugPrint("selectedDate ====>${DateFormat('yyyy-MM-dd').format(selectedDate)}");
     debugPrint("selectedDate ====>${body}");
+
     if(body.isEmpty)
     {
       dateWiseTextList = ApiResponse(status: 0, msg: Message(title: "", description: "uh oh! Seems like you haven't logged your period yet", image: "https://neowindia.com/public/assets/log_images/gry1.png", periodMsg: "Period Late", color: "black"));
