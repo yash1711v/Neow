@@ -665,17 +665,6 @@ class _MonthViewState extends State<_MonthView> {
                               child: Container(
                                 height: 70,
                                 width: 70.0,
-                                decoration: BoxDecoration(
-                                    gradient:  isPredictedDate ? LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Color(0xFFFFFFFF),
-                                        Color(0xFFFFFFFF),
-                                      ],
-                                    ) : null
-                                    // Optional: Add decoration if needed (e.g., background color, border, etc.)
-                                    ) ,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment
                                       .center, // Center the content vertically
@@ -710,34 +699,41 @@ class _MonthViewState extends State<_MonthView> {
                                                 date); // Callback when the day is pressed
                                           });
                                         },
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            // Makes the container circular
-                                            color: currentDateCheck
-                                                ? CommonColors
-                                                    .secondaryColor // Background color when checked
-                                                : Colors.transparent,
-                                            // Transparent when unchecked
-                                            border: Border.all(
+                                        child: DottedBorder(
+                                          color: isPredictedDate?Colors.red:Colors.transparent,
+                                          dashPattern: [4, 3],
+                                          strokeWidth:
+                                          (isFirtile || isPredictedDate) ? 2 : 0,
+                                          borderType: BorderType.Circle,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              // Makes the container circular
                                               color: currentDateCheck
                                                   ? CommonColors
-                                                      .secondaryColor // Border color when checked
-                                                  : Colors.grey,
-                                              // Border color when unchecked
-                                              width: 2, // Border width
+                                                      .secondaryColor // Background color when checked
+                                                  : Colors.transparent,
+                                              // Transparent when unchecked
+                                              border: Border.all(
+                                                color: currentDateCheck
+                                                    ? CommonColors
+                                                        .secondaryColor // Border color when checked
+                                                    : Colors.grey,
+                                                // Border color when unchecked
+                                                width: 2, // Border width
+                                              ),
                                             ),
+                                            alignment: Alignment.center,
+                                            child: currentDateCheck
+                                                ? Icon(
+                                                    Icons.check,
+                                                    // Display checkmark icon when checked
+                                                    color: Colors
+                                                        .white, // Color of the checkmark
+                                                    size: 20, // Icon size
+                                                  )
+                                                : null,
                                           ),
-                                          alignment: Alignment.center,
-                                          child: currentDateCheck
-                                              ? Icon(
-                                                  Icons.check,
-                                                  // Display checkmark icon when checked
-                                                  color: Colors
-                                                      .white, // Color of the checkmark
-                                                  size: 20, // Icon size
-                                                )
-                                              : null,
                                         ),
                                       ),
                                     )
