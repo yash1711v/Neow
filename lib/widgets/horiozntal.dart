@@ -48,6 +48,8 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
     return dates;
   }
 
+  DateTime monthDate = DateTime.now();
+
   void _scrollToCurrentDate() {
     int currentIndex = dates.indexWhere((date) =>
         date.year == widget.mViewModel.selectedDate.year &&
@@ -63,9 +65,29 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                color: Color(0XFFFBF5F7),
+                child: Center(
+                  child: Text(
+                    DateFormat.MMMM().format(monthDate), // Month
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
         Container(
           color: Color(0XFFFBF5F7),
-          height: 85,
+          height: 50,
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -138,132 +160,68 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
 
               return Visibility(
                 visible: date.isSameDayOrAfter(DateTime.now()),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      DateFormat.MMM().format(date), // Month
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          widget.mViewModel.selectedDate = date;
-                        });
-                        debugPrint(
-                            "Selected Date: ${widget.mViewModel.selectedDate}");
-                        widget.mViewModel.updateSelectedDate(date);
-                        // widget.mViewModel.getCycleDayOrDaysToGo(selectedDate);
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal:
-                                (isFirtile || isPredictedDate) ? 5.0 : 0),
-                        child: DottedBorder(
-                          color: isFirtile
-                              ? Colors.green
-                              : isPredictedDate
-                                  ? Colors.red
-                                  : Colors.transparent,
-                          // Border color
-                          strokeWidth: 2,
-                          // Border width
-                          dashPattern: [6, 3],
-                          // Defines the pattern: [dot length, space length]
-                          borderType: BorderType.Circle,
-                          // Shape of the border
-                          radius: Radius.circular(0),
-                          padding: EdgeInsets.zero,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      widget.mViewModel.selectedDate = date;
+                    });
+                    debugPrint(
+                        "Selected Date: ${widget.mViewModel.selectedDate}");
+                    widget.mViewModel.updateSelectedDate(date);
+                    // widget.mViewModel.getCycleDayOrDaysToGo(selectedDate);
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal:
+                            (isFirtile || isPredictedDate) ? 10.0 : 0),
+                    child: DottedBorder(
+                      color: isFirtile
+                          ? Colors.green
+                          : isPredictedDate
+                              ? Colors.red
+                              : Colors.transparent,
+                      // Border color
+                      strokeWidth: 2,
+                      // Border width
+                      dashPattern: [6, 3],
+                      // Defines the pattern: [dot length, space length]
+                      borderType: BorderType.Circle,
+                      // Shape of the border
+                      radius: Radius.circular(0),
+                      padding: EdgeInsets.zero,
 
+                      child: Center(
+                        child: Container(
+                          width: 40,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isSelected
+                                ? Colors.grey
+                                : PriodDates
+                                    ? Color(0xFFFF9D93)
+                                    : isOvulation
+                                        ? Colors.green
+                                        : Colors.transparent,
+                          ),
                           child: Center(
-                            child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isSelected
-                                    ? Colors.grey
-                                    : PriodDates
-                                        ? Color(0xFFFF9D93)
-                                        : isOvulation
-                                            ? Colors.green
-                                            : Colors.transparent,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  date.day.toString(), // Day
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        isSelected || PriodDates || isOvulation
-                                            ? Colors.white
-                                            : Colors.black,
-                                  ),
-                                ),
+                            child: Text(
+                              date.day.toString(), // Day
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    isSelected || PriodDates || isOvulation
+                                        ? Colors.white
+                                        : Colors.black,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      //
-                      // DateContainer(
-                      //   date: date,
-                      //   isSelected: isSelected,
-                      //   isPeriodDate: PriodDates,
-                      //   isOvulation: isOvulation,
-                      //   showDottedBorder: isFirtile,
-                      //   isPredictedDate: isPredictedDate,
-                      // )
-                      // Container(
-                      //   width: 50,
-                      //   margin: EdgeInsets.symmetric(horizontal: 5, vertical: 8),
-                      //   decoration: BoxDecoration(
-                      //     shape: BoxShape.circle,
-                      //     color: isSelected ? Colors.grey : PriodDates? Color(0xFFFF9D93) : isOvulation ? Colors.green: Colors.transparent,
-                      //
-                      //   ),
-                      //   child: Padding(
-                      //     padding: const EdgeInsets.all(10.0),
-                      //     child: Column(
-                      //       mainAxisAlignment: MainAxisAlignment.center,
-                      //       children: [
-                      //         Text(
-                      //           DateFormat.MMM().format(date), // Month
-                      //           style: TextStyle(
-                      //             fontSize: 14,
-                      //             fontWeight: FontWeight.bold,
-                      //             color: isSelected || PriodDates || isOvulation ? Colors.white : Colors.black,
-                      //           ),
-                      //         ),
-                      //         // SizedBox(height: 5),
-                      //         Text(
-                      //           date.day.toString(), // Day
-                      //           style: TextStyle(
-                      //             fontSize: 20,
-                      //             fontWeight: FontWeight.bold,
-                      //             color: isSelected || PriodDates || isOvulation ? Colors.white : Colors.black,
-                      //           ),
-                      //         ),
-                      //         // SizedBox(height: 5),
-                      //         // Text(
-                      //         //   DateFormat.E().format(date), // Weekday
-                      //         //   style: TextStyle(
-                      //         //     fontSize: 14,
-                      //         //     fontWeight: FontWeight.bold,
-                      //         //     color: isSelected ? Colors.white : Colors.black,
-                      //         //   ),
-                      //         // ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
                     ),
-                  ],
+                  ),
+
                 ),
               );
             },

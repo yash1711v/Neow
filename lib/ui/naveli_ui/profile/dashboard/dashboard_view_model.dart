@@ -224,8 +224,7 @@ class DashBoardViewModel with ChangeNotifier {
     // CommonUtils.hideProgressDialog();
     if (master == null) {
       CommonUtils.oopsMSG();
-      print(
-          "................................about your cycle data oops.............................");
+
     } else if (master.success == false) {
       CommonUtils.showSnackBar(
         master.message ?? "--",
@@ -234,7 +233,7 @@ class DashBoardViewModel with ChangeNotifier {
       print("daaa dipak =>${master.message}");
     } else if (master.success == true) {
       //     CommonUtils.hideProgressDialog();
-      print("daaa =>${master.data}");
+      print("about =>${master.data}");
       dataList = master.data ?? [];
       if (dataList.isNotEmpty) {
         int max3Lenght = dataList.length>3?3:dataList.length;

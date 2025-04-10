@@ -527,7 +527,8 @@ class _DashboardViewState extends State<DashboardView> {
                               color: CommonColors.blackColor,
                               size: 25,
                             ),*/
-                            Image.asset(LocalImages.imgPersonalInformation, height: 25),
+                            Image.asset(LocalImages.imgPersonalInformation,
+                                height: 25),
                             kCommonSpaceH10,
                             Text(
                               'Personal Information',
@@ -609,7 +610,7 @@ class _DashboardViewState extends State<DashboardView> {
                             kCommonSpaceH10,
                             Expanded(
                               child: CustomTextFieldContainer(
-                               // color: CommonColors.mGrey200,
+                                // color: CommonColors.mGrey200,
                                 color: Color(0xFFF5F5F5),
                                 labelText: "District",
                                 controller: districtController,
@@ -622,7 +623,7 @@ class _DashboardViewState extends State<DashboardView> {
                         kCommonSpaceV5,
 
                         CustomTextFieldContainer(
-                         // color: CommonColors.mGrey200,
+                          // color: CommonColors.mGrey200,
                           color: Color(0xFFF5F5F5),
                           labelText: "Mobile",
                           controller: mobileController,
@@ -796,7 +797,8 @@ class _DashboardViewState extends State<DashboardView> {
                               color: CommonColors.blackColor,
                               size: 25,
                             ),*/
-                            Image.asset(LocalImages.imgAboutYourCycle, height: 25),
+                            Image.asset(LocalImages.imgAboutYourCycle,
+                                height: 25),
                             kCommonSpaceH10,
                             Text(
                               'About Your Cycle',
@@ -862,6 +864,15 @@ class _DashboardViewState extends State<DashboardView> {
                                           CommonColors.primaryColor
                                               .withOpacity(0.5)),
                                       _tableCell(
+                                          'Deviation (days)',
+                                          CommonColors.primaryColor
+                                              .withOpacity(0.5)),
+                                      _tableCell(
+                                          'Interpretation',
+                                          CommonColors.primaryColor
+                                              .withOpacity(0.2)),
+
+                                      _tableCell(
                                           'Period Length (days)',
                                           CommonColors.primaryColor
                                               .withOpacity(0.2)),
@@ -879,44 +890,94 @@ class _DashboardViewState extends State<DashboardView> {
                                   for (int index = 0;
                                       index < mViewModel.dataList.length;
                                       index++)
-                                    TableRow(
-                                      children: [
-                                        _tableCell((index + 1).toString(),
-                                            CommonColors.mWhite),
-                                        _tableCell(
-                                            mViewModel.dataList[index].periodDate ??
-                                                '',
-                                            CommonColors.mWhite),
-                                        _tableCell(
-                                            mViewModel.dataList[index]
-                                                    .periodCycleLength ??
-                                                '',
-                                            CommonColors.mWhite),
-                                        _tableCell(
-                                            mViewModel.dataList[index].periodLength ?? '',
-                                            CommonColors.mWhite),
-                                        _tableCell((mViewModel.dataList[index].deviation ?? 0).toString(), CommonColors.mWhite),
-                                        TableCell(
-                                          child: Container(
-                                            color: CommonColors.mWhite,
-                                            height: 50,
-                                            width: 120,
-                                            padding: const EdgeInsets.all(5),
-                                            alignment: Alignment.center,
-                                            child: int.parse(mViewModel.dataList[index]
-                                                            .periodLength ??
-                                                        '0') <=
-                                                    5
-                                                ? Icon(Icons.thumb_up,
-                                                    color: Colors.green,
-                                                    size: 25)
-                                                : Icon(Icons.warning_rounded,
-                                                    color: Colors.red,
-                                                    size: 25),
+                                      TableRow(
+                                        children: [
+                                          _tableCell((index + 1).toString(),
+                                              CommonColors.mWhite),
+                                          _tableCell(
+                                              mViewModel.dataList[index]
+                                                      .periodDate ??
+                                                  '',
+                                              CommonColors.mWhite),
+                                          _tableCell(
+                                              mViewModel.dataList[index]
+                                                      .periodCycleLength ??
+                                                  '',
+                                              CommonColors.mWhite),
+                                          _tableCell(
+                                              (mViewModel.dataList[index]
+                                                  .cycleLengthDeviation ??
+                                                  0)
+                                                  .toString(),
+                                              CommonColors.mWhite),
+                                          TableCell(
+                                            child: Container(
+                                              color: CommonColors.mWhite,
+                                              height: 70,
+                                              width: 120,
+                                              padding: const EdgeInsets.all(5),
+                                              alignment: Alignment.center,
+                                              child:(mViewModel
+                                                  .dataList[
+                                              index]
+                                                  .cycleLengthDeviation ??
+                                                  0) == 0
+                                                  ? Icon(Icons.warning_rounded,
+                                                  color: Colors.red,
+                                                  size: 25)
+                                                  : Icon(Icons.thumb_up,
+                                                  color: Colors.green,
+                                                  size: 25),
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
+                                          _tableCell(
+                                              mViewModel.dataList[index]
+                                                      .periodLength ??
+                                                  '',
+                                              CommonColors.mWhite),
+                                          _tableCell(
+                                              (mViewModel.dataList[index]
+                                                          .periodLengthDeviation ??
+                                                      0)
+                                                  .toString(),
+                                              CommonColors.mWhite),
+                                          TableCell(
+                                            child: Container(
+                                              color: CommonColors.mWhite,
+                                              height: 70,
+                                              width: 120,
+                                              padding: const EdgeInsets.all(5),
+                                              alignment: Alignment.center,
+                                              child: int.parse(mViewModel
+                                                                  .dataList[
+                                                                      index]
+                                                                  .periodLength ??
+                                                              '0') <
+                                                          (mViewModel
+                                                                  .dataList[
+                                                                      index]
+                                                                  .periodLengthDeviation ??
+                                                              0) ||
+                                                      int.parse(mViewModel
+                                                                  .dataList[
+                                                                      index]
+                                                                  .periodLength ??
+                                                              '0') >
+                                                          (mViewModel
+                                                                  .dataList[
+                                                                      index]
+                                                                  .periodLengthDeviation ??
+                                                              0)
+                                                  ? Icon(Icons.warning_rounded,
+                                                      color: Colors.red,
+                                                      size: 25)
+                                                  : Icon(Icons.thumb_up,
+                                                      color: Colors.green,
+                                                      size: 25),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                 ],
                               ),
                             ),
@@ -959,8 +1020,8 @@ class _DashboardViewState extends State<DashboardView> {
                                 height: 120,
                                 child: LineChart(
                                   LineChartData(
-                                    gridData: FlGridData(
-                                        show: false), // Hide grid lines
+                                    gridData: FlGridData(show: false),
+                                    // Hide grid lines
                                     titlesData: FlTitlesData(
                                       leftTitles: AxisTitles(
                                         sideTitles: SideTitles(
@@ -970,7 +1031,8 @@ class _DashboardViewState extends State<DashboardView> {
                                           interval: 28,
                                           getTitlesWidget: (value, meta) {
                                             return Text(
-                                              value.toStringAsFixed(0), // Format Y-axis values
+                                              value.toStringAsFixed(0),
+                                              // Format Y-axis values
                                               style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 12,
@@ -1014,15 +1076,16 @@ class _DashboardViewState extends State<DashboardView> {
                                     maxY: 45,
                                     lineBarsData: [
                                       LineChartBarData(
-                                        spots: mViewModel.scaledSpots,/*[
+                                        spots: mViewModel.scaledSpots,
+                                        /*[
                                           FlSpot(double.parse(mViewModel.dataList[0]
                                               .periodLength??"0"), double.parse(mViewModel.dataList[0]
                                               .periodCycleLength??"0")),
                                           FlSpot(double.parse(mViewModel.dataList[1]
                                               .periodLength??"0"), double.parse(mViewModel.dataList[0]
                                               .periodCycleLength??"0")), // First point
-                                          *//*FlSpot(8, 28), // Second point
-                                          FlSpot(14, 45), // Third point*//*
+                                          */ /*FlSpot(8, 28), // Second point
+                                          FlSpot(14, 45), // Third point*/ /*
                                         ],*/
                                         isCurved: true,
                                         color: CommonColors.primaryColor
@@ -1278,7 +1341,8 @@ class _DashboardViewState extends State<DashboardView> {
                                           BarChartRodData(
                                             fromY: 0,
                                             toY: int.parse(bdata.ydata)
-                                                .toDouble(), // Water intake value
+                                                .toDouble(),
+                                            // Water intake value
                                             width: 15,
                                             color: const Color.fromARGB(
                                                 255, 111, 64, 133),
@@ -1424,10 +1488,10 @@ class _DashboardViewState extends State<DashboardView> {
                             padding: const EdgeInsets.all(5.0),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors
-                                    .white, // Background color of the dropdown box
-                                borderRadius:
-                                    BorderRadius.circular(8), // Rounded corners
+                                color: Colors.white,
+                                // Background color of the dropdown box
+                                borderRadius: BorderRadius.circular(8),
+                                // Rounded corners
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black
@@ -1452,8 +1516,8 @@ class _DashboardViewState extends State<DashboardView> {
                                           255, 5, 5, 5), // Text color
                                     ),
                                   ),
-                                  isExpanded:
-                                      true, // Make dropdown expand to full width
+                                  isExpanded: true,
+                                  // Make dropdown expand to full width
                                   onChanged: (String? newValue) {
                                     setState(() {
                                       selectedItem = newValue;
@@ -2009,7 +2073,7 @@ Widget _tableCell(String text, Color color) {
   return TableCell(
     child: Container(
       color: color,
-      height: 50,
+      height: 70,
       width: 120,
       padding: const EdgeInsets.all(5),
       alignment: Alignment.center,

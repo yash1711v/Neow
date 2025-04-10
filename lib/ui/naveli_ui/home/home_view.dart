@@ -1433,7 +1433,7 @@ class _HomeViewState extends State<HomeView> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               (mViewModel.isLoading)
-                                  ? Lottie.asset("assets/icons/Flow.json",width: 250,height: 180)
+                                  ? CircularProgressIndicator()
                                   : Visibility(
                                       visible: timeoutValue == 2,
                                       child: Container(

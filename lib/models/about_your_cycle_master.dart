@@ -54,13 +54,15 @@ class CycleTableData {
   String? _periodDate;
   String? _periodLength;
   String? _periodCycleLength;
-  int? _deviation;
+  int? _cycleLengthDeviation;
+  int? _periodLengthDeviation;
 
   CycleTableData(
       {String? periodDate,
       String? periodLength,
       String? periodCycleLength,
-      int? deviation}) {
+      int? cycleLengthDeviation,
+      int? periodLengthDeviation,}) {
     if (periodDate != null) {
       _periodDate = periodDate;
     }
@@ -70,14 +72,21 @@ class CycleTableData {
     if (periodCycleLength != null) {
       _periodCycleLength = periodCycleLength;
     }
-    if (deviation != null) {
-      _deviation = deviation;
+    if (cycleLengthDeviation != null) {
+      _cycleLengthDeviation = cycleLengthDeviation;
+    }
+    if (periodLengthDeviation != null) {
+      _periodLengthDeviation = periodLengthDeviation;
     }
   }
 
-  int? get deviation => _deviation;
+  int? get cycleLengthDeviation => _cycleLengthDeviation;
 
-  set deviation(int? deviation) => _deviation = deviation;
+  set cycleLengthDeviation(int? deviation) => _cycleLengthDeviation = deviation;
+
+  int? get periodLengthDeviation => _periodLengthDeviation;
+
+  set periodLengthDeviation(int? deviation) => _periodLengthDeviation = deviation;
 
   String? get periodDate => _periodDate;
 
@@ -95,7 +104,8 @@ class CycleTableData {
     _periodDate = json['period_date'];
     _periodCycleLength = json['period_cycle_length'].toString();
     _periodLength = json['period_length'].toString();
-    _deviation = json['deviation'];
+    _cycleLengthDeviation = json['period_cycle_length_deviation'];
+    _periodLengthDeviation = json['period_length_deviation'];
   }
 
   Map<String, dynamic> toJson() {
@@ -103,7 +113,8 @@ class CycleTableData {
     data['period_date'] = _periodDate;
     data['period_cycle_length'] = _periodCycleLength;
     data['period_length'] = _periodLength;
-    data['deviation'] = _deviation;
+    data['period_cycle_length_deviation'] = _cycleLengthDeviation;
+    data['period_length_deviation'] = _periodLengthDeviation;
     return data;
   }
 }

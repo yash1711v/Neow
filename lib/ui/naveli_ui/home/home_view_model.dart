@@ -786,6 +786,7 @@ class HomeViewModel with ChangeNotifier {
   }
 
   Future<void> getPeriodInfoList() async {
+    peroidCustomeList = [];
     //CommonUtils.showProgressDialog();
     PeriodInfoListResponse? master = await _services.api!.getPeriodInfoList();
     //CommonUtils.hideProgressDialog();
@@ -859,42 +860,17 @@ await Future.delayed(Duration(seconds: 1));
     //CommonUtils.showProgressDialog();
     isLoading = true;
     dynamic body = {};
-    peroidCustomeList.forEach((element){
-      // element.
-      debugPrint("element ====>${element.avgCycleLength}");
-      element.predictions.forEach((data){
-
-        debugPrint("month ====>${data.month}");
-        debugPrint("month2 ====>${DateTime.parse(DateFormat('yyyy-MM-dd').format(selectedDate)).month.toString()}");
-
-        if(data.month.toString() == DateTime.parse(DateFormat('yyyy-MM-dd').format(selectedDate)).month.toString())
-        {
-          debugPrint("month ====>${data.month}");
-          debugPrint("month2 ====>${DateTime.parse(DateFormat('yyyy-MM-dd').format(selectedDate)).month.toString()}");
-          body = {
-            "clicked_date": DateFormat('yyyy-MM-dd').format(selectedDate).toString(),
-            "avg_cycle_length": element.avgCycleLength,
-            "predicted_start": data.predictedStart,
-            "predicted_end": data.predictedEnd,
-            "ovulation_day": data.ovulationDay,
-            "fertile_window_start": data.fertileWindowStart,
-            "fertile_window_end": data.fertileWindowEnd,
-          };
-        }
-      });
-    });
+    body = {
+      "clicked_date": DateFormat('yyyy-MM-dd').format(selectedDate).toString(),
+    };
     debugPrint("selectedDate ====>${DateFormat('yyyy-MM-dd').format(selectedDate)}");
     debugPrint("selectedDate ====>${body}");
 
-    if(body.isEmpty)
-    {
-      dateWiseTextList = ApiResponse(status: 0, msg: Message(title: "", description: "uh oh! Seems like you haven't logged your period yet", image: "https://neowindia.com/public/assets/log_images/gry1.png", periodMsg: "Period Late", color: "black"));
-    } else {
+
       Map<String, dynamic> response =
           await _services.api!.getDateWiseText(params: body);
       debugPrint("response in main response====>${response}");
       dateWiseTextList = ApiResponse.fromJson(response);
-    }
 
 
 
