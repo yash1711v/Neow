@@ -921,7 +921,7 @@ class _DashboardViewState extends State<DashboardView> {
                                                   .dataList[
                                               index]
                                                   .cycleLengthDeviation ??
-                                                  0) == 0
+                                                  0) != 0
                                                   ? Icon(Icons.warning_rounded,
                                                   color: Colors.red,
                                                   size: 25)
@@ -948,26 +948,11 @@ class _DashboardViewState extends State<DashboardView> {
                                               width: 120,
                                               padding: const EdgeInsets.all(5),
                                               alignment: Alignment.center,
-                                              child: int.parse(mViewModel
-                                                                  .dataList[
-                                                                      index]
-                                                                  .periodLength ??
-                                                              '0') <
-                                                          (mViewModel
-                                                                  .dataList[
-                                                                      index]
-                                                                  .periodLengthDeviation ??
-                                                              0) ||
-                                                      int.parse(mViewModel
-                                                                  .dataList[
-                                                                      index]
-                                                                  .periodLength ??
-                                                              '0') >
-                                                          (mViewModel
-                                                                  .dataList[
-                                                                      index]
-                                                                  .periodLengthDeviation ??
-                                                              0)
+                                              child: (mViewModel
+                                                  .dataList[
+                                              index]
+                                                  .periodLengthDeviation ??
+                                                  0) != 0
                                                   ? Icon(Icons.warning_rounded,
                                                       color: Colors.red,
                                                       size: 25)
