@@ -259,7 +259,7 @@ class _DashboardViewState extends State<DashboardView> {
       mViewModelSleep.attachedContext(context);
       mViewModelSleep.fetchSleepData();
 
-      setBarData();
+      // setBarData();
       mViewModelWeight.fetchWeightData();
       mAilmentsViewModel.getStoredAilmentsListApi(false);
       if (gUserType == AppConstants.NEOWME ||
@@ -917,11 +917,11 @@ class _DashboardViewState extends State<DashboardView> {
                                               width: 120,
                                               padding: const EdgeInsets.all(5),
                                               alignment: Alignment.center,
-                                              child:(mViewModel
+                                              child:!(mViewModel
                                                   .dataList[
                                               index]
-                                                  .cycleLengthDeviation ??
-                                                  0) != 0
+                                                  .cycleLengthInterpretation ??
+                                                  true)
                                                   ? Icon(Icons.warning_rounded,
                                                   color: Colors.red,
                                                   size: 25)
@@ -948,11 +948,11 @@ class _DashboardViewState extends State<DashboardView> {
                                               width: 120,
                                               padding: const EdgeInsets.all(5),
                                               alignment: Alignment.center,
-                                              child: (mViewModel
+                                              child: !(mViewModel
                                                   .dataList[
                                               index]
-                                                  .periodLengthDeviation ??
-                                                  0) != 0
+                                                  .periodLengthInterpretation ??
+                                                  true)
                                                   ? Icon(Icons.warning_rounded,
                                                       color: Colors.red,
                                                       size: 25)

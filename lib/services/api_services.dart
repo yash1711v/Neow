@@ -1264,6 +1264,7 @@ class ApiServices extends BaseServices {
   @override
   Future<AboutYourCycleReponse?> getAboutYourCycle() async {
     dynamic response = await appBaseClient.getApiWithTokenCall(url: ApiUrl.GET_ABOUT_YOUR_CYCLE);
+    debugPrint("response in overriding ${response}");
     if (response != null) {
       try {
         return AboutYourCycleReponse.fromJson(response);

@@ -221,6 +221,7 @@ class DashBoardViewModel with ChangeNotifier {
   Future<void> getAboutYourCycle() async {
     // CommonUtils.showProgressDialog();
     AboutYourCycleReponse? master = await _services.api!.getAboutYourCycle();
+    print("about =>${master?.data![0].periodLengthInterpretation}");
     // CommonUtils.hideProgressDialog();
     if (master == null) {
       CommonUtils.oopsMSG();

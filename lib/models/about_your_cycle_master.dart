@@ -56,13 +56,18 @@ class CycleTableData {
   String? _periodCycleLength;
   int? _cycleLengthDeviation;
   int? _periodLengthDeviation;
+  bool? _periodCycleLengthInterpretation;
+  bool? _cycleLengthInterpretation;
 
   CycleTableData(
       {String? periodDate,
       String? periodLength,
       String? periodCycleLength,
       int? cycleLengthDeviation,
-      int? periodLengthDeviation,}) {
+      int? periodLengthDeviation,
+        bool? periodCycleLengthInterpretation,
+        bool? cycleLengthInterpretation
+      }) {
     if (periodDate != null) {
       _periodDate = periodDate;
     }
@@ -78,6 +83,13 @@ class CycleTableData {
     if (periodLengthDeviation != null) {
       _periodLengthDeviation = periodLengthDeviation;
     }
+
+    if (periodCycleLengthInterpretation != null) {
+      _periodCycleLengthInterpretation = periodCycleLengthInterpretation;
+    }
+    if (cycleLengthInterpretation != null) {
+      _cycleLengthInterpretation = cycleLengthInterpretation;
+    }
   }
 
   int? get cycleLengthDeviation => _cycleLengthDeviation;
@@ -87,6 +99,14 @@ class CycleTableData {
   int? get periodLengthDeviation => _periodLengthDeviation;
 
   set periodLengthDeviation(int? deviation) => _periodLengthDeviation = deviation;
+
+  bool? get cycleLengthInterpretation => _cycleLengthInterpretation;
+
+  set cycleLengthInterpretation(bool? inter) => _cycleLengthInterpretation = inter;
+
+  bool? get periodLengthInterpretation => _periodCycleLengthInterpretation;
+
+  set periodLengthInterpretation(bool? inter) => _periodCycleLengthInterpretation = inter;
 
   String? get periodDate => _periodDate;
 
@@ -115,6 +135,8 @@ class CycleTableData {
     data['period_length'] = _periodLength;
     data['period_cycle_length_deviation'] = _cycleLengthDeviation;
     data['period_length_deviation'] = _periodLengthDeviation;
+    data['period_cycle_length_interpretation'] = _cycleLengthInterpretation;
+    data['period_length_interpretation'] = _periodCycleLengthInterpretation;
     return data;
   }
 }

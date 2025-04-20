@@ -37,6 +37,12 @@ class _HealthMixViewState extends State<HealthMixView>
     S.of(mainNavKey.currentContext!)!.calebSpeaks,
     S.of(mainNavKey.currentContext!)!.empowHer, */
   ];
+  final List<String> subHeadings = [
+    'Popular',
+    "Latest",
+    "Saved"
+
+  ];
 
   @override
   void initState() {
@@ -171,6 +177,18 @@ class _HealthMixViewState extends State<HealthMixView>
               /* Text(
                   "Testing code",
                 ), */
+                  // TabBar(tabs: subHeadings.map((title) {
+                  //   return Tab(
+                  //     child: Text(
+                  //       title.toUpperCase(),
+                  //       style: TextStyle(
+                  //         color: CommonColors.blackColor,
+                  //         fontSize: 15,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     ),
+                  //   );
+                  // }).toList()),
               kCommonSpaceV20,
                   Expanded(
                     child: GridView.builder(
@@ -181,7 +199,7 @@ class _HealthMixViewState extends State<HealthMixView>
                         mainAxisSpacing: 5.0, // spacing between rows
                         crossAxisSpacing: 5.0, // spacing between columns
                       ),
-                      padding: EdgeInsets.all(10.0), // padding around the grid
+                      padding: EdgeInsets.symmetric(horizontal: 5.0), // padding around the grid
                       itemCount: mViewModel
                           .healthPostsList.length, // total number of items
                       itemBuilder: (BuildContext context, int index) {
