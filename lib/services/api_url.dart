@@ -10,6 +10,7 @@ class ApiUrl {
   static const String SIGN_UP = "${BASE_URL}signup";
   static const String LOGIN = "${BASE_URL}login";
   static const String DynamicText = "${BASE_URL}get-dyanamic-text";
+  static const String logSymptoms = "${BASE_URL}listuserSymptomsLogs";
   static const String VERIFY_MOBILE = "${BASE_URL}verify-mobile";
   static const String USER_DETAIL = "${BASE_URL}user-details";
   static const String LOGOUT = "${BASE_URL}logout";

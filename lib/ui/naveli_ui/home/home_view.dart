@@ -1,7 +1,7 @@
 import 'dart:async';
 
 // import 'package:widgets_easier/widgets_easier.dart';
-import 'package:dotted_border/dotted_border.dart';
+import    'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -217,7 +217,7 @@ class _HomeViewState extends State<HomeView> {
     DateTime dateWithoutTime =
         DateTime(currentDate.year, currentDate.month, currentDate.day);
     // mViewModel.startSlider();
-    mViewHealthMixModel.getHealthMixPostsApi(titleId: 7);
+    mViewHealthMixModel.getHealthMixPostsApi(titleId: 7, type: "Popular");
     /* mViewModel.getSliderVideoApi().whenComplete(
           () => mViewHealthMixModel
               .getHealthMixPostsApi(titleId: 7)

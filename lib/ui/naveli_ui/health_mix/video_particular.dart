@@ -46,7 +46,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       children: [
         SizedBox(
           width: double.infinity,
-          height: kDeviceHeight / 4,
+          height: double.infinity,
           child: YoutubePlayer(
             controller: _controller,
             showVideoProgressIndicator: true,

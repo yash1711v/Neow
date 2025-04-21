@@ -22,9 +22,11 @@ class HealthMixView extends StatefulWidget {
 class _HealthMixViewState extends State<HealthMixView>
     with SingleTickerProviderStateMixin {
   TabController? tabController;
+  TabController? tabController2;
   late HealthMixViewModel mViewModel;
   SampleItem? selectedMenu;
   int selectedTabIndex = 0;
+  int selectedTabIndex2 = 0;
   final bool _isLiked = false;
 
   final List<String> text = [
@@ -37,12 +39,7 @@ class _HealthMixViewState extends State<HealthMixView>
     S.of(mainNavKey.currentContext!)!.calebSpeaks,
     S.of(mainNavKey.currentContext!)!.empowHer, */
   ];
-  final List<String> subHeadings = [
-    'Popular',
-    "Latest",
-    "Saved"
-
-  ];
+  final List<String> subHeadings = ['Popular', "Latest", "Saved"];
 
   @override
   void initState() {
@@ -50,6 +47,7 @@ class _HealthMixViewState extends State<HealthMixView>
     Future.delayed(Duration.zero, () {
       mViewModel.attachedContext(context);
       tabController = TabController(length: text.length, vsync: this);
+      tabController2 = TabController(length: subHeadings.length, vsync: this);
       getPostList();
     });
   }
@@ -63,23 +61,89 @@ class _HealthMixViewState extends State<HealthMixView>
     getPostList();
   }
 
+  void onButtonPressed2(int index) {
+    setState(() {
+      selectedTabIndex2 = index;
+    });
+    tabController2?.animateTo(selectedTabIndex2,
+        duration: const Duration(milliseconds: 300), curve: Curves.ease);
+    getPostList();
+  }
+
   void getPostList() {
     if (selectedTabIndex == 0) {
-      mViewModel.getHealthMixPostsApi(titleId: 7);
+       if(selectedTabIndex2 == 1){
+        mViewModel.getHealthMixPostsApi(titleId: 1,type: "latest");
+      } else if(selectedTabIndex2 == 2){
+        mViewModel.getHealthMixPostsApi(titleId: 1,type: "saved");
+      } else {
+        mViewModel.getHealthMixPostsApi(titleId: 1,type: "popular");
+       }
     } else if (selectedTabIndex == 1) {
-      mViewModel.getHealthMixPostsApi(titleId: 1);
+      if(selectedTabIndex2 == 1){
+        mViewModel.getHealthMixPostsApi(titleId: 2,type: "latest");
+      } else if(selectedTabIndex2 == 2){
+        mViewModel.getHealthMixPostsApi(titleId: 2,type: "saved");
+      } else {
+        mViewModel.getHealthMixPostsApi(titleId: 2,type: "popular");
+      }
     } else if (selectedTabIndex == 2) {
-      mViewModel.getHealthMixPostsApi(titleId: 2);
+      if(selectedTabIndex2 == 1){
+        mViewModel.getHealthMixPostsApi(titleId: 3,type: "latest");
+      } else if(selectedTabIndex2 == 2){
+        mViewModel.getHealthMixPostsApi(titleId: 3,type: "saved");
+      } else {
+        mViewModel.getHealthMixPostsApi(titleId: 3,type: "popular");
+      }
     } else if (selectedTabIndex == 3) {
-      mViewModel.getHealthMixPostsApi(titleId: 4);
+      if(selectedTabIndex2 == 1){
+        mViewModel.getHealthMixPostsApi(titleId: 4,type: "latest");
+      } else if(selectedTabIndex2 == 2){
+        mViewModel.getHealthMixPostsApi(titleId: 4,type: "saved");
+      } else {
+        mViewModel.getHealthMixPostsApi(titleId: 4,type: "popular");
+      }
     } else if (selectedTabIndex == 4) {
-      mViewModel.getHealthMixPostsApi(titleId: 3);
+
+      if(selectedTabIndex2 == 1){
+        mViewModel.getHealthMixPostsApi(titleId: 5,type: "latest");
+      } else if(selectedTabIndex2 == 2){
+        mViewModel.getHealthMixPostsApi(titleId: 5,type: "saved");
+      } else {
+        mViewModel.getHealthMixPostsApi(titleId: 5,type: "popular");
+      }
+
     } else if (selectedTabIndex == 5) {
-      mViewModel.getHealthMixPostsApi(titleId: 5);
+
+      if(selectedTabIndex2 == 1){
+        mViewModel.getHealthMixPostsApi(titleId: 6,type: "latest");
+      } else if(selectedTabIndex2 == 2){
+        mViewModel.getHealthMixPostsApi(titleId: 6,type: "saved");
+      } else {
+        mViewModel.getHealthMixPostsApi(titleId: 6,type: "popular");
+      }
+
     } else if (selectedTabIndex == 6) {
-      mViewModel.getHealthMixPostsApi(titleId: 6);
+
+      if(selectedTabIndex2 == 1){
+        mViewModel.getHealthMixPostsApi(titleId: 7,type: "latest");
+      } else if(selectedTabIndex2 == 2){
+        mViewModel.getHealthMixPostsApi(titleId: 7,type: "saved");
+      } else {
+        mViewModel.getHealthMixPostsApi(titleId: 7,type: "popular");
+      }
+
+
     } else if (selectedTabIndex == 7) {
-      mViewModel.getHealthMixPostsApi(titleId: 8);
+
+      if(selectedTabIndex2 == 1){
+        mViewModel.getHealthMixPostsApi(titleId: 8,type: "latest");
+      } else if(selectedTabIndex2 == 2){
+        mViewModel.getHealthMixPostsApi(titleId: 8,type: "saved");
+      } else {
+        mViewModel.getHealthMixPostsApi(titleId: 8,type: "popular");
+      }
+
     }
   }
 
@@ -99,25 +163,6 @@ class _HealthMixViewState extends State<HealthMixView>
         child: Scaffold(
             backgroundColor: CommonColors.mTransparent,
             appBar: AppBar(
-              /* bottom: TabBar(
-              tabAlignment: TabAlignment.start,
-              isScrollable: true,
-              onTap: (index) {
-                onButtonPressed(index);
-              },
-              tabs: text.map((title) {
-                return Tab(
-                  child: Text(
-                    title.toUpperCase(),
-                    style: TextStyle(
-                      color: CommonColors.blackColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ), */
               backgroundColor: CommonColors.mTransparent,
               elevation: 0,
               centerTitle: true,
@@ -174,162 +219,162 @@ class _HealthMixViewState extends State<HealthMixView>
                                           color: txtColor,
                                         )))));
                           }))),
+              SizedBox(
+                height: 25,
+              ),
+              SizedBox(
+                  height: 50,
+                  child: Container(
+                      child: ListView.builder(
+                          itemCount: subHeadings.length,
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            var txtColor = selectedTabIndex2 == index
+                                ? CommonColors.primaryColor
+                                : CommonColors.blackColor;
+                            return (GestureDetector(
+                                onTap: () {
+                                  onButtonPressed2(index);
+                                },
+                                child: Container(
+                                    height: 70,
+                                    padding: const EdgeInsets.only(
+                                      left: 0,
+                                      right: 15,
+                                    ),
+                                    margin: const EdgeInsets.only(left: 5),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(subHeadings[index],
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: txtColor,
+                                                )),
+                                          ],
+                                        ),
+                                        Visibility(
+                                          visible: selectedTabIndex2 == index,
+                                          child: Container(
+                                              height: 3,
+                                              width: 80,
+                                              color: txtColor),
+                                        )
+                                      ],
+                                    ))));
+                          }))),
               /* Text(
                   "Testing code",
                 ), */
-                  // TabBar(tabs: subHeadings.map((title) {
-                  //   return Tab(
-                  //     child: Text(
-                  //       title.toUpperCase(),
-                  //       style: TextStyle(
-                  //         color: CommonColors.blackColor,
-                  //         fontSize: 15,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     ),
-                  //   );
-                  // }).toList()),
-              kCommonSpaceV20,
+              // TabBar(
+              //     controller: tabController2,
+              //     tabs: subHeadings.map((title) {
+              //   return Tab(
+              //
+              //     child: Text(
+              //       title.toUpperCase(),
+              //       style: TextStyle(
+              //         color: CommonColors.blackColor,
+              //         fontSize: 15,
+              //         fontWeight: FontWeight.bold,
+              //       ),
+              //     ),
+              //   );
+              // }).toList()),
+              // kCommonSpaceV20,
                   Expanded(
-                    child: GridView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // number of items in each row
-                        mainAxisSpacing: 5.0, // spacing between rows
-                        crossAxisSpacing: 5.0, // spacing between columns
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 5.0), // padding around the grid
-                      itemCount: mViewModel
-                          .healthPostsList.length, // total number of items
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                            onTap: () {
-                              push(PostList(
-                                  position: index,
-                                  selectedTabIndex: selectedTabIndex));
-                            },
-                            child: Container(
-                              // color: Colors.blue, // color of grid items
-                              clipBehavior: Clip.antiAlias,
-                              decoration: ShapeDecoration(
-                                color: CommonColors.mWhite,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                shadows: const [
-                                  BoxShadow(
-                                    color: Color(0x3F000000),
-                                    blurRadius: 5,
-                                    offset: Offset(0, 2),
-                                    spreadRadius: 0,
-                                  )
-                                ],
-                              ),
-                              child: Column(
+                    child: SingleChildScrollView(
+                       padding: EdgeInsets.only(left: 15),
+                      child: Wrap(
+                        spacing: 15.0, // space between items horizontally
+                        runSpacing: 0.0, // space between lines
+                        children: List.generate(
+                          mViewModel.healthPostsList.length,
+                              (index) {
+                            final item = mViewModel.healthPostsList[index];
+                            final isImage = item.mediaType == 'image';
+                            final mediaUrl = item.media ?? "https://icon-library.com/images/no-picture-available-icon/no-picture-available-icon-1.jpg";
+
+                            return GestureDetector(
+                              onTap: () {
+                                push(PostList(position: index, selectedTabIndex: selectedTabIndex));
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width / 2 - 20, // approx half-width with padding
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
-                                        height: 110,
-                                        // padding:const EdgeInsets.all(10,),
-                                        decoration: BoxDecoration(
-                                          // color:Color(0xFFF2C731),
-                                          /* gradient: LinearGradient(
-                                      begin: Alignment.topCenter,//(0.5, 0.5),
-                                      end: Alignment.bottomCenter,//(-0.5, -0.5),
-                                      colors: [Color(0xFFF2C731),Color(0xFFF2C731),Color(0xFFF2C731), CommonColors.blackColor.withOpacity(0.1)],
-                                      // stops: [0, 0.2, 0.8, 1],
-                                    ), */
-                                          borderRadius: BorderRadius.circular(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.1),
+                                            blurRadius: 5,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      height: 150,
+                                      width: double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: isImage
+                                            ? Image.network(mediaUrl, fit: BoxFit.cover)
+                                            : Align(
+                                          alignment: Alignment.center,
+                                          child: Image.network(
+                                            "https://icon-library.com/images/no-picture-available-icon/no-picture-available-icon-1.jpg",
+                                            height: 110,
+                                          ),
                                         ),
-                                        child: Align(
-                                            alignment: Alignment.center,
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                                children: [
-                                                  if (mViewModel
-                                                      .healthPostsList[index]
-                                                      .mediaType ==
-                                                      'image')
-                                                    Container(
-                                                      height: 110,
-                                                      decoration: BoxDecoration(
-                                                        image: DecorationImage(
-                                                          image: NetworkImage(mViewModel
-                                                              .healthPostsList[
-                                                          index]
-                                                              .media ??
-                                                              "https://icon-library.com/images/no-picture-available-icon/no-picture-available-icon-1.jpg"),
-                                                          fit: BoxFit.fill,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  if (mViewModel
-                                                      .healthPostsList[index]
-                                                      .mediaType ==
-                                                      'link')
-                                                    SizedBox(
-                                                        height: 110,
-                                                        child: Align(
-                                                            alignment:
-                                                            Alignment.center,
-                                                            child: Image.network(
-                                                              "https://icon-library.com/images/no-picture-available-icon/no-picture-available-icon-1.jpg",
-                                                              height: 110,
-                                                            )) /* VideoPlayerScreen(
-                                      link: mViewModel
-                                              .healthPostsList[index].media ??
-                                          "https://icon-library.com/images/no-picture-available-icon/no-picture-available-icon-1.jpg",
-                                      // isFillAvailableSpace: false,
-                                      // isLoop: true,
-                                      // isMute: false,
-                                    ), */
-                                                    ),
-                                                ])
-
-                                          /* Image.asset(
-                                                  LocalImages.img_nutrition_img,
-                                                  // width:kDeviceWidth/1.4,
-                                                  height:100,
-                                                  fit: BoxFit.cover,
-                                                ) */
-                                        )),
-                                    kCommonSpaceV5,
-                                    SizedBox(height: 5),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 10),
                                       child: Text(
-                                          mViewModel.healthPostsList[index]
-                                              .description ??
-                                              '',
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          )),
+                                        item.description ?? '',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                    SizedBox(height: 5),
+                                    const SizedBox(height: 5),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 10),
                                       child: Text(
-                                          mViewModel.healthPostsList[index]
-                                              .diffrenceTime ??
-                                              '',
-                                          style: TextStyle(
-                                            color: CommonColors.blackColor
-                                                .withOpacity(0.6),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          )),
+                                        item.diffrenceTime ?? '',
+                                        style: TextStyle(
+                                          color: CommonColors.blackColor.withOpacity(0.6),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ]),
-                            ));
-                      },
+                                    const SizedBox(height: 15),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   )
-              /* GridView.builder(
+
+                  /* GridView.builder(
                   scrollDirection:Axis.vertical,
                   shrinkWrap: true,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -345,7 +390,7 @@ class _HealthMixViewState extends State<HealthMixView>
                       color: Colors.blue, // color of grid items
                       child: Center(
                         child: Text(
-                          
+
                                     'Testing',
                           overflow: TextOverflow.ellipsis,
                           maxLines:1,

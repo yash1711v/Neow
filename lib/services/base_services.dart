@@ -224,4 +224,6 @@ abstract class BaseServices {
   Future<PeriodInfoListResponse?> savePeriodsInfo({required Map<String, dynamic> params});
 
   Future<AboutYourCycleReponse?> getAboutYourCycle();
+
+  Future<Map<String,dynamic>> postUserSymptoms({required Map<String, dynamic> body});
 }

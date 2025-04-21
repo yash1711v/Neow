@@ -165,8 +165,8 @@ class LogYourSymptomsModel with ChangeNotifier {
       String? previousDateString = globalUserMaster?.previousPeriodsBegin ?? '';
       List<String> dateParts = previousDateString.split(',');
       int year = int.tryParse(dateParts[0].trim()) ?? 0;
-      int month = int.tryParse(dateParts[1].trim()) ?? 0;
-      int day = int.tryParse(dateParts[2].trim()) ?? 0;
+      int month = int.tryParse(dateParts[0].trim()) ?? 0;
+      int day = int.tryParse(dateParts[0].trim()) ?? 0;
 
       DateTime previousDate = DateTime(year, month, day);
 
@@ -257,6 +257,14 @@ class LogYourSymptomsModel with ChangeNotifier {
       //   master.message ?? S.of(mainNavKey.currentContext!)!.userDataSyncFailed,
       // );
     }
+    notifyListeners();
+  }
+
+  Future<void> postUserSymptomsLogApi({required Map<String, dynamic> body}) async {
+
+    Map<String,dynamic> master =
+        await _services.api!.postUserSymptoms(body: {});
+    debugPrint("master: $master");
     notifyListeners();
   }
 

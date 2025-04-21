@@ -486,13 +486,13 @@ class S implements WidgetsLocalizations {
 
   String get periodCramps => "Period Cramps";
 
-  String get noHurt => "No Hurts";
+  String get noHurt => "No Pain";
 
-  String get hurtLittleBit => "Hurts Little bit";
+  String get hurtLittleBit => "Little";
 
-  String get hurtMore => "Hurts More";
+  String get hurtMore => "Bad";
 
-  String get hurtWorst => "Hurts Worst";
+  String get hurtWorst => "Severe";
 
   String get collectionMethod => "Collection Method";
 

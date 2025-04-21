@@ -239,73 +239,80 @@ class _CommonSymptomsTitleState extends State<CommonSymptomsTitle> {
                       onTap: () {
                         showDialog(
                           context: context,
+                          barrierColor: Colors.black54, // Optional dim effect
                           builder: (BuildContext context) {
-                            Future.delayed(
-                              const Duration(seconds: 3),
-                              () {
-                                Navigator.of(context).pop();
-                              },
-                            );
-                            return AlertDialog(
-                              content: Container(
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                    Align(
-                                        alignment: Alignment.topRight,
-                                        child: SecondaryButton(
-                                          width: 40,
-                                          isRounded: false,
-                                          padding: const EdgeInsets.only(
-                                              left: 8, right: 20),
-                                          onPress: () {
-                                            Navigator.pop(context);
-                                          },
-                                          label: 'X',
-                                          labelColor: CommonColors.primaryColor,
-                                        )),
-                                    Container(
-                                      color: CommonColors.mWhite,
-                                      padding: const EdgeInsets.only(
-                                          left: 15,
-                                          right: 15,
-                                          top: 15,
-                                          bottom: 5),
-                                      child: Text(
-                                        widget.title,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: CommonColors.blackColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
-                                      ),
+                            Future.delayed(const Duration(seconds: 3), () {
+                              Navigator.of(context).pop();
+                            });
+
+                            return Dialog(
+                              backgroundColor: Colors.transparent,
+                              insetPadding: const EdgeInsets.all(20),
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  /// Main dialog box
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                          color: CommonColors.primaryColor,
+                                          width: 2),
                                     ),
-                                    Container(
-                                      color: CommonColors.mWhite,
-                                      padding: const EdgeInsets.only(
-                                          left: 15,
-                                          right: 15,
-                                          top: 10,
-                                          bottom: 10),
-                                      child: Text(
-                                        widget.dialogText ?? "Some text",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            color: CommonColors.blackColor,
-                                            fontSize: 14),
-                                      ),
-                                    )
-                                    /* Text(
-                                      widget.dialogText ?? "Some text",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: CommonColors.primaryColor,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ), */
-                                  ])),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        /// Close button
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: GestureDetector(
+                                            onTap: () => Navigator.pop(context),
+                                            child: const Icon(Icons.close,
+                                                color:
+                                                    CommonColors.primaryColor),
+                                          ),
+                                        ),
+
+                                        /// Title
+                                        Text(
+                                          widget.title ?? "Working Ability",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: CommonColors.primaryColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+
+                                        /// Description
+                                        Text(
+                                          widget.dialogText ??
+                                              "Capacity to perform tasks effectively while on periods",
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  /// Push-pin like pointer at the top-left
+                                  Positioned(
+                                    top: -20,
+                                    left: 12,
+                                    child: Icon(
+                                      Icons.push_pin,
+                                      size: 32,
+                                      color: CommonColors.primaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             );
                           },
                         );
@@ -348,88 +355,102 @@ class _CommonSymptomsTitleState extends State<CommonSymptomsTitle> {
                               // Navigator.of(context).pop();
                             },
                           );
-                          return AlertDialog(
-                            backgroundColor: CommonColors.mTransparent,
-                            content: Container(
-                                // color:CommonColors.mWhite,
-                                height: kDeviceHeight / 3,
-                                width: kDeviceWidth - 20,
-                                decoration: BoxDecoration(
-                                  color: CommonColors.mWhite,
-                                  /* image: DecorationImage(
-                                    image: AssetImage(LocalImages.img_info_banner),
-                                    fit: BoxFit.cover,
-                                  ), */
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Align(
-                                          alignment: Alignment.topRight,
-                                          child: SecondaryButton(
-                                            width: 40,
-                                            isRounded: false,
-                                            padding: const EdgeInsets.only(
-                                                left: 8, right: 20),
-                                            onPress: () {
-                                              Navigator.pop(context);
-                                            },
-                                            label: 'X',
-                                            labelColor:
-                                                CommonColors.primaryColor,
-                                          )),
-                                      Container(
-                                        color: CommonColors.mWhite,
-                                        padding: const EdgeInsets.only(
-                                            left: 15,
-                                            right: 15,
-                                            top: 15,
-                                            bottom: 5),
-                                        child: Text(
-                                          widget.title,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: CommonColors.primaryColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
-                                        ),
-                                      ),
-                                      Container(
-                                        color: CommonColors.mWhite,
-                                        padding: const EdgeInsets.only(
-                                            left: 15,
-                                            right: 15,
-                                            top: 10,
-                                            bottom: 10),
-                                        child: Text(
-                                          widget.dialogText ?? "Some text",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: CommonColors.blackColor,
-                                              fontSize: 14),
-                                        ),
-                                      )
-                                      /* Text(
-                                      widget.dialogText ?? "Some text",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: CommonColors.primaryColor,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                          return Stack(
+                            children: [
+                              AlertDialog(
+                                backgroundColor: CommonColors.mTransparent,
+                                content: Container(
+                                    // color:CommonColors.mWhite,
+                                   height: kDeviceHeight/4,
+                                    width: kDeviceWidth - 20,
+                                    decoration: BoxDecoration(
+                                      color: CommonColors.mWhite,
+                                      /* image: DecorationImage(
+                                      image: AssetImage(LocalImages.img_info_banner),
+                                      fit: BoxFit.cover,
                                     ), */
-                                    ])),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                GestureDetector(
+                                                    onTap: () =>
+                                                        Navigator.pop(context),
+                                                    child: Icon(Icons.cancel)),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 25,
+                                          ),
+                                          Container(
+                                            color: CommonColors.mWhite,
+                                            padding: const EdgeInsets.only(
+                                                left: 15,
+                                                right: 15,
+                                                bottom: 5),
+                                            child: Text(
+                                              widget.title,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  color: CommonColors.primaryColor,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20),
+                                            ),
+                                          ),
+                                          Container(
+                                            color: CommonColors.mWhite,
+                                            padding: const EdgeInsets.only(
+                                                left: 15,
+                                                right: 15,),
+                                            child: Text(
+                                              widget.dialogText ?? "Some text",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  color:
+                                                      CommonColors.blackColor,
+                                                  fontSize: 14),
+                                            ),
+                                          )
+                                          /* Text(
+                                        widget.dialogText ?? "Some text",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: CommonColors.primaryColor,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ), */
+                                        ])),
 
-                            /* Text(
-                              widget.dialogText ?? "Some text",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: CommonColors.primaryColor,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
+                                /* Text(
+                                  widget.dialogText ?? "Some text",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: CommonColors.primaryColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ), */
                               ),
-                            ), */
+                              Positioned(
+                                top: MediaQuery.of(context).size.height/2 - 125,
+                                left: 55,
+                                child: Image.asset("assets/images/ic_pin.png",width: 35,),
+
+                              ),
+                            ],
                           );
                         },
                       );

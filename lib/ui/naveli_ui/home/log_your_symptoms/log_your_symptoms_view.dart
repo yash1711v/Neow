@@ -37,6 +37,202 @@ class _LogYourSymptomsState extends State<LogYourSymptoms>
       // startBlinkingAnimation();
     });
   }
+  void showDysmenorrheaDialog(BuildContext context) {
+    debugPrint("showDysmenorrheaDialog");
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            width: 340, // Custom dimensions, responsive if needed
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// Header row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Dysmenorrhea",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "(severe pain)",
+                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// Image and speech bubble
+                Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    Image.asset(
+                      'assets/images/ic_server_img.png',
+                      height: 160,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                /// Description
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Possible cause may be:",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                /// Bulleted list
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("• Fibroids"),
+                      Text("• Endometriosis"),
+                      Text("• Pelvic Infections"),
+                      Text("• Cyst"),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// CTA
+                const Text(
+                  "Get examined today!",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  void showheavyFlow(BuildContext context) {
+    debugPrint("showDysmenorrheaDialog");
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            width: 340, // Custom dimensions, responsive if needed
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// Header row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Heavy menstrual bleeding",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+
+
+                const SizedBox(height: 16),
+
+                /// Image and speech bubble
+                Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    Image.asset(
+                      'assets/images/ic_heavy.png',
+                      height: 160,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                /// Description
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Possible cause may be:",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                /// Bulleted list
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("• Fibroids"),
+                      Text("• Cyst"),
+                      Text("• Endometrial Polyps"),
+                      Text("• Cancer"),
+
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// CTA
+                const Text(
+                  "Get examined today!",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   // @override
   // void dispose() {
@@ -164,6 +360,7 @@ class _LogYourSymptomsState extends State<LogYourSymptoms>
                   kCommonSpaceH10,
                   CommonSymptomsWidget(
                     onTap: () {
+                      showheavyFlow(context);
                       setState(() {
                         mViewModel.selectedStaining = 3;
                         mViewModel.count += 1;
@@ -277,89 +474,92 @@ class _LogYourSymptomsState extends State<LogYourSymptoms>
               ),
               kCommonSpaceV10,
               IntrinsicHeight(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CommonSymptomsWidget(
-                      // height: 98,
-                      onTap: () {
-                        setState(() {
-                          mViewModel.selectedWorkingAbility = 1;
-                        });
-                        if (mViewModel.count != 0) {
-                          mViewModel.count -= 1;
-                        }
-                        mViewModel.userSymptomsLogApi(
-                            workingAbility: mViewModel.selectedWorkingAbility,
-                            workingAbilityScore: 0);
-                      },
-                      imagePath: LocalImages.img_working_4,
-                      // imgHeight: 70,
-                      underText: 'Very\nActive',
-                      isUnderText: true,
-                      isSelected: mViewModel.selectedWorkingAbility == 1,
-                    ),
-                    kCommonSpaceH15,
-                    CommonSymptomsWidget(
-                      // height: 116,
-                      onTap: () {
-                        setState(() {
-                          mViewModel.selectedWorkingAbility = 2;
-                        });
-                        if (mViewModel.count != 0) {
-                          mViewModel.count -= 1;
-                        }
-                        mViewModel.userSymptomsLogApi(
-                            workingAbility: mViewModel.selectedWorkingAbility,
-                            workingAbilityScore: 1);
-                      },
-                      imagePath: LocalImages.img_working_3,
-                      // imgHeight: 70,
-                      underText: 'Active\n',
-                      isUnderText: true,
-                      isSelected: mViewModel.selectedWorkingAbility == 2,
-                    ),
-                    kCommonSpaceH15,
-                    CommonSymptomsWidget(
-                      // height: 116,
-                      onTap: () {
-                        setState(() {
-                          mViewModel.selectedWorkingAbility = 3;
-                        });
-                        if (mViewModel.count != 0) {
-                          mViewModel.count -= 1;
-                        }
-                        mViewModel.userSymptomsLogApi(
-                            workingAbility: mViewModel.selectedWorkingAbility,
-                            workingAbilityScore: 1);
-                      },
-                      imagePath: LocalImages.img_working_2,
-                      // imgHeight: 70,
-                      underText: 'Somewhat\nActive',
-                      isUnderText: true,
-                      isSelected: mViewModel.selectedWorkingAbility == 3,
-                    ),
-                    kCommonSpaceH15,
-                    CommonSymptomsWidget(
-                      // height: 116,
-                      onTap: () {
-                        setState(() {
-                          mViewModel.selectedWorkingAbility = 4;
-                        });
-                        if (mViewModel.count != 0) {
-                          mViewModel.count -= 1;
-                        }
-                        mViewModel.userSymptomsLogApi(
-                            workingAbility: mViewModel.selectedWorkingAbility,
-                            workingAbilityScore: 1);
-                      },
-                      imagePath: LocalImages.img_working_1,
-                      // imgHeight: 70,
-                      underText: 'inactive\n',
-                      isUnderText: true,
-                      isSelected: mViewModel.selectedWorkingAbility == 4,
-                    ),
-                  ],
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      CommonSymptomsWidget(
+                        // height: 98,
+                        onTap: () {
+                          setState(() {
+                            mViewModel.selectedWorkingAbility = 1;
+                          });
+                          if (mViewModel.count != 0) {
+                            mViewModel.count -= 1;
+                          }
+                          mViewModel.userSymptomsLogApi(
+                              workingAbility: mViewModel.selectedWorkingAbility,
+                              workingAbilityScore: 0);
+                        },
+                        imagePath: LocalImages.img_working_4,
+                        // imgHeight: 70,
+                        underText: 'Very\nActive',
+                        isUnderText: true,
+                        isSelected: mViewModel.selectedWorkingAbility == 1,
+                      ),
+                      kCommonSpaceH15,
+                      CommonSymptomsWidget(
+                        // height: 116,
+                        onTap: () {
+                          setState(() {
+                            mViewModel.selectedWorkingAbility = 2;
+                          });
+                          if (mViewModel.count != 0) {
+                            mViewModel.count -= 1;
+                          }
+                          mViewModel.userSymptomsLogApi(
+                              workingAbility: mViewModel.selectedWorkingAbility,
+                              workingAbilityScore: 1);
+                        },
+                        imagePath: LocalImages.img_working_3,
+                        // imgHeight: 70,
+                        underText: 'Active\n',
+                        isUnderText: true,
+                        isSelected: mViewModel.selectedWorkingAbility == 2,
+                      ),
+                      kCommonSpaceH15,
+                      CommonSymptomsWidget(
+                        // height: 116,
+                        onTap: () {
+                          setState(() {
+                            mViewModel.selectedWorkingAbility = 3;
+                          });
+                          if (mViewModel.count != 0) {
+                            mViewModel.count -= 1;
+                          }
+                          mViewModel.userSymptomsLogApi(
+                              workingAbility: mViewModel.selectedWorkingAbility,
+                              workingAbilityScore: 1);
+                        },
+                        imagePath: LocalImages.img_working_2,
+                        // imgHeight: 70,
+                        underText: 'Somewhat\nActive',
+                        isUnderText: true,
+                        isSelected: mViewModel.selectedWorkingAbility == 3,
+                      ),
+                      kCommonSpaceH15,
+                      CommonSymptomsWidget(
+                        // height: 116,
+                        onTap: () {
+                          setState(() {
+                            mViewModel.selectedWorkingAbility = 4;
+                          });
+                          if (mViewModel.count != 0) {
+                            mViewModel.count -= 1;
+                          }
+                          mViewModel.userSymptomsLogApi(
+                              workingAbility: mViewModel.selectedWorkingAbility,
+                              workingAbilityScore: 1);
+                        },
+                        imagePath: LocalImages.img_working_1,
+                        // imgHeight: 70,
+                        underText: 'inactive\n',
+                        isUnderText: true,
+                        isSelected: mViewModel.selectedWorkingAbility == 4,
+                      ),
+                    ],
+                  ),
                 ),
               ),
               CommonSymptomsTitle(
@@ -663,6 +863,7 @@ class _LogYourSymptomsState extends State<LogYourSymptoms>
                   children: [
                     CommonSymptomsWidget(
                       onTap: () {
+
                         setState(() {
                           mViewModel.selectedCramps = 1;
                         });
@@ -714,6 +915,7 @@ class _LogYourSymptomsState extends State<LogYourSymptoms>
                     ),
                     CommonSymptomsWidget(
                       onTap: () {
+                        showDysmenorrheaDialog(context);
                         setState(() {
                           mViewModel.selectedCramps = 4;
                           mViewModel.count += 1;
@@ -1401,6 +1603,18 @@ class _LogYourSymptomsState extends State<LogYourSymptoms>
                   label: 'Save',
                   buttonColor: CommonColors.primaryColor,
                   onPress: () {
+                    mViewModel.postUserSymptomsLogApi(body: {
+                      "location": mViewModel.selectedLocationArray,
+                      "cramps": mViewModel.selectedCramps,
+                      "days": mViewModel.selectedDays,
+                      "collectionMethod": mViewModel.selectedCollection,
+                      "frequencyOfChangeDay":
+                          mViewModel.selectedFrequency.toString(),
+                      "mood": mViewModel.selectedMood,
+                      "energy": mViewModel.selectedEnergy,
+                      "stress": mViewModel.selectedStress,
+                      "acne": mViewModel.selectedAcne,
+                    });
                     CommonUtils.showSnackBar(
                       ' Data Save Successfully.',
                       color: CommonColors.greenColor,

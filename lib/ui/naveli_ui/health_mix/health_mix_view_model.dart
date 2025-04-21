@@ -92,12 +92,15 @@ class HealthMixViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getHealthMixPostsApi({required int titleId}) async {
+  Future<void> getHealthMixPostsApi({required int titleId,required String type}) async {
+
     CommonUtils.showProgressDialog();
     Map<String, dynamic> params = <String, dynamic>{
       ApiParams.title_id: titleId,
+      "type": type,
       ApiParams.language_code: AppPreferences.instance.getLanguageCode(),
     };
+    debugPrint("params: $params");
     HealthMixPostMaster? master =
         await _services.api!.getHealthMixPosts(params: params);
     CommonUtils.hideProgressDialog();
@@ -116,6 +119,7 @@ class HealthMixViewModel with ChangeNotifier {
       //   color: CommonColors.greenColor,
       // );
       healthPostsList = master.data?.healthMixPosts ?? [];
+      debugPrint("healthPostsList: $healthPostsList");
       // isLikedList = List.generate(healthPostsList.length, (_) => false);
       await getLikedPostApi();
     }
