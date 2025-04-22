@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:naveli_2023/utils/global_variables.dart';
@@ -73,6 +72,7 @@ class WaterReminderViewModel with ChangeNotifier {
 
   // Method to show a notification
   void _showNotification() {
+
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: 10,
@@ -84,6 +84,7 @@ class WaterReminderViewModel with ChangeNotifier {
             'https://c.ndtvimg.com/2022-11/089qdk1g_benefits-of-drinking-water-before-brushing_625x300_24_November_22.jpg', // Change this to your image path
       ),
     );
+
   }
 
   // Method to convert dropdown value to minutes

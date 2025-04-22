@@ -52,6 +52,7 @@ class AboutYourCycleReponse {
 
 class CycleTableData {
   String? _periodDate;
+  String? _period_start_date;
   String? _periodLength;
   String? _periodCycleLength;
   int? _cycleLengthDeviation;
@@ -61,6 +62,7 @@ class CycleTableData {
 
   CycleTableData(
       {String? periodDate,
+      String? period_start_date,
       String? periodLength,
       String? periodCycleLength,
       int? cycleLengthDeviation,
@@ -90,11 +92,18 @@ class CycleTableData {
     if (cycleLengthInterpretation != null) {
       _cycleLengthInterpretation = cycleLengthInterpretation;
     }
+    if (period_start_date != null) {
+      _period_start_date = period_start_date;
+    }
   }
 
   int? get cycleLengthDeviation => _cycleLengthDeviation;
 
   set cycleLengthDeviation(int? deviation) => _cycleLengthDeviation = deviation;
+
+  String? get period_start_date => _period_start_date;
+
+  set period_start_date(String? date) => _period_start_date = date;
 
   int? get periodLengthDeviation => _periodLengthDeviation;
 
@@ -126,6 +135,7 @@ class CycleTableData {
     _periodLength = json['period_length'].toString();
     _cycleLengthDeviation = json['period_cycle_length_deviation'];
     _periodLengthDeviation = json['period_length_deviation'];
+    _period_start_date = json['period_start_date'];
   }
 
   Map<String, dynamic> toJson() {
@@ -137,6 +147,7 @@ class CycleTableData {
     data['period_length_deviation'] = _periodLengthDeviation;
     data['period_cycle_length_interpretation'] = _cycleLengthInterpretation;
     data['period_length_interpretation'] = _periodCycleLengthInterpretation;
+    data['period_start_date'] = _period_start_date;
     return data;
   }
 }

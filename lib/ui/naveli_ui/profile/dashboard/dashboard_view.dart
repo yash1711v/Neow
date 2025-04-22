@@ -971,129 +971,175 @@ class _DashboardViewState extends State<DashboardView> {
 
                         kCommonSpaceV20,
                         kCommonSpaceV20,
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(10.0),
-                                bottomRight: Radius.circular(0.0),
-                                topLeft: Radius.circular(10.0),
-                                bottomLeft: Radius.circular(0.0)),
-                            color: Colors.white,
-                          ),
-                          padding: EdgeInsets.all(20),
-                          width: double.infinity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Last 3 Peroids",
-                                style: TextStyle(
-                                  color: CommonColors.blackColor,
-                                  fontSize: 14,
-                                ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Last 3 Peroids",
+                              style: TextStyle(
+                                color: CommonColors.blackColor,
+                                fontSize: 14,
                               ),
-                              Text(
-                                "Duration",
-                                style: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 139, 134, 134),
-                                  fontSize: 12,
-                                ),
+                            ),
+                            Text(
+                              "Duration",
+                              style: TextStyle(
+                                color:
+                                    const Color.fromARGB(255, 139, 134, 134),
+                                fontSize: 12,
                               ),
-                              kCommonSpaceV10,
-                              Container(
-                                height: 120,
-                                child: LineChart(
-                                  LineChartData(
-                                    gridData: FlGridData(show: false),
-                                    // Hide grid lines
-                                    titlesData: FlTitlesData(
-                                      leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles:
-                                              true, // Hide left titles (labels)
-                                          reservedSize: 20,
-                                          interval: 28,
-                                          getTitlesWidget: (value, meta) {
-                                            return Text(
-                                              value.toStringAsFixed(0),
-                                              // Format Y-axis values
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 12,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles:
-                                              false, // Hide bottom titles (labels)
-                                        ),
-                                      ),
-                                      topTitles: AxisTitles(
-                                        // Hide top titles if any
-                                        sideTitles: SideTitles(
-                                          showTitles:
-                                              false, // Hide top titles (labels)
-                                        ),
-                                      ),
-                                      rightTitles: AxisTitles(
-                                        // Hide right titles if any
-                                        sideTitles: SideTitles(
-                                          showTitles:
-                                              false, // Hide right titles (labels)
-                                        ),
-                                      ),
+                            ),
+                            kCommonSpaceV10,
+                            Container(
+                              height: 400,
+                              color: Colors.white,
+                              padding: EdgeInsets.all(25),
+                              child: LineChart(
+                                LineChartData(
+                                  lineTouchData: LineTouchData(
+                                    handleBuiltInTouches: true, // Enables tap/touch
+                                    touchTooltipData: LineTouchTooltipData(
+                                      tooltipRoundedRadius: 8,
+                                      fitInsideHorizontally: true,
+                                      fitInsideVertically: true,
+                                      getTooltipItems: (touchedSpots) {
+                                        return touchedSpots.map((touchedSpot) {
+                                          const monthNames = [
+                                            '', // index 0 is unused to align 1-based month numbers
+                                            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+                                          ];
+
+                                          String monthLabel = '';
+                                          if (touchedSpot.x >= 1 && touchedSpot.x <= 12) {
+                                            monthLabel = monthNames[touchedSpot.x.toInt()];
+                                          }
+                                          return LineTooltipItem(
+                                            'Month: ${monthLabel}\nCycle Length: ${touchedSpot.y.toStringAsFixed(0)}',
+                                            const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          );
+                                        }).toList();
+                                      },
                                     ),
-                                    borderData: FlBorderData(
-                                      show: true,
-                                      border: Border.all(
-                                        color: const Color.fromARGB(
-                                            255, 204, 207, 209),
-                                        width: 0.5,
-                                      ),
-                                    ),
-                                    minX: 0,
-                                    maxX: 15,
-                                    minY: 0,
-                                    maxY: 45,
-                                    lineBarsData: [
-                                      LineChartBarData(
-                                        spots: mViewModel.scaledSpots,
-                                        /*[
-                                          FlSpot(double.parse(mViewModel.dataList[0]
-                                              .periodLength??"0"), double.parse(mViewModel.dataList[0]
-                                              .periodCycleLength??"0")),
-                                          FlSpot(double.parse(mViewModel.dataList[1]
-                                              .periodLength??"0"), double.parse(mViewModel.dataList[0]
-                                              .periodCycleLength??"0")), // First point
-                                          */ /*FlSpot(8, 28), // Second point
-                                          FlSpot(14, 45), // Third point*/ /*
-                                        ],*/
-                                        isCurved: true,
-                                        color: CommonColors.primaryColor
-                                            .withOpacity(0.2),
-                                        dotData: FlDotData(show: false),
-                                        belowBarData: BarAreaData(
-                                          show: true,
-                                          color: CommonColors.primaryColor
-                                              .withOpacity(
-                                                  0.2), // Color below the line
-                                        ),
-                                        aboveBarData: BarAreaData(
-                                          show: false,
-                                          color: Colors.blue.withOpacity(
-                                              0.8), // Color above the line
-                                        ),
-                                      ),
-                                    ],
                                   ),
+                                  gridData: FlGridData(show: false),
+                                  // Hide grid lines
+                                  titlesData: FlTitlesData(
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles:
+                                            true, // Hide left titles (labels)
+                                        reservedSize: 15,
+                                        interval: 5,
+                                        getTitlesWidget: (value, meta) {
+                                          return Text(
+                                            value.toStringAsFixed(0),
+                                            // Format Y-axis values
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        getTitlesWidget: (data,meta){
+                                          const monthNames = [
+                                            '', // index 0 is unused to align 1-based month numbers
+                                            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+                                          ];
+
+                                          String monthLabel = '';
+                                          if (data >= 1 && data <= 12) {
+                                            monthLabel = monthNames[data.toInt()];
+                                          }
+
+                                          return Text(
+                                            monthLabel,
+                                            // Format X-axis values
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                            ),
+                                          );
+                                        },
+                                        reservedSize: 26,
+                                        showTitles:
+                                            true, // Hide bottom titles (labels)
+                                      ),
+                                    ),
+                                    topTitles: AxisTitles(
+                                      // Hide top titles if any
+                                      sideTitles: SideTitles(
+                                        showTitles:
+                                            false, // Hide top titles (labels)
+                                      ),
+                                    ),
+                                    rightTitles: AxisTitles(
+                                      // Hide right titles if any
+                                      sideTitles: SideTitles(
+                                        showTitles:
+                                            false, // Hide right titles (labels)
+                                      ),
+                                    ),
+                                  ),
+                                  borderData: FlBorderData(
+                                    show: true,
+                                    border: Border.all(
+                                      color: const Color.fromARGB(
+                                          255, 204, 207, 209),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  minX: 0,
+                                  maxX: 5,
+                                  minY: 0,
+                                  maxY: 45,
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: mViewModel.scaledSpots,
+
+                                      isCurved: true,
+                                      color: CommonColors.primaryColor
+                                          .withOpacity(0.2),
+                                      dotData: FlDotData(show: true,
+
+                                      getDotPainter: (value,data,bardata,index){
+                                        return FlDotCirclePainter(
+                                          radius: 4,
+                                          color: CommonColors.primaryColor
+                                              .withOpacity(0.2),
+                                          strokeWidth: 2,
+                                          strokeColor: CommonColors.primaryColor
+                                              .withOpacity(0.2),
+                                        );
+
+                                       }
+                                      ),
+                                      belowBarData: BarAreaData(
+                                        show: false,
+                                        color: CommonColors.primaryColor
+                                            .withOpacity(
+                                                0.2), // Color below the line
+                                      ),
+                                      aboveBarData: BarAreaData(
+                                        show: false,
+                                        color: Colors.blue.withOpacity(
+                                            0.8), // Color above the line
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            kCommonSpaceV10,
+                          ],
                         ),
                         // Add more widgets if needed (e.g. LineChart or additional content)
                       ],

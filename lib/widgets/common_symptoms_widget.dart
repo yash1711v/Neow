@@ -361,7 +361,7 @@ class _CommonSymptomsTitleState extends State<CommonSymptomsTitle> {
                                 backgroundColor: CommonColors.mTransparent,
                                 content: Container(
                                     // color:CommonColors.mWhite,
-                                   height: kDeviceHeight/4,
+                                    height: kDeviceHeight / 4,
                                     width: kDeviceWidth - 20,
                                     decoration: BoxDecoration(
                                       color: CommonColors.mWhite,
@@ -379,7 +379,8 @@ class _CommonSymptomsTitleState extends State<CommonSymptomsTitle> {
                                             height: 5,
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.end,
@@ -397,14 +398,13 @@ class _CommonSymptomsTitleState extends State<CommonSymptomsTitle> {
                                           Container(
                                             color: CommonColors.mWhite,
                                             padding: const EdgeInsets.only(
-                                                left: 15,
-                                                right: 15,
-                                                bottom: 5),
+                                                left: 15, right: 15, bottom: 5),
                                             child: Text(
                                               widget.title,
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                  color: CommonColors.primaryColor,
+                                                  color:
+                                                      CommonColors.primaryColor,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 20),
                                             ),
@@ -412,8 +412,9 @@ class _CommonSymptomsTitleState extends State<CommonSymptomsTitle> {
                                           Container(
                                             color: CommonColors.mWhite,
                                             padding: const EdgeInsets.only(
-                                                left: 15,
-                                                right: 15,),
+                                              left: 15,
+                                              right: 15,
+                                            ),
                                             child: Text(
                                               widget.dialogText ?? "Some text",
                                               textAlign: TextAlign.center,
@@ -445,10 +446,13 @@ class _CommonSymptomsTitleState extends State<CommonSymptomsTitle> {
                                 ), */
                               ),
                               Positioned(
-                                top: MediaQuery.of(context).size.height/2 - 125,
+                                top: MediaQuery.of(context).size.height / 2 -
+                                    125,
                                 left: 55,
-                                child: Image.asset("assets/images/ic_pin.png",width: 35,),
-
+                                child: Image.asset(
+                                  "assets/images/ic_pin.png",
+                                  width: 35,
+                                ),
                               ),
                             ],
                           );

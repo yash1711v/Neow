@@ -241,7 +241,7 @@ class DashBoardViewModel with ChangeNotifier {
         List<FlSpot> spotList=[];
         for(int i=0;i<max3Lenght;i++){
           //print("ddddddPeriodLenght===>${dataList[i].periodLength??"0"}");
-          spotList.add(FlSpot(double.parse(dataList[i].periodLength??"0"),double.parse(dataList[i].periodCycleLength??"0")));
+          spotList.add(FlSpot(double.parse(DateTime.parse(dataList[i].period_start_date??"0").month.toString()),double.parse(dataList[i].periodCycleLength??"0")));
         }
         top3Spots = List.from(spotList)
           ..sort((a, b) => b.y.compareTo(a.y)) // Sort by Y value descending
