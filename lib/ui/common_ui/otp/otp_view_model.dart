@@ -33,7 +33,7 @@ class OTPViewModel with ChangeNotifier {
       CommonUtils.showProgressDialog();
       await _auth.signInWithCredential(credential);
       CommonUtils.hideProgressDialog();
-      SignInViewModel().loginApi(mobile: phone, roleId: int.parse(userRoleId));
+      await SignInViewModel().loginApi(mobile: phone, roleId: int.parse(userRoleId));
       print('OTP is correct');
     } catch (e) {
       print('OTP is wrong');

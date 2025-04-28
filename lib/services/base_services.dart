@@ -226,4 +226,6 @@ abstract class BaseServices {
   Future<AboutYourCycleReponse?> getAboutYourCycle();
 
   Future<Map<String,dynamic>> postUserSymptoms({required Map<String, dynamic> body});
+
+  Future<Map<String,dynamic>> getDialogBoxData();
 }

@@ -48,7 +48,7 @@ Future<void> main() async {
   //         kDebugMode ? AndroidProvider.playIntegrity : AndroidProvider.playIntegrity);
   print('Firebase Project ID: ${options.projectId}');
   await NotificationService().initService();
-  await NotificationService.initializeNotification();
+  // await NotificationService.initializeNotification();
   // tz.initializeTimeZones();
   runApp(const App());
 

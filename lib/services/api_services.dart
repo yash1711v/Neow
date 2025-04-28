@@ -1286,4 +1286,20 @@ class ApiServices extends BaseServices {
     }
   }
 
+  @override
+  Future<Map<String, dynamic>> getDialogBoxData() async {
+    dynamic response = await appBaseClient.getApiWithTokenCall(url: ApiUrl.notification);
+    debugPrint("response in overriding ${response}");
+    if (response != null) {
+      try {
+        return response;
+      } on Exception catch (e) {
+        log("Exception :: $e");
+        return {};
+      }
+    } else {
+      return {};
+    }
+  }
+
 }

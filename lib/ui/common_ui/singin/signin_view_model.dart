@@ -39,6 +39,7 @@ class SignInViewModel with ChangeNotifier {
     };
 
     LoginMaster? master = await _services.api!.login(params: params);
+    debugPrint("Login Response :: ${jsonEncode(master)}");
     CommonUtils.hideProgressDialog();
     if (master == null) {
       CommonUtils.oopsMSG();

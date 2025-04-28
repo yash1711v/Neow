@@ -81,6 +81,7 @@ class _HomeViewState extends State<HomeView> {
 
     Future.delayed(Duration.zero, () {
       mViewModel.attachedContext(context);
+      mViewModel.getDialogBox(context);
       mViewYourNaveliModel =
           Provider.of<YourNaveliViewModel>(context, listen: false);
       mViewHealthMixModel =
